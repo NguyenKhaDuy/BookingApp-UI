@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Bell } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export default function HeaderBooking() {
     const [open, setOpen] = useState(false);
@@ -33,7 +34,7 @@ export default function HeaderBooking() {
     ];
 
     return (
-        <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10">
+        <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10 ">
             <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
                 {/* Logo */}
                 <div className="flex items-center gap-3 cursor-pointer">
@@ -50,10 +51,10 @@ export default function HeaderBooking() {
                 {/* Navigation Desktop */}
                 <nav className="hidden md:flex items-center gap-10 text-gray-200 font-medium">
                     {[
-                        { label: 'Dịch vụ', href: '#services' },
-                        { label: 'Kỹ thuật viên', href: '#technicians' },
-                        { label: 'Bảng giá', href: '#pricing' },
-                        { label: 'Liên hệ', href: '#contact' },
+                        { label: 'Dịch vụ', href: '/services' },
+                        { label: 'Kỹ thuật viên', href: '/technicians' },
+                        { label: 'Bảng giá', href: '/pricing' },
+                        { label: 'Liên hệ', href: '/contact' },
                     ].map((item) => (
                         <a key={item.href} href={item.href} className="relative group transition-all">
                             <span className="group-hover:text-orange-500 transition">{item.label}</span>
@@ -89,7 +90,9 @@ export default function HeaderBooking() {
                                         exit={{ opacity: 0, y: -10 }}
                                         className="absolute right-0 mt-3 w-80 bg-[#0f1f36] text-white rounded-xl shadow-xl border border-white/10 overflow-hidden"
                                     >
-                                        <div className="p-4 font-semibold border-b border-white/10">Thông báo</div>
+                                        <div className="p-4 font-bold border-b border-white/10 text-orange-500 uppercase">
+                                            Thông báo
+                                        </div>
 
                                         <div className="max-h-80 overflow-y-auto">
                                             {notifications.map((n) => (
@@ -114,19 +117,26 @@ export default function HeaderBooking() {
                     {/* User avatar / Login – Register buttons */}
                     {!isLoggedIn ? (
                         <div className="hidden md:flex items-center gap-3">
-                            <button className="bg-transparent border border-orange-500 text-orange-500 px-5 py-2.5 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition shadow-md">
-                                Đăng nhập
-                            </button>
-                            <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:opacity-90 transition shadow-md">
-                                Đăng ký
-                            </button>
+                            import {Link} from "react-router-dom";
+                            <Link to="/login">
+                                <button className="bg-transparent border border-orange-500 text-orange-500 px-5 py-2.5 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition shadow-md">
+                                    Đăng nhập
+                                </button>
+                            </Link>
+                            <Link to="/register">
+                                <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:opacity-90 transition shadow-md">
+                                    Đăng ký
+                                </button>
+                            </Link>
                         </div>
                     ) : (
-                        <img
-                            src={user.avatar}
-                            alt="avatar"
-                            className="w-10 h-10 rounded-full border border-white/20 cursor-pointer"
-                        />
+                        <Link to="/profile">
+                            <img
+                                src={user.avatar}
+                                alt="avatar"
+                                className="w-10 h-10 rounded-full border border-white/20 cursor-pointer"
+                            />
+                        </Link>
                     )}
 
                     {/* Mobile menu button */}
@@ -168,18 +178,25 @@ export default function HeaderBooking() {
                             {/* Login / Avatar mobile */}
                             {!isLoggedIn ? (
                                 <div className="flex flex-col gap-3 mt-3">
-                                    <button className="bg-transparent border border-orange-500 text-orange-500 px-6 py-2.5 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition shadow-md w-full">
+                                    <Link
+                                        to="/login"
+                                        className="block bg-transparent border border-orange-500 text-orange-500 px-6 py-2.5 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition shadow-md w-full text-center"
+                                    >
                                         Đăng nhập
-                                    </button>
-                                    <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:opacity-90 transition shadow-md w-full">
+                                    </Link>
+
+                                    <Link
+                                        to="/register"
+                                        className="block bg-gradient-to-r from-orange-500 to-orange-600 text-white px-6 py-2.5 rounded-xl font-semibold hover:opacity-90 transition shadow-md w-full text-center"
+                                    >
                                         Đăng ký
-                                    </button>
+                                    </Link>
                                 </div>
                             ) : (
-                                <div className="flex items-center gap-3 mt-3">
+                                <Link to="/profile" className="flex items-center gap-3 mt-3 cursor-pointer">
                                     <img src={user.avatar} className="w-10 h-10 rounded-full" />
                                     <span>{user.name}</span>
-                                </div>
+                                </Link>
                             )}
                         </nav>
                     </motion.div>
