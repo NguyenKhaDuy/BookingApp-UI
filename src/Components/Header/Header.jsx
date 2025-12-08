@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 export default function HeaderBooking() {
     const [open, setOpen] = useState(false);
@@ -37,16 +38,19 @@ export default function HeaderBooking() {
         <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10 ">
             <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">
                 {/* Logo */}
-                <div className="flex items-center gap-3 cursor-pointer">
-                    <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-white font-extrabold text-xl shadow-xl"
-                    >
-                        T
-                    </motion.div>
-                    <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">TechBooking</span>
-                </div>
+                <Link to={'/'}>
+                    <div className="flex items-center gap-3 cursor-pointer">
+                        <motion.div
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            className="w-12 h-12 rounded-2xl shadow-xl overflow-hidden flex items-center justify-center"
+                        >
+                            <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-2xl" />
+                        </motion.div>
+
+                        <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">BookingApp</span>
+                    </div>
+                </Link>
 
                 {/* Navigation Desktop */}
                 <nav className="hidden md:flex items-center gap-10 text-gray-200 font-medium">
@@ -67,7 +71,7 @@ export default function HeaderBooking() {
                 <div className="flex items-center gap-4">
                     {/* Notification icon */}
                     {isLoggedIn && (
-                        <div className="relative">
+                        <div className="relative mt-auto">
                             <button
                                 onClick={() => {
                                     setNotifOpen(!notifOpen);
@@ -114,22 +118,33 @@ export default function HeaderBooking() {
                         </div>
                     )}
 
-                    {/* User avatar / Login – Register buttons */}
-                    {!isLoggedIn ? (
-                        <div className="hidden md:flex items-center gap-3">
-                            import {Link} from "react-router-dom";
-                            <Link to="/login">
-                                <button className="bg-transparent border border-orange-500 text-orange-500 px-5 py-2.5 rounded-xl font-semibold hover:bg-orange-500 hover:text-white transition shadow-md">
-                                    Đăng nhập
-                                </button>
-                            </Link>
-                            <Link to="/register">
-                                <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:opacity-90 transition shadow-md">
-                                    Đăng ký
-                                </button>
-                            </Link>
-                        </div>
-                    ) : (
+                    {/* ⭐ NEW – REQUEST MANAGER ICON */}
+                    {isLoggedIn && (
+                        <Link to="/request" className="relative group">
+                            <div className="relative mt-auto">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="w-7 h-7 text-white group-hover:text-orange-500 transition"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                >
+                                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+                                    <path d="M9 3h6v4H9z" />
+                                </svg>
+
+                                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full shadow">
+                                    3
+                                </span>
+                            </div>
+                        </Link>
+                    )}
+
+                    {/* Avatar */}
+                    {isLoggedIn && (
                         <Link to="/profile">
                             <img
                                 src={user.avatar}
@@ -137,6 +152,27 @@ export default function HeaderBooking() {
                                 className="w-10 h-10 rounded-full border border-white/20 cursor-pointer"
                             />
                         </Link>
+                    )}
+
+                    {/* Nếu chưa đăng nhập → Hiện 2 nút login / register */}
+                    {!isLoggedIn && (
+                        <div className="hidden md:flex items-center gap-3">
+                            <Link
+                                to="/login"
+                                className="bg-transparent border border-orange-500 text-orange-500 px-5 py-2.5 rounded-xl font-semibold 
+            hover:bg-orange-500 hover:text-white transition shadow"
+                            >
+                                Đăng nhập
+                            </Link>
+
+                            <Link
+                                to="/register"
+                                className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-5 py-2.5 rounded-xl font-semibold 
+            hover:opacity-90 transition shadow"
+                            >
+                                Đăng ký
+                            </Link>
+                        </div>
                     )}
 
                     {/* Mobile menu button */}

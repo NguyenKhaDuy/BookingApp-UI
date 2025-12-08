@@ -10,7 +10,7 @@ import TechnicianDetailPage from './Pages/TechnicianDetailPage/TechnicianDetailP
 import Register from './Pages/Register/RegisterPage';
 import LoginPage from './Pages/Login/LoginPage'
 import ProfilePage from './Pages/ProfilePage/ProfilePage';
-
+import RequestPage from './Pages/RequestPage/RequestPage';
 function App() {
   return (
       <BrowserRouter>
@@ -24,6 +24,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<Register />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/request" element={<RequestPage />} />
           </Routes>
           <Footer />
       </BrowserRouter>
