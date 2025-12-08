@@ -60,10 +60,10 @@ export default function HeaderBooking() {
                         { label: 'Bảng giá', href: '/pricing' },
                         { label: 'Liên hệ', href: '/contact' },
                     ].map((item) => (
-                        <a key={item.href} href={item.href} className="relative group transition-all">
+                        <Link key={item.href} to={item.href} className="relative group transition-all">
                             <span className="group-hover:text-orange-500 transition">{item.label}</span>
                             <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-orange-500 rounded-full group-hover:w-full transition-all"></span>
-                        </a>
+                        </Link>
                     ))}
                 </nav>
 
@@ -100,16 +100,16 @@ export default function HeaderBooking() {
 
                                         <div className="max-h-80 overflow-y-auto">
                                             {notifications.map((n) => (
-                                                <button
+                                                <Link
                                                     key={n.id}
-                                                    onClick={() => (window.location.href = '/notification')}
+                                                    to='/notification'
                                                     className={`w-full text-left px-4 py-3 flex flex-col gap-1 border-b border-white/5 hover:bg-white/5 transition ${
                                                         n.unread ? 'bg-orange-500/10' : ''
                                                     }`}
                                                 >
                                                     <span className="font-medium">{n.title}</span>
                                                     <span className="text-xs text-gray-400">{n.time}</span>
-                                                </button>
+                                                </Link>
                                             ))}
                                         </div>
                                     </motion.div>

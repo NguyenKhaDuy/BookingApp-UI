@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 
 export default function TechnicianHero() {
     return (
-        <section className="w-full bg-[#0a1a2f] text-white py-24 px-6">
+        <section className="w-full bg-[#0a1a2f] text-white py-24 px-6 rounded-b-3xl shadow-xl">
             <div className="max-w-6xl mx-auto text-center space-y-6">
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
