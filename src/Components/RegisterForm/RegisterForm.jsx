@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import logo from '../../assets/logo.png'
 
 export default function RegisterForm({ onSendOtp }) {
     const [form, setForm] = useState({
@@ -17,9 +18,7 @@ export default function RegisterForm({ onSendOtp }) {
         <>
             {/* HEADER */}
             <div className="text-center mb-6">
-                <div className="w-14 h-14 bg-orange-500 rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold shadow-md">
-                    T
-                </div>
+                <img src={logo} alt="logo" className="w-20 h-20 object-contain mx-auto" />
                 <h1 className="text-2xl font-bold mt-4">Đăng ký</h1>
                 <p className="text-gray-500 text-sm mt-1">Nhập thông tin để tạo tài khoản mới</p>
             </div>

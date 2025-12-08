@@ -1,6 +1,7 @@
-import { User, Lock, Settings, LogOut } from 'lucide-react';
+// COMPONENT: ProfileSidebar.jsx
+import { User, Lock, Settings } from 'lucide-react';
 
-export default function ProfileSidebar({ active, setActive }) {
+export function ProfileSidebar({ active, setActive }) {
     return (
         <aside className="hidden md:flex flex-col w-64 bg-white border rounded-xl shadow p-6 h-fit sticky top-24">
             <div className="flex flex-col items-center text-center mb-10">
@@ -35,10 +36,6 @@ export default function ProfileSidebar({ active, setActive }) {
                     ${active === 'settings' ? 'bg-orange-500 text-white shadow' : 'hover:bg-orange-100'}`}
                 >
                     <Settings className="w-5 h-5" /> Cài đặt
-                </button>
-
-                <button className="flex items-center gap-3 p-3 text-red-500 hover:bg-red-100 rounded-xl mt-4">
-                    <LogOut className="w-5 h-5" /> Đăng xuất
                 </button>
             </nav>
         </aside>
