@@ -15,6 +15,8 @@ import ContactPage from './Pages/Client/ContactPage/ContactPage';
 import AdminHome from './Pages/Admin/AdminHome/AdminHome';
 import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
+import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
+import TechnicianHome from './Pages/Technician/TechnicianHome/TechnicianHome'
 function App() {
     return (
         <BrowserRouter>
@@ -39,6 +41,9 @@ function App() {
                 <Route element={<DashboardLayout />}>
                     <Route path="/admin/home" element={<AdminHome />} />
                 </Route>
+
+                {/* ================= TECHNICIAN LAYOUT ================= */}
+                <Route path="/technician/home" element={<TechnicianLayout />} />
             </Routes>
         </BrowserRouter>
     );
