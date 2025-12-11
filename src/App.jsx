@@ -13,6 +13,7 @@ import ForgotPassword from './Pages/Client/ForgotPasswordPage/ForgotPasswordPage
 import BookingPage from './Pages/Client/BookingPage/BookingPage';
 import ContactPage from './Pages/Client/ContactPage/ContactPage';
 import AdminHome from './Pages/Admin/AdminHome/AdminHome';
+import AdminCustomer from './Pages/Admin/AdminHome/AdminCustomers';
 import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
 import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
@@ -38,9 +39,10 @@ function App() {
                 </Route>
 
                 {/* ================= ADMIN LAYOUT ================= */}
-                <Route element={<DashboardLayout />}>
-                    <Route path="/admin/home" element={<AdminHome />} />
-                </Route>
+                <Route path='/admin/home' element={<DashboardLayout />} />
+                {/* <Route path="/admin/home" element={<AdminHome />} />
+                    <Route path="/admin/users" element={<AdminCustomer />} /> */}
+                {/* </Route> */}
 
                 {/* ================= TECHNICIAN LAYOUT ================= */}
                 <Route path="/technician/home" element={<TechnicianLayout />} />
