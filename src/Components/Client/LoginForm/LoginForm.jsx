@@ -44,18 +44,20 @@ export default function LoginForm() {
 
     return (
         <form className="w-full space-y-5" onSubmit={handleSubmit}>
-           {/* ... (Phần UI giữ nguyên) ... */}
+            {/* ... (Phần UI giữ nguyên) ... */}
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-gray-700">Email</label>
                 <div className="relative">
-                    <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                    <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                         type="email"
                         name="email"
                         value={form.email}
                         onChange={handleChange}
                         placeholder="Nhập email của bạn"
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300"
+                        className="w-full pl-10 pr-4 py-3 border rounded-lg bg-white
+        focus:border-orange-500 focus:ring-2 focus:ring-orange-300
+        outline-none transition"
                         required
                     />
                 </div>
@@ -64,14 +66,16 @@ export default function LoginForm() {
             <div className="flex flex-col gap-2">
                 <label className="text-sm font-semibold text-gray-700">Mật khẩu</label>
                 <div className="relative">
-                    <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+                    <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                         type="password"
                         name="password"
                         value={form.password}
                         onChange={handleChange}
                         placeholder="Nhập mật khẩu"
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-300"
+                        className="w-full pl-10 pr-4 py-3 border rounded-lg bg-white
+        focus:border-orange-500 focus:ring-2 focus:ring-orange-300
+        outline-none transition"
                         required
                     />
                 </div>
