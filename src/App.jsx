@@ -38,9 +38,10 @@ function App() {
                 </Route>
 
                 {/* ================= ADMIN LAYOUT ================= */}
-                <Route element={<DashboardLayout />}>
-                    <Route path="/admin/home" element={<AdminHome />} />
-                </Route>
+                <Route path='/admin/home' element={<DashboardLayout />} />
+                {/* <Route path="/admin/home" element={<AdminHome />} />
+                    <Route path="/admin/users" element={<AdminCustomer />} /> */}
+                {/* </Route> */}
 
                 {/* ================= TECHNICIAN LAYOUT ================= */}
                 <Route path="/technician/home" element={<TechnicianLayout />} />
