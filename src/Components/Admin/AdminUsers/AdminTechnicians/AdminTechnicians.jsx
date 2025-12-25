@@ -545,51 +545,150 @@ export default function AdminTechnicians() {
                 </div>
             )}
 
-            {/* Detail Modal */}
-            {showDetail && (
+            {/* Technician Detail Modal */}
+            {showDetail && selected && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h3 className="text-xl font-semibold mb-4">Technician Details</h3>
+                    <div className="bg-white rounded-lg w-full max-w-2xl p-6 shadow-lg overflow-y-auto max-h-[90vh]">
+                        <h3 className="text-xl font-semibold mb-6 text-center">Technician Details</h3>
 
-                        <div className="space-y-3 text-sm">
-                            <div className="flex flex-col items-center gap-2">
-                                <div>
-                                    <strong>ID: </strong>
-                                    {selected.id_user}
-                                </div>
-                                <img src={selected.avatarBase64} className="w-24 h-24 rounded-full object-cover" />
-                            </div>
-                            <div></div>
+                        {/* Avatar + ID */}
+                        <div className="flex flex-col items-center gap-2 mb-6">
+                            <img
+                                src={selected.avatarBase64}
+                                alt="avatar"
+                                className="w-28 h-28 rounded-full object-cover border"
+                            />
+                            <span className="text-sm text-gray-500">ID: {selected.id_user}</span>
+                        </div>
+
+                        {/* Detail Info */}
+                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
                             <div>
-                                <strong>Full Name:</strong> {selected.full_name}
+                                <strong>Full Name:</strong>
+                                <div>{selected.full_name}</div>
                             </div>
+
                             <div>
-                                <strong>Email:</strong> {selected.email}
+                                <strong>Email:</strong>
+                                <div>{selected.email}</div>
                             </div>
+
                             <div>
-                                <strong>Phone:</strong> {selected.phone_number}
+                                <strong>Phone:</strong>
+                                <div>{selected.phone_number}</div>
                             </div>
+
                             <div>
-                                <strong>Gender:</strong> {selected.gender}
+                                <strong>Gender:</strong>
+                                <div>{selected.gender}</div>
                             </div>
-                            <div>
-                                <strong>Address:</strong> {selected.address}
+
+                            <div className="col-span-2">
+                                <strong>Address:</strong>
+                                <div>{selected.address}</div>
                             </div>
+
                             <div>
-                                <strong>Date of Birth:</strong> {selected.dob}
+                                <strong>Date of Birth:</strong>
+                                <div>{selected.dob}</div>
                             </div>
+
                             <div>
-                                <strong>Role:</strong> {selected.roleDTOS?.map((r) => r.role_name).join(', ')}
-                            </div>
-                            <div>
-                                <strong>Created At:</strong> {selected.created_at}
-                            </div>
-                            <div>
-                                <strong>Updated At:</strong> {selected.updated_at}
+                                <strong>Working Area:</strong>
+                                <div>{selected.working_area}</div>
                             </div>
                         </div>
 
-                        {/* BUTTONS */}
+                        {/* Professional Info */}
+                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+                            <div>
+                                <strong>Experience (years):</strong>
+                                <div>{selected.experience_year}</div>
+                            </div>
+
+                            <div>
+                                <strong>Level:</strong>
+                                <div>{selected.level}</div>
+                            </div>
+
+                            <div>
+                                <strong>Status:</strong>
+                                <span
+                                    className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold
+                            ${
+                                selected.status_technician === 'ACTIVE'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-200 text-gray-600'
+                            }`}
+                                >
+                                    {selected.status_technician}
+                                </span>
+                            </div>
+
+                            <div>
+                                <strong>Total Star:</strong>
+                                <div>{selected.total_star ?? 0} ⭐</div>
+                            </div>
+
+                            <div>
+                                <strong>Technician Debt:</strong>
+                                <div>{selected.technician_debt ?? 0} đ</div>
+                            </div>
+                        </div>
+
+                        {/* Skills & Services */}
+                        <div className="text-sm mb-6 space-y-3">
+                            <div>
+                                <strong>Services:</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {selected.nameServiceTechnician?.length ? (
+                                        selected.nameServiceTechnician.map((s, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs"
+                                            >
+                                                {s}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400">No services</span>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div>
+                                <strong>Skills:</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {selected.nameSkillTechnician?.length ? (
+                                        selected.nameSkillTechnician.map((s, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs"
+                                            >
+                                                {s}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400">No skills</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Meta */}
+                        <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-6">
+                            <div>
+                                <strong>Created At:</strong>
+                                <div>{selected.created_at}</div>
+                            </div>
+
+                            <div>
+                                <strong>Updated At:</strong>
+                                <div>{selected.updated_at}</div>
+                            </div>
+                        </div>
+
+                        {/* ACTIONS */}
                         <div className="mt-5 flex justify-between items-center">
                             {/* Close */}
                             <button
