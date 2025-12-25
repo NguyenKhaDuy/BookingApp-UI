@@ -478,15 +478,20 @@ export default function AdminCustomer() {
                             <div>
                                 <strong>Role:</strong> {selected.roleDTOS?.map((r) => r.role_name).join(', ')}
                             </div>
-                            <div>
-                                <strong>Created At:</strong> {selected.created_at}
-                            </div>
-                            <div>
-                                <strong>Updated At:</strong> {selected.updated_at}
+                            <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-6">
+                                <div>
+                                    <strong>Created At:</strong>
+                                    <div>{selected.created_at}</div>
+                                </div>
+
+                                <div>
+                                    <strong>Updated At:</strong>
+                                    <div>{selected.updated_at}</div>
+                                </div>
                             </div>
                         </div>
 
-                        {/* BUTTONS */}
+                        {/* ACTIONS */}
                         <div className="mt-5 flex justify-between items-center">
                             {/* Close */}
                             <button
