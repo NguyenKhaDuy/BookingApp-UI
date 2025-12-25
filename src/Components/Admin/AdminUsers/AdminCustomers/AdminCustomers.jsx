@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { EyeIcon, Plus } from 'lucide-react';
+import { Camera, EyeIcon, Plus } from 'lucide-react';
 
 export default function AdminCustomer() {
     const [query, setQuery] = useState('');
@@ -183,7 +183,11 @@ export default function AdminCustomer() {
                         {currentUsers.map((c) => (
                             <tr key={c.id_user} className="border-t hover:bg-gray-50 transition hover:scale-100">
                                 <td className="p-3">
-                                    <img src={c.avatarBase64} className="w-12 h-12 rounded-full object-cover" alt="avatar" />
+                                    <img
+                                        src={c.avatarBase64}
+                                        className="w-12 h-12 rounded-full object-cover"
+                                        alt="avatar"
+                                    />
                                 </td>
                                 <td className="p-3">{c.id_user}</td>
                                 <td className="p-3">{c.full_name}</td>
@@ -245,9 +249,11 @@ export default function AdminCustomer() {
                 rounded-md border
                 font-semibold
                 transition
-                ${currentPage === page
-                                    ? 'bg-orange-500 text-white border-orange-500 shadow'
-                                    : 'bg-white text-gray-700 hover:bg-orange-100 hover:text-orange-600'}
+                ${
+                    currentPage === page
+                        ? 'bg-orange-500 text-white border-orange-500 shadow'
+                        : 'bg-white text-gray-700 hover:bg-orange-100 hover:text-orange-600'
+                }
             `}
                         >
                             {page}
@@ -278,6 +284,53 @@ export default function AdminCustomer() {
                         <h2 className="text-lg font-semibold mb-4">Edit Customer</h2>
 
                         <div className="space-y-3">
+                            {/* Upload Avatar */}
+                            <div className="flex justify-center">
+                                <div className="relative w-24 h-24">
+                                    {/* Avatar */}
+                                    <img
+                                        src={form.avatarBase64 || 'https://i.pravatar.cc/150?img=12'}
+                                        alt="Avatar"
+                                        className="w-24 h-24 rounded-full object-cover border transition hover:scale-105"
+                                    />
+
+                                    {/* Hidden file input */}
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        id="avatar-upload"
+                                        className="hidden"
+                                        onChange={(e) => {
+                                            const file = e.target.files[0];
+                                            if (file) {
+                                                const reader = new FileReader();
+                                                reader.onload = () =>
+                                                    setForm((s) => ({ ...s, avatarBase64: reader.result }));
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                    />
+
+                                    {/* Camera icon */}
+                                    <label
+                                        htmlFor="avatar-upload"
+                                        className="
+                absolute bottom-1 right-1
+                w-8 h-8
+                flex items-center justify-center
+                rounded-full
+                bg-black/50 text-white
+                cursor-pointer
+                hover:bg-orange-500
+                hover:ring-2 hover:ring-orange-300
+                transition-all
+            "
+                                    >
+                                        <Camera size={16} />
+                                    </label>
+                                </div>
+                            </div>
+
                             {/* Full Name */}
                             <div>
                                 <label className="block text-sm text-gray-600">Full Name</label>
@@ -344,32 +397,6 @@ export default function AdminCustomer() {
                                     className="w-full px-3 py-2 border rounded"
                                 />
                             </div>
-
-                            {/* Upload Avatar */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Avatar</label>
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            const reader = new FileReader();
-                                            reader.onload = () =>
-                                                setForm((s) => ({ ...s, avatarBase64: reader.result }));
-                                            reader.readAsDataURL(file);
-                                        }
-                                    }}
-                                    className="w-full"
-                                />
-                                {form.avatarBase64 && (
-                                    <img
-                                        src={form.avatarBase64}
-                                        alt="Avatar Preview"
-                                        className="w-20 h-20 rounded-full mt-2"
-                                    />
-                                )}
-                            </div>
                         </div>
 
                         <div className="mt-4 flex justify-end gap-2">
@@ -425,9 +452,14 @@ export default function AdminCustomer() {
                         <h3 className="text-xl font-semibold mb-4">Customer Details</h3>
 
                         <div className="space-y-3 text-sm">
-                            <div>
-                                <strong>ID:</strong> {selected.id_user}
+                            <div className="flex flex-col items-center gap-2">
+                                <div>
+                                    <strong>ID: </strong>
+                                    {selected.id_user}
+                                </div>
+                                <img src={selected.avatarBase64} className="w-24 h-24 rounded-full object-cover" />
                             </div>
+                            <div></div>
                             <div>
                                 <strong>Full Name:</strong> {selected.full_name}
                             </div>
@@ -446,16 +478,9 @@ export default function AdminCustomer() {
                             <div>
                                 <strong>Date of Birth:</strong> {selected.dob}
                             </div>
-
-                            <div>
-                                <strong>Avatar:</strong>
-                            </div>
-                            <img src={selected.avatarBase64} className="w-20 h-20 rounded-full" />
-
                             <div>
                                 <strong>Role:</strong> {selected.roleDTOS?.map((r) => r.role_name).join(', ')}
                             </div>
-
                             <div>
                                 <strong>Created At:</strong> {selected.created_at}
                             </div>
