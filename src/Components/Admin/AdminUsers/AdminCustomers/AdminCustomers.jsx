@@ -449,15 +449,12 @@ export default function AdminCustomer() {
             {showDetail && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h3 className="text-xl font-semibold mb-4">Customer Details</h3>
+                        <h3 className="text-xl font-semibold mb-6 text-center">Customer Details</h3>
 
                         <div className="space-y-3 text-sm">
                             <div className="flex flex-col items-center gap-2">
-                                <div>
-                                    <strong>ID: </strong>
-                                    {selected.id_user}
-                                </div>
                                 <img src={selected.avatarBase64} className="w-24 h-24 rounded-full object-cover" />
+                                <span className="text-sm text-gray-500">ID: {selected.id_user}</span>
                             </div>
                             <div></div>
                             <div>
