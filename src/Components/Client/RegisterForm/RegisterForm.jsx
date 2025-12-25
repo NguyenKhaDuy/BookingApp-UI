@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import logo from '../../../assets/logo.png'
+import logo from '../../../assets/logo.png';
+import { User, Mail, Phone, Lock } from 'lucide-react';
 
 export default function RegisterForm({ onSendOtp }) {
     const [form, setForm] = useState({
@@ -14,6 +15,15 @@ export default function RegisterForm({ onSendOtp }) {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
+    const inputClass =
+        'w-full pl-10 pr-4 py-3 border rounded-lg bg-white ' +
+        'focus:border-orange-500 focus:ring-2 focus:ring-orange-300 ' +
+        'outline-none transition';
+
+    const iconClass =
+        'w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 ' +
+        'group-focus-within:text-orange-500 transition';
+
     return (
         <>
             {/* HEADER */}
@@ -26,72 +36,77 @@ export default function RegisterForm({ onSendOtp }) {
             {/* FORM INPUTS */}
             <div className="space-y-4">
                 {/* Họ tên */}
-                <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Họ và tên"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    className="w-full border p-3 rounded-lg bg-white 
-                    focus:border-orange-500 focus:ring-2 focus:ring-orange-300 
-                    outline-none transition"
-                />
+                <div className="relative group">
+                    <User className={iconClass} />
+                    <input
+                        type="text"
+                        name="fullName"
+                        placeholder="Họ và tên"
+                        value={form.fullName}
+                        onChange={handleChange}
+                        className={inputClass}
+                    />
+                </div>
 
                 {/* Email */}
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    value={form.email}
-                    onChange={handleChange}
-                    className="w-full border p-3 rounded-lg bg-white
-                    focus:border-orange-500 focus:ring-2 focus:ring-orange-300 
-                    outline-none transition"
-                />
+                <div className="relative group">
+                    <Mail className={iconClass} />
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Email"
+                        value={form.email}
+                        onChange={handleChange}
+                        className={inputClass}
+                    />
+                </div>
 
                 {/* Số điện thoại */}
-                <input
-                    type="text"
-                    name="phone"
-                    placeholder="Số điện thoại"
-                    value={form.phone}
-                    onChange={handleChange}
-                    className="w-full border p-3 rounded-lg bg-white
-                    focus:border-orange-500 focus:ring-2 focus:ring-orange-300 
-                    outline-none transition"
-                />
+                <div className="relative group">
+                    <Phone className={iconClass} />
+                    <input
+                        type="text"
+                        name="phone"
+                        placeholder="Số điện thoại"
+                        value={form.phone}
+                        onChange={handleChange}
+                        className={inputClass}
+                    />
+                </div>
 
                 {/* Mật khẩu */}
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Mật khẩu"
-                    value={form.password}
-                    onChange={handleChange}
-                    className="w-full border p-3 rounded-lg bg-white
-                    focus:border-orange-500 focus:ring-2 focus:ring-orange-300 
-                    outline-none transition"
-                />
+                <div className="relative group">
+                    <Lock className={iconClass} />
+                    <input
+                        type="password"
+                        name="password"
+                        placeholder="Mật khẩu"
+                        value={form.password}
+                        onChange={handleChange}
+                        className={inputClass}
+                    />
+                </div>
 
                 {/* Xác nhận mật khẩu */}
-                <input
-                    type="password"
-                    name="confirmPassword"
-                    placeholder="Xác nhận mật khẩu"
-                    value={form.confirmPassword}
-                    onChange={handleChange}
-                    className="w-full border p-3 rounded-lg bg-white
-                    focus:border-orange-500 focus:ring-2 focus:ring-orange-300 
-                    outline-none transition"
-                />
+                <div className="relative group">
+                    <Lock className={iconClass} />
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Xác nhận mật khẩu"
+                        value={form.confirmPassword}
+                        onChange={handleChange}
+                        className={inputClass}
+                    />
+                </div>
 
-                {/* BUTTON GỬI OTP */}
+                {/* BUTTON */}
                 <button
                     onClick={() => onSendOtp(form.email)}
                     className="w-full bg-orange-500 text-white py-3 rounded-lg 
                     font-semibold shadow-md hover:bg-orange-600 transition"
                 >
-                    Đăng kí
+                    Đăng ký
                 </button>
             </div>
         </>
