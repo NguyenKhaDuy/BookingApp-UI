@@ -1,9 +1,28 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import RepairStatus from '../../../Components/Client/RepairStatus/RepairStatus';
 import RequestHeader from '../../../Components/Client/RequestHeader/RequestHeader';
 import Invoice from '../../../Components/Client/Invoice/Invoice';
+
 export default function RequestPage() {
     const [tab, setTab] = useState('request');
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('vnp_ResponseCode');
+        const txnRef = params.get('vnp_TxnRef');
+
+        if (code === '00' && txnRef) {
+            // ✅ tự chuyển sang tab hóa đơn
+            setTab('invoice');
+
+            // ✅ gọi backend cập nhật trạng thái
+            fetch(`http://localhost:8081/api/payment-info/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}`);
+
+            // ✅ xoá query param cho sạch URL
+            window.history.replaceState({}, document.title, '/request');
+        }
+    }, []);
+
     return (
         <Fragment>
             <RequestHeader />

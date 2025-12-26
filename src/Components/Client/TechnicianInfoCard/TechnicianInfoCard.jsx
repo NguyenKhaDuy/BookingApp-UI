@@ -5,16 +5,25 @@ export default function TechnicianInfoCard({ tech }) {
 
             <div className="space-y-3 text-gray-700">
                 <p>
-                    <strong>Kinh nghiệm:</strong> {tech.experience} năm
+                    <strong>Kinh nghiệm:</strong> {tech.experience_year} năm
                 </p>
                 <p>
-                    <strong>Khu vực làm việc:</strong> {tech.area}
+                    <strong>Giới tính:</strong> {tech.gender}
                 </p>
                 <p>
-                    <strong>Số công việc đã hoàn thành:</strong> {tech.jobsDone}
+                    <strong>Năm sinh:</strong> {tech?.dob ? `${tech.dob[2]}/${tech.dob[1]}/${tech.dob[0]}` : '—'}
                 </p>
                 <p>
-                    <strong>Số điện thoại:</strong> {tech.phone}
+                    <strong>Khu vực làm việc:</strong> {tech.working_area}
+                </p>
+                <p>
+                    <strong>Level:</strong> {tech.level}
+                </p>
+                <p>
+                    <strong>Số điện thoại:</strong> {tech.phone_number}
+                </p>
+                <p>
+                    <strong>Email:</strong> {tech.email}
                 </p>
             </div>
         </div>

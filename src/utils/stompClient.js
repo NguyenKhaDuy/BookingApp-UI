@@ -42,7 +42,6 @@ export function connectWebSocket(token = null) {
     return stompClient;
 }
 
-
 // Cho Home đăng ký hàm nhận thông báo
 export function addWebSocketListener(callback) {
     globalListeners.push(callback);
