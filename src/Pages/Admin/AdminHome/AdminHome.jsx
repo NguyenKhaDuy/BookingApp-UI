@@ -9,6 +9,7 @@ export default function AdminHome({ active }) {
             {active === 'dashboard' && <StatsGrid />}
             {active === 'users-customer' && <AdminCustomers />}
             {active === 'users-technician' && <AdminTechnicians />}
+            
         </Fragment>
     );
 }
