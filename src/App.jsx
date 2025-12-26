@@ -27,7 +27,7 @@ function App() {
                     <Route path="/notification" element={<Notification />} />
                     <Route path="/services" element={<ServicePage />} />
                     <Route path="/technicians" element={<TechnicianPage />} />
-                    <Route path="/technicians/techniciandetail" element={<TechnicianDetailPage />} />
+                    <Route path="/technicians/techniciandetail/:id_user" element={<TechnicianDetailPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/profile" element={<ProfilePage />} />

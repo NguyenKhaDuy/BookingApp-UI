@@ -3,13 +3,20 @@ import { CheckCircle, XCircle } from 'lucide-react';
 
 export default function Invoice() {
     const [status, setStatus] = useState('unpaid');
-    const [selectedInvoice, setSelectedInvoice] = useState(null); // POPUP DATA
-    const [showModal, setShowModal] = useState(false); // POPUP STATE
+
+    // xem chi tiết
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
+    const [showDetailModal, setShowDetailModal] = useState(false);
+
+    // thanh toán
+    const [showBankModal, setShowBankModal] = useState(false);
+    const [selectedBank, setSelectedBank] = useState('');
+    const [payInvoice, setPayInvoice] = useState(null);
 
     const invoiceList = {
         unpaid: [
             {
-                id: 1,
+                id: 'INV004',
                 service: 'Thông tắc lavabo',
                 technician: 'Thợ Bảo',
                 amount: 250000,
@@ -29,14 +36,68 @@ export default function Invoice() {
         ],
     };
 
+    const bankList = [
+        { code: 'NCB', name: 'Ngân hàng NCB' },
+        { code: 'VCB', name: 'Vietcombank' },
+        { code: 'ACB', name: 'ACB' },
+        { code: 'BIDV', name: 'BIDV' },
+        { code: 'TECHCOMBANK', name: 'Techcombank' },
+    ];
+
     const openDetail = (bill) => {
         setSelectedInvoice(bill);
-        setShowModal(true);
+        setShowDetailModal(true);
+    };
+
+    const openPayment = (bill) => {
+        setPayInvoice(bill);
+        setSelectedBank('');
+        setShowBankModal(true);
+    };
+
+    const getCookie = (name) => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    };
+
+    const token = getCookie('token');
+
+    
+
+    const handlePayment = async () => {
+        console.log("toeken: " + token);
+        const payload = {
+            bank: selectedBank,
+            amount: payInvoice.amount,
+            id_request: String(payInvoice.id),
+            requestType: 'invoice',
+        };
+
+        try {
+            const res = await fetch('http://localhost:8081/api/customer/payment/', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const paymentUrl = await res.text();
+
+            // redirect sang VNPAY
+            window.location.href = paymentUrl;
+        } catch (err) {
+            console.error(err);
+            alert('Thanh toán thất bại');
+        }
     };
 
     return (
         <div className="max-w-5xl mx-auto px-4 bg-white shadow rounded-xl p-5 border">
-            {/* STATUS FILTER */}
+            {/* FILTER */}
             <div className="flex gap-4 mb-6">
                 <button
                     onClick={() => setStatus('unpaid')}
@@ -55,11 +116,11 @@ export default function Invoice() {
                 </button>
             </div>
 
-            {/* INVOICE LIST */}
+            {/* LIST */}
             <div className="space-y-4">
                 {invoiceList[status].map((bill) => (
                     <div key={bill.id} className="border p-4 rounded-xl shadow-sm">
-                        <div className="flex items-center justify-between">
+                        <div className="flex justify-between items-center">
                             <div>
                                 <h3 className="font-bold text-lg">{bill.service}</h3>
                                 <p className="text-sm text-gray-500">
@@ -68,7 +129,6 @@ export default function Invoice() {
                                 <p className="font-semibold text-orange-600 mt-1">{bill.amount.toLocaleString()} đ</p>
                             </div>
 
-                            {/* ICON */}
                             {status === 'paid' ? (
                                 <CheckCircle className="text-green-500" size={32} />
                             ) : (
@@ -76,21 +136,18 @@ export default function Invoice() {
                             )}
                         </div>
 
-                        {/* BUTTONS */}
                         <div className="flex gap-3 mt-4">
-                            {/* XEM CHI TIẾT */}
                             <button
-                                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
                                 onClick={() => openDetail(bill)}
                             >
                                 Xem chi tiết
                             </button>
 
-                            {/* PAY BUTTON */}
                             {status === 'unpaid' && (
                                 <button
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-                                    onClick={() => alert('Đi tới trang thanh toán chuyển khoản')}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg"
+                                    onClick={() => openPayment(bill)}
                                 >
                                     Thanh toán ngay
                                 </button>
@@ -100,33 +157,72 @@ export default function Invoice() {
                 ))}
             </div>
 
-            {/* MODAL */}
-            {showModal && selectedInvoice && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-6 relative">
+            {/* MODAL CHI TIẾT */}
+            {showDetailModal && selectedInvoice && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white max-w-md w-full rounded-xl p-6">
                         <h2 className="text-xl font-bold mb-3">Chi tiết hóa đơn</h2>
                         <p>
-                            <strong>Dịch vụ:</strong> {selectedInvoice.service}
+                            <b>Dịch vụ:</b> {selectedInvoice.service}
                         </p>
                         <p>
-                            <strong>Thợ:</strong> {selectedInvoice.technician}
+                            <b>Thợ:</b> {selectedInvoice.technician}
                         </p>
                         <p>
-                            <strong>Ngày:</strong> {selectedInvoice.date}
+                            <b>Ngày:</b> {selectedInvoice.date}
                         </p>
                         <p>
-                            <strong>Số tiền:</strong> {selectedInvoice.amount.toLocaleString()} đ
+                            <b>Số tiền:</b> {selectedInvoice.amount.toLocaleString()} đ
                         </p>
-                        <p className="mt-2 text-gray-600 text-sm">
-                            <strong>Ghi chú:</strong> {selectedInvoice.note}
+                        <p className="mt-2 text-sm text-gray-600">
+                            <b>Ghi chú:</b> {selectedInvoice.note}
                         </p>
 
                         <button
-                            className="mt-6 w-full py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                            onClick={() => setShowModal(false)}
+                            className="mt-5 w-full bg-orange-500 text-white py-2 rounded-lg"
+                            onClick={() => setShowDetailModal(false)}
                         >
                             Đóng
                         </button>
+                    </div>
+                </div>
+            )}
+
+            {/* MODAL CHỌN NGÂN HÀNG */}
+            {showBankModal && payInvoice && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white max-w-md w-full rounded-xl p-6">
+                        <h2 className="text-xl font-bold mb-4">Chọn ngân hàng</h2>
+
+                        <select
+                            className="w-full border p-2 rounded-lg mb-4"
+                            value={selectedBank}
+                            onChange={(e) => setSelectedBank(e.target.value)}
+                        >
+                            <option value="">-- Chọn ngân hàng --</option>
+                            {bankList.map((bank) => (
+                                <option key={bank.code} value={bank.code}>
+                                    {bank.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <div className="flex gap-3">
+                            <button
+                                className="flex-1 bg-gray-300 py-2 rounded-lg"
+                                onClick={() => setShowBankModal(false)}
+                            >
+                                Hủy
+                            </button>
+
+                            <button
+                                className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+                                disabled={!selectedBank}
+                                onClick={handlePayment}
+                            >
+                                Thanh toán
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
