@@ -27,7 +27,7 @@ export default function LoginForm() {
             const res = await axios.post('http://localhost:8081/api/login/', form, { withCredentials: true });
 
             // 🔥 LƯU USER INFO
-            // localStorage.setItem('user', JSON.stringify(res.data));
+            localStorage.setItem('user', JSON.stringify(res.data));
             setUser(res.data); // cập nhật ngay UI Header
 
             const roles = res.data.roles || [];

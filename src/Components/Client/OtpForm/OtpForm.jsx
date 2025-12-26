@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
 
 export default function OtpForm({ email, onVerify }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
@@ -33,13 +34,26 @@ export default function OtpForm({ email, onVerify }) {
         }
     };
 
-    const resendOtp = () => {
+    const resendOtp = async () => {
         if (timer > 0) return;
-        setTimer(300);
-        setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0].focus();
-        alert('Mã OTP mới đã được gửi');
+
+        try {
+            const res = await axios.post(
+                'http://localhost:8081/api/resend-otp/',
+                {},
+                { withCredentials: true }, // ⭐ gửi session
+            );
+
+            setTimer(300);
+            setOtp(['', '', '', '', '', '']);
+            inputRefs.current[0].focus();
+            alert(res.data.message);
+        } catch (error) {
+            console.error(error);
+            alert(error.response?.data?.message || 'Gửi OTP thất bại');
+        }
     };
+
 
     const handleVerify = () => {
         onVerify(otp.join(''));

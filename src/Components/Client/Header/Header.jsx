@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
+import default_avatar from '../../../assets/default-avatar.jpg'
 
 export default function HeaderBooking() {
     const [open, setOpen] = useState(false); // mobile menu
@@ -15,7 +16,8 @@ export default function HeaderBooking() {
     const [services, setServices] = useState([]);
 
     const { user, setUser } = useContext(UserContext);
-    const isLoggedIn = !!user;
+    const isLoggedIn = !!user && typeof user === 'object' && user.id;
+
 
     const notifications = [
         { id: 1, title: 'Đơn sửa chữa đã được xác nhận', time: '5 phút trước', unread: true },
@@ -37,27 +39,33 @@ export default function HeaderBooking() {
     }, []);
 
 
-     useEffect(() => {
-         const fetchUser = async () => {
-             try {
-                 const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
-                 if (typeof res.data === 'object') {
-                     setUser(res.data);
-                 } else {
-                     setUser(null);
-                 }
-                //  localStorage.setItem('user', JSON.stringify(res.data));
-             } catch (err) {
-                 console.log('Chưa login');
-             }
-         };
-         fetchUser();
-     }, []);
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
+
+                // kiểm tra đúng user object
+                if (res.status === 200 && res.data?.id) {
+                    setUser(res.data);
+                    localStorage.setItem('user', JSON.stringify(res.data));
+                } else {
+                    setUser(null);
+                    localStorage.removeItem('user');
+                }
+            } catch (err) {
+                setUser(null);
+                localStorage.removeItem('user');
+            }
+        };
+
+        fetchUser();
+    }, []);
+
     
     console.log(user);
 
     const handleLogout = () => {
-        // localStorage.removeItem('user');
+        localStorage.removeItem('user');
         localStorage.removeItem('token');
         setUser(null);
         setAvatarMenuOpen(false);
@@ -211,7 +219,7 @@ export default function HeaderBooking() {
                                         src={
                                             user.avatarBase64
                                                 ? `data:image/png;base64,${user.avatarBase64}`
-                                                : '/default-avatar.png'
+                                                : default_avatar
                                         }
                                         alt="avatar"
                                         className="w-10 h-10 rounded-full border border-white/20 cursor-pointer"
@@ -363,7 +371,7 @@ export default function HeaderBooking() {
                                             src={
                                                 user.avatarBase64
                                                     ? `data:image/png;base64,${user.avatarBase64}`
-                                                    : '/default-avatar.png'
+                                                    : default_avatar
                                             }
                                             alt="avatar"
                                             className="w-10 h-10 rounded-full"
