@@ -39,8 +39,8 @@ function App() {
 
                 {/* ================= ADMIN LAYOUT ================= */}
                 <Route path='/admin/home' element={<DashboardLayout />} />
-                {/* <Route path="/admin/home" element={<AdminHome />} />
-                    <Route path="/admin/users" element={<AdminCustomer />} /> */}
+                {/* <Route path="/admin/home" element={<AdminHome />} /> */}
+                {/* <Route path="/admin/users" element={<AdminCustomer />} /> */}
                 {/* </Route> */}
 
                 {/* ================= TECHNICIAN LAYOUT ================= */}
