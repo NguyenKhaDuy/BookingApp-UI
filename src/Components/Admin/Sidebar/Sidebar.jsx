@@ -1,32 +1,26 @@
 import { useState } from 'react';
 import { Menu, Home, Users, Settings, BarChart3 } from 'lucide-react';
+import { Link } from 'react-router-dom';   // ➜ Quan trọng
 import logo from '../../../assets/logo.png';
 
 export default function Sidebar() {
     const [open, setOpen] = useState(true);
 
     const items = [
-        { icon: Home, label: 'Dashboard' },
-        { icon: Users, label: 'Users' },
-        { icon: BarChart3, label: 'Reports' },
-        { icon: Settings, label: 'Settings' },
+        { icon: Home, label: 'Dashboard', path: '/admin/home' },
+        { icon: Users, label: 'Users', path: '/admin/users' },     // ➜ Trang bạn muốn trỏ tới
+        { icon: BarChart3, label: 'Reports', path: '/admin/reports' },
+        { icon: Settings, label: 'Settings', path: '/admin/settings' },
     ];
 
     return (
         <div
-            className={`${
-                open ? 'w-64' : 'w-20'
-            } bg-white border-r shadow-sm h-screen flex flex-col transition-all duration-300 relative`}
+            className={`${open ? 'w-64' : 'w-20'
+                } bg-white border-r shadow-sm h-screen flex flex-col transition-all duration-300 relative`}
         >
             {/* Header */}
             <div className={`flex items-center gap-3 border-b ${open ? 'p-4' : 'p-2'} `}>
-                <img
-                    src={logo}
-                    alt="logo"
-                    className={`transition-all duration-300 
-                        ${open ? 'w-10 h-10' : 'w-10 h-10'}
-                    `}
-                />
+                <img src={logo} alt="logo" className="w-10 h-10" />
 
                 <h1
                     className={`text-xl font-semibold text-orange-500 transition-all duration-200
@@ -50,10 +44,13 @@ export default function Sidebar() {
                     const Icon = item.icon;
                     return (
                         <div key={index} className="group relative">
-                            <button className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-orange-100 text-gray-700">
+                            <Link
+                                to={item.path}
+                                className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-orange-100 text-gray-700"
+                            >
                                 <Icon size={20} />
                                 <span className={`${!open && 'hidden'}`}>{item.label}</span>
-                            </button>
+                            </Link>
 
                             {/* Tooltip khi thu nhỏ */}
                             {!open && (

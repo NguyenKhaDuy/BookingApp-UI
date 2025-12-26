@@ -1,52 +1,92 @@
 import React, { useState } from 'react';
 import { Camera, EyeIcon, Plus } from 'lucide-react';
 
-export default function AdminCustomer() {
+export default function AdminTechnicians() {
     const [query, setQuery] = useState('');
 
-    const [customers, setCustomers] = useState([
+    const [technicians, setTechnicians] = useState([
         {
-            id_user: 'CUS001',
-            full_name: 'Nguyễn Văn A',
-            address: 'Hà Nội',
-            phone_number: '0901234567',
-            email: 'vana@example.com',
-            avatarBase64: 'https://i.pravatar.cc/100?img=1',
-            dob: '10-05-2001',
+            id_user: 'TECH001',
+            full_name: 'Nguyễn Minh Khang',
+            address: 'Quận 1, TP HCM',
+            phone_number: '0908123456',
+            email: 'khang.tech@example.com',
+            avatarBase64: 'https://i.pravatar.cc/150?img=11',
+            dob: '15-04-1995',
             gender: 'Male',
-            roleDTOS: [{ role_name: 'USER' }],
-            created_at: '01-01-2024 08:30:00',
-            updated_at: '10-02-2024 12:10:00',
+            working_area: 'TP HCM',
+            experience_year: 5,
+            status_technician: 'ACTIVE',
+            level: 'Senior',
+            total_star: 45,
+            technician_debt: 0,
+            roleDTOS: [{ role_name: 'TECHNICIAN' }],
+            nameServiceTechnician: ['Sửa điện', 'Lắp đặt máy lạnh'],
+            nameSkillTechnician: ['Điện dân dụng', 'Điện lạnh'],
+            locationTechnicianDTOS: [{ location_name: 'Quận 1' }, { location_name: 'Quận 3' }],
+            technicianWalletDTO: {
+                balance: 1200000,
+                total_income: 8500000,
+            },
+            created_at: '01-01-2024 09:00:00',
+            updated_at: '20-03-2024 14:30:00',
         },
         {
-            id_user: 'CUS002',
-            full_name: 'Trần Thị B',
-            address: 'TP HCM',
-            phone_number: '0939876543',
-            email: 'thib@example.com',
-            avatarBase64: 'https://i.pravatar.cc/100?img=5',
-            dob: '22-08-1999',
+            id_user: 'TECH002',
+            full_name: 'Trần Văn Hòa',
+            address: 'Quận Thanh Khê, Đà Nẵng',
+            phone_number: '0912348899',
+            email: 'hoa.tech@example.com',
+            avatarBase64: 'https://i.pravatar.cc/150?img=22',
+            dob: '10-09-1992',
+            gender: 'Male',
+            working_area: 'Đà Nẵng',
+            experience_year: 7,
+            status_technician: 'ACTIVE',
+            level: 'Expert',
+            total_star: 60,
+            technician_debt: 150000,
+            roleDTOS: [{ role_name: 'TECHNICIAN' }],
+            nameServiceTechnician: ['Sửa ống nước', 'Chống thấm'],
+            nameSkillTechnician: ['Cấp thoát nước', 'Xây dựng cơ bản'],
+            locationTechnicianDTOS: [{ location_name: 'Thanh Khê' }, { location_name: 'Hải Châu' }],
+            technicianWalletDTO: {
+                balance: 800000,
+                total_income: 12000000,
+            },
+            created_at: '05-02-2024 10:20:00',
+            updated_at: '18-03-2024 16:10:00',
+        },
+        {
+            id_user: 'TECH003',
+            full_name: 'Lê Thị Ngọc Anh',
+            address: 'Quận Bình Thạnh, TP HCM',
+            phone_number: '0934567788',
+            email: 'ngocanh.tech@example.com',
+            avatarBase64: 'https://i.pravatar.cc/150?img=32',
+            dob: '25-12-1998',
             gender: 'Female',
-            roleDTOS: [{ role_name: 'ADMIN' }],
-            created_at: '15-02-2024 10:00:00',
-            updated_at: '15-03-2024 15:10:00',
-        },
-        {
-            id_user: 'CUS003',
-            full_name: 'Phạm Quốc C',
-            address: 'Đà Nẵng',
-            phone_number: '0912345678',
-            email: 'quocc@example.com',
-            avatarBase64: 'https://i.pravatar.cc/100?img=8',
-            dob: '12-02-2000',
-            gender: 'Male',
-            roleDTOS: [{ role_name: 'USER' }],
-            created_at: '20-03-2024 11:15:00',
-            updated_at: '21-03-2024 16:40:00',
+            working_area: 'TP HCM',
+            experience_year: 3,
+            status_technician: 'INACTIVE',
+            level: 'Junior',
+            total_star: 25,
+            technician_debt: 0,
+            roleDTOS: [{ role_name: 'TECHNICIAN' }],
+            nameServiceTechnician: ['Vệ sinh máy lạnh'],
+            nameSkillTechnician: ['Bảo trì thiết bị'],
+            locationTechnicianDTOS: [{ location_name: 'Bình Thạnh' }],
+            technicianWalletDTO: {
+                balance: 300000,
+                total_income: 2500000,
+            },
+            created_at: '10-03-2024 08:45:00',
+            updated_at: '15-03-2024 11:30:00',
         },
     ]);
+
     // filtered list
-    const filtered = customers.filter((c) => {
+    const filtered = technicians.filter((c) => {
         const q = query.trim().toLowerCase();
         if (!q) return true;
         return (
@@ -82,24 +122,35 @@ export default function AdminCustomer() {
         role: 'USER',
     });
 
-    function openEdit(c) {
-        setSelected(c);
+    //sửa biến và các tham số trong edit modal cho phù hợp
+    function openEdit(t) {
+        setSelected(t);
         setForm({
-            id_user: c.id_user,
-            full_name: c.full_name,
-            address: c.address,
-            phone_number: c.phone_number,
-            email: c.email,
-            gender: c.gender,
-            dob: c.dob,
-            avatarBase64: c.avatarBase64,
-            role: c.roleDTOS?.[0]?.role_name || 'USER',
+            id_user: t.id_user,
+            full_name: t.full_name,
+            address: t.address,
+            phone_number: t.phone_number,
+            email: t.email,
+            avatarBase64: t.avatarBase64,
+
+            dob: t.dob,
+            gender: t.gender,
+            working_area: t.working_area,
+            experience_year: t.experience_year,
+            status_technician: t.status_technician,
+            level: t.level,
+
+            role: t.roleDTOS?.[0]?.role_name || 'TECHNICIAN',
+
+            nameServiceTechnician: t.nameServiceTechnician || [],
+            nameSkillTechnician: t.nameSkillTechnician || [],
         });
+
         setShowEdit(true);
     }
 
     function saveEdit() {
-        setCustomers((prev) =>
+        setTechnicians((prev) =>
             prev.map((p) =>
                 p.id_user === selected.id_user ? { ...p, ...form, roleDTOS: [{ role_name: form.role }] } : p,
             ),
@@ -114,7 +165,7 @@ export default function AdminCustomer() {
     }
 
     function confirmDelete() {
-        setCustomers((prev) => prev.filter((p) => p.id_user !== selected.id_user));
+        setTechnicians((prev) => prev.filter((p) => p.id_user !== selected.id_user));
         setShowDelete(false);
         setSelected(null);
     }
@@ -126,7 +177,7 @@ export default function AdminCustomer() {
 
     return (
         <div className="p-6">
-            <h1 className="text-2xl font-semibold text-gray-700 mb-4">Customer Management</h1>
+            <h1 className="text-2xl font-semibold text-gray-700 mb-4">Technician Management</h1>
 
             {/* Search + Add (Add is static placeholder) */}
             <div className="flex items-center justify-between mb-4 gap-4">
@@ -141,7 +192,7 @@ export default function AdminCustomer() {
                     <button
                         onClick={() => {
                             const newCus = {
-                                id_user: `CUS${String(customers.length + 1).padStart(3, '0')}`,
+                                id_user: `CUS${String(technicians.length + 1).padStart(3, '0')}`,
                                 full_name: 'New Customer',
                                 address: 'Unknown',
                                 phone_number: '',
@@ -153,12 +204,12 @@ export default function AdminCustomer() {
                                 created_at: new Date().toLocaleString(),
                                 updated_at: new Date().toLocaleString(),
                             };
-                            setCustomers((s) => [newCus, ...s]);
+                            setTechnicians((s) => [newCus, ...s]);
                         }}
                         className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-orange-500 text-white border border-orange-500 hover:bg-white hover:text-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition"
                     >
                         <Plus size={18} />
-                        Add Customer
+                        Add Technician
                     </button>
                 </div>
             </div>
@@ -277,24 +328,22 @@ export default function AdminCustomer() {
                 </div>
             </div>
 
-            {/* Edit Modal */}
+            {/* Edit Technician Modal */}
             {showEdit && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-md p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h2 className="text-lg font-semibold mb-4">Edit Customer</h2>
+                    <div className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg overflow-y-auto max-h-[90vh]">
+                        <h2 className="text-lg font-semibold mb-4">Edit Technician</h2>
 
-                        <div className="space-y-3">
-                            {/* Upload Avatar */}
+                        <div className="space-y-4">
+                            {/* Avatar */}
                             <div className="flex justify-center">
                                 <div className="relative w-24 h-24">
-                                    {/* Avatar */}
                                     <img
                                         src={form.avatarBase64 || 'https://i.pravatar.cc/150?img=12'}
                                         alt="Avatar"
                                         className="w-24 h-24 rounded-full object-cover border transition hover:scale-105"
                                     />
 
-                                    {/* Hidden file input */}
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -311,20 +360,16 @@ export default function AdminCustomer() {
                                         }}
                                     />
 
-                                    {/* Camera icon */}
                                     <label
                                         htmlFor="avatar-upload"
                                         className="
-                absolute bottom-1 right-1
-                w-8 h-8
-                flex items-center justify-center
-                rounded-full
-                bg-black/50 text-white
-                cursor-pointer
-                hover:bg-orange-500
-                hover:ring-2 hover:ring-orange-300
-                transition-all
-            "
+                                absolute bottom-1 right-1
+                                w-8 h-8 flex items-center justify-center
+                                rounded-full bg-black/50 text-white
+                                cursor-pointer
+                                hover:bg-orange-500 hover:ring-2 hover:ring-orange-300
+                                transition-all
+                            "
                                     >
                                         <Camera size={16} />
                                     </label>
@@ -361,30 +406,80 @@ export default function AdminCustomer() {
                                 />
                             </div>
 
-                            {/* Gender */}
+                            {/* Address */}
                             <div>
-                                <label className="block text-sm text-gray-600">Gender</label>
-                                <select
-                                    value={form.gender}
-                                    onChange={(e) => setForm((s) => ({ ...s, gender: e.target.value }))}
+                                <label className="block text-sm text-gray-600">Address</label>
+                                <input
+                                    value={form.address}
+                                    onChange={(e) => setForm((s) => ({ ...s, address: e.target.value }))}
                                     className="w-full px-3 py-2 border rounded"
-                                >
-                                    <option value="Male">Male</option>
-                                    <option value="Female">Female</option>
-                                </select>
+                                />
                             </div>
 
-                            {/* Role */}
+                            {/* Working Area */}
                             <div>
-                                <label className="block text-sm text-gray-600">Role</label>
-                                <select
-                                    value={form.role}
-                                    onChange={(e) => setForm((s) => ({ ...s, role: e.target.value }))}
+                                <label className="block text-sm text-gray-600">Working Area</label>
+                                <input
+                                    value={form.working_area}
+                                    onChange={(e) => setForm((s) => ({ ...s, working_area: e.target.value }))}
                                     className="w-full px-3 py-2 border rounded"
-                                >
-                                    <option value="USER">USER</option>
-                                    <option value="ADMIN">ADMIN</option>
-                                </select>
+                                />
+                            </div>
+
+                            {/* Experience + Level */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm text-gray-600">Experience (years)</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        value={form.experience_year}
+                                        onChange={(e) =>
+                                            setForm((s) => ({ ...s, experience_year: Number(e.target.value) }))
+                                        }
+                                        className="w-full px-3 py-2 border rounded"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm text-gray-600">Level</label>
+                                    <select
+                                        value={form.level}
+                                        onChange={(e) => setForm((s) => ({ ...s, level: e.target.value }))}
+                                        className="w-full px-3 py-2 border rounded"
+                                    >
+                                        <option value="Junior">Junior</option>
+                                        <option value="Senior">Senior</option>
+                                        <option value="Expert">Expert</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Gender + Status */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-sm text-gray-600">Gender</label>
+                                    <select
+                                        value={form.gender}
+                                        onChange={(e) => setForm((s) => ({ ...s, gender: e.target.value }))}
+                                        className="w-full px-3 py-2 border rounded"
+                                    >
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm text-gray-600">Status</label>
+                                    <select
+                                        value={form.status_technician}
+                                        onChange={(e) => setForm((s) => ({ ...s, status_technician: e.target.value }))}
+                                        className="w-full px-3 py-2 border rounded"
+                                    >
+                                        <option value="ACTIVE">ACTIVE</option>
+                                        <option value="INACTIVE">INACTIVE</option>
+                                    </select>
+                                </div>
                             </div>
 
                             {/* Date of Birth */}
@@ -399,17 +494,22 @@ export default function AdminCustomer() {
                             </div>
                         </div>
 
-                        <div className="mt-4 flex justify-end gap-2">
+                        {/* Actions */}
+                        <div className="mt-6 flex justify-end gap-2">
                             <button
                                 onClick={() => {
                                     setShowEdit(false);
                                     setSelected(null);
                                 }}
-                                className="px-4 py-2 border rounded"
+                                className="px-4 py-2 border rounded hover:bg-gray-50"
                             >
                                 Cancel
                             </button>
-                            <button onClick={saveEdit} className="px-4 py-2 bg-indigo-600 text-white rounded">
+
+                            <button
+                                onClick={saveEdit}
+                                className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+                            >
                                 Save
                             </button>
                         </div>
@@ -445,49 +545,146 @@ export default function AdminCustomer() {
                 </div>
             )}
 
-            {/* Detail Modal */}
-            {showDetail && (
+            {/* Technician Detail Modal */}
+            {showDetail && selected && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h3 className="text-xl font-semibold mb-6 text-center">Customer Details</h3>
+                    <div className="bg-white rounded-lg w-full max-w-2xl p-6 shadow-lg overflow-y-auto max-h-[90vh]">
+                        <h3 className="text-xl font-semibold mb-6 text-center">Technician Details</h3>
 
-                        <div className="space-y-3 text-sm">
-                            <div className="flex flex-col items-center gap-2">
-                                <img src={selected.avatarBase64} className="w-24 h-24 rounded-full object-cover" />
-                                <span className="text-sm text-gray-500">ID: {selected.id_user}</span>
-                            </div>
-                            <div></div>
-                            <div>
-                                <strong>Full Name:</strong> {selected.full_name}
-                            </div>
-                            <div>
-                                <strong>Email:</strong> {selected.email}
-                            </div>
-                            <div>
-                                <strong>Phone:</strong> {selected.phone_number}
-                            </div>
-                            <div>
-                                <strong>Gender:</strong> {selected.gender}
-                            </div>
-                            <div>
-                                <strong>Address:</strong> {selected.address}
-                            </div>
-                            <div>
-                                <strong>Date of Birth:</strong> {selected.dob}
-                            </div>
-                            <div>
-                                <strong>Role:</strong> {selected.roleDTOS?.map((r) => r.role_name).join(', ')}
-                            </div>
-                            <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-6">
-                                <div>
-                                    <strong>Created At:</strong>
-                                    <div>{selected.created_at}</div>
-                                </div>
+                        {/* Avatar + ID */}
+                        <div className="flex flex-col items-center gap-2 mb-6">
+                            <img
+                                src={selected.avatarBase64}
+                                alt="avatar"
+                                className="w-28 h-28 rounded-full object-cover border"
+                            />
+                            <span className="text-sm text-gray-500">ID: {selected.id_user}</span>
+                        </div>
 
-                                <div>
-                                    <strong>Updated At:</strong>
-                                    <div>{selected.updated_at}</div>
+                        {/* Detail Info */}
+                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+                            <div>
+                                <strong>Full Name:</strong>
+                                <div>{selected.full_name}</div>
+                            </div>
+
+                            <div>
+                                <strong>Email:</strong>
+                                <div>{selected.email}</div>
+                            </div>
+
+                            <div>
+                                <strong>Phone:</strong>
+                                <div>{selected.phone_number}</div>
+                            </div>
+
+                            <div>
+                                <strong>Gender:</strong>
+                                <div>{selected.gender}</div>
+                            </div>
+
+                            <div className="col-span-2">
+                                <strong>Address:</strong>
+                                <div>{selected.address}</div>
+                            </div>
+
+                            <div>
+                                <strong>Date of Birth:</strong>
+                                <div>{selected.dob}</div>
+                            </div>
+
+                            <div>
+                                <strong>Working Area:</strong>
+                                <div>{selected.working_area}</div>
+                            </div>
+                        </div>
+
+                        {/* Professional Info */}
+                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
+                            <div>
+                                <strong>Experience (years):</strong>
+                                <div>{selected.experience_year}</div>
+                            </div>
+
+                            <div>
+                                <strong>Level:</strong>
+                                <div>{selected.level}</div>
+                            </div>
+
+                            <div>
+                                <strong>Status:</strong>
+                                <span
+                                    className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold
+                            ${
+                                selected.status_technician === 'ACTIVE'
+                                    ? 'bg-green-100 text-green-700'
+                                    : 'bg-gray-200 text-gray-600'
+                            }`}
+                                >
+                                    {selected.status_technician}
+                                </span>
+                            </div>
+
+                            <div>
+                                <strong>Total Star:</strong>
+                                <div>{selected.total_star ?? 0} ⭐</div>
+                            </div>
+
+                            <div>
+                                <strong>Technician Debt:</strong>
+                                <div>{selected.technician_debt ?? 0} đ</div>
+                            </div>
+                        </div>
+
+                        {/* Skills & Services */}
+                        <div className="text-sm mb-6 space-y-3">
+                            <div>
+                                <strong>Services:</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {selected.nameServiceTechnician?.length ? (
+                                        selected.nameServiceTechnician.map((s, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs"
+                                            >
+                                                {s}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400">No services</span>
+                                    )}
                                 </div>
+                            </div>
+
+                            <div>
+                                <strong>Skills:</strong>
+                                <div className="flex flex-wrap gap-2 mt-1">
+                                    {selected.nameSkillTechnician?.length ? (
+                                        selected.nameSkillTechnician.map((s, i) => (
+                                            <span
+                                                key={i}
+                                                className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs"
+                                            >
+                                                {s}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-gray-400">No skills</span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Meta */}
+                        <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-6">
+                            <div>
+                                <strong>Created At:</strong>
+                                <div>{selected.created_at}</div>
+                            </div>
+
+                            <div>
+                                <strong>Updated At:</strong>
+                                <div>{selected.updated_at}</div>
                             </div>
                         </div>
 
