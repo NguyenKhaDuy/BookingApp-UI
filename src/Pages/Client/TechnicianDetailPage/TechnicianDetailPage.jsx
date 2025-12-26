@@ -1,3 +1,7 @@
+import { useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+
 import TechnicianProfileHeader from '../../../Components/Client/TechnicianProfileHeader/TechnicianProfileHeader';
 import TechnicianInfoCard from '../../../Components/Client/TechnicianInfoCard/TechnicianInfoCard';
 import TechnicianSkills from '../../../Components/Client/TechnicianSkills/TechnicianSkills';
@@ -5,46 +9,43 @@ import TechnicianReviews from '../../../Components/Client/TechnicianReviews/Tech
 import TechnicianCalendar from '../../../Components/Client/TechnicianCalendar/TechnicianCalendar';
 import TechnicianMap from '../../../Components/Client/TechnicianMap/TechnicianMap';
 import TechnicianActionBar from '../../../Components/Client/TechnicianActionBar/TechnicianActionBar';
-export default function TechnicianDetailPage() {
-    const techData = {
-        phone: '0903123456',
-        name: 'Nguyễn Văn Khoa',
-        avatar: '/img/tech1.jpg',
-    };
+import TechnicianService from '../../../Components/Client/TechnicianService/TechnicianService';
 
-    const reviews = [
-        {
-            id: 1,
-            name: 'Trần Minh Huy',
-            rating: 5,
-            comment: 'Thợ làm việc rất nhanh và chuyên nghiệp. Rất hài lòng!',
-            date: '2024-11-20',
-        },
-        {
-            id: 2,
-            name: 'Lê Thị Trang',
-            rating: 4,
-            comment: 'Làm việc ổn, nhiệt tình. Sẽ tiếp tục đặt lần sau.',
-            date: '2024-11-12',
-        },
-        {
-            id: 3,
-            name: 'Phạm Đình Duy',
-            rating: 5,
-            comment: 'Giải thích rõ ràng, sửa đúng bệnh. Giá hợp lý.',
-            date: '2024-10-03',
-        },
-    ];
+export default function TechnicianDetailPage() {
+    const { id_user } = useParams();
+    console.log(id_user);
+    const [techData, setTechData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!id_user) return;
+
+        axios
+            .get(`http://localhost:8081/api/detail-technician/id=${id_user}`)
+            .then((res) => {
+                setTechData(res.data.data); // 👈 data backend trả về
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error(err);
+                setError('Không tìm thấy kỹ thuật viên');
+                setLoading(false);
+            });
+    }, [id_user]);
+
+    if (loading) return <div>Đang tải dữ liệu...</div>;
+    if (error) return <div className="text-red-500">{error}</div>;
 
     return (
         <div className="bg-gray-100 min-h-screen p-4 md:p-8 space-y-6">
             <TechnicianProfileHeader tech={techData} />
             <TechnicianInfoCard tech={techData} />
-            <TechnicianSkills skills={['Điện', 'Điện lạnh', 'Fix PC', 'Camera']} />
-            <TechnicianCalendar />
+            <TechnicianSkills skills={techData.nameSkillTechnician || []} />
+            <TechnicianService services={techData.nameServiceTechnician || []} />
+            <TechnicianCalendar schedules={techData.technicianScheduleDTOS} />
             <TechnicianMap />
-            <TechnicianReviews reviews={reviews} />
-            {/* Floating Action Buttons */}
+            <TechnicianReviews ratings={techData.ratingDTOS || []} />
             <TechnicianActionBar phone={techData.phone} />
         </div>
     );

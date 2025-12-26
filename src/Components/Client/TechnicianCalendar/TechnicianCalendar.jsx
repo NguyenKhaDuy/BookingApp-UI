@@ -1,47 +1,55 @@
 import { useState } from 'react';
 
-export default function TechnicianCalendar() {
-    const [selected, setSelected] = useState(null);
+/* ===== HELPER FUNCTIONS ===== */
+const formatTime = ([h, m]) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 
-    const days = ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'];
-
+const formatDate = ([y, m, d]) => `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
+export default function TechnicianCalendar({ schedules }) {
     return (
         <div className="bg-white rounded-3xl p-6 shadow-md">
-            <h2 className="text-xl font-semibold mb-4">Lịch làm việc</h2>
+            <h2 className="text-xl font-semibold mb-6">Lịch làm việc</h2>
 
-            <div className="grid grid-cols-7 gap-2 text-center">
-                {days.map((d, i) => (
-                    <button
-                        key={i}
-                        onClick={() => setSelected(i)}
-                        className={`
-              py-3 rounded-xl border text-sm font-medium 
-              transition shadow-sm
-              ${
-                  selected === i
-                      ? 'bg-indigo-600 text-white border-indigo-600'
-                      : 'bg-gray-50 text-gray-600 border-gray-300 hover:border-indigo-400'
-              }
-            `}
-                    >
-                        {d}
-                    </button>
-                ))}
-            </div>
+            <div className="space-y-4">
+                {schedules.map((s) => {
+                    const date = formatDate(s.date);
+                    const start = formatTime(s.time_start);
+                    const end = formatTime(s.time_end);
 
-            {/* Time slots */}
-            <div className="mt-6">
-                <h3 className="text-lg font-semibold mb-3">Khung giờ trống</h3>
-                <div className="flex flex-wrap gap-3">
-                    {['08:00', '09:30', '11:00', '13:30', '15:00', '17:00'].map((t) => (
-                        <button
-                            key={t}
-                            className="px-4 py-2 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-200 shadow-sm hover:bg-indigo-100"
+                    const isOvernight =
+                        s.time_start[0] > s.time_end[0] ||
+                        (s.time_start[0] === s.time_end[0] && s.time_start[1] > s.time_end[1]);
+
+                    return (
+                        <div
+                            key={s.idSchedule}
+                            className="flex items-center justify-between p-4 rounded-2xl border shadow-sm"
                         >
-                            {t}
-                        </button>
-                    ))}
-                </div>
+                            {/* Date */}
+                            <div>
+                                <p className="text-sm text-gray-500">Ngày</p>
+                                <p className="font-semibold">{date}</p>
+                            </div>
+
+                            {/* Time */}
+                            <div>
+                                <p className="text-sm text-gray-500">Thời gian</p>
+                                <p className="font-semibold">
+                                    {start} – {end}
+                                    {isOvernight && <span className="ml-2 text-xs text-orange-500">(qua đêm)</span>}
+                                </p>
+                            </div>
+
+                            {/* Status */}
+                            <div
+                                className={`px-4 py-1 rounded-full text-sm font-semibold
+                  ${s.status_code === 'OFFLINE' ? 'bg-gray-100 text-gray-500' : 'bg-green-100 text-green-600'}
+                `}
+                            >
+                                {s.status_code}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
