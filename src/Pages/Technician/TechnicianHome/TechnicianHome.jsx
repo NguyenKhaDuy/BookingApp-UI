@@ -1,7 +1,6 @@
 import { useEffect, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
-
 import TechnicianDashboard from '../../../Components/Technician/TechnicianDashboard/TechnicianDashboard';
 import RepairRequest from '../../../Components/Technician/RepairRequest/RepairRequest';
 import Notification from '../../../Components/Technician/Notifications/Notifications';
@@ -13,9 +12,11 @@ import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
 
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
+     const { showToast } = useToast();
     const { user, setUser } = useContext(UserContext);
     const [open, setOpen] = useState(false);
 
@@ -133,14 +134,13 @@ export default function TechnicianHome({ active }) {
             const data = await res.json();
 
             if (!res.ok) {
-                console.error('Lỗi khi accept request:', data);
-                alert(`❌ Lỗi: ${data.message || 'Không xác định'}`);
+                // console.error('Lỗi khi accept request:', data);
+                showToast(`Lỗi: ${data.message || 'Không xác định'}`, 'error');
             } else {
                 console.log('ACCEPT JOB SUCCESS:', data);
             }
         } catch (err) {
-            console.error('Exception accept request:', err);
-            alert('❌ Có lỗi xảy ra, vui lòng thử lại');
+            showToast(`Có lỗi xảy ra, vui lòng thử lại`, 'error');
         } finally {
             setOpen(false);
             setNotification(null);// đóng popup
@@ -176,19 +176,15 @@ export default function TechnicianHome({ active }) {
 
             if (!res.ok) {
                 console.error('Lỗi khi refuse request:', data);
-                alert(`❌ Lỗi: ${data.message || 'Không xác định'}`);
+                showToast(`Lỗi: ${data.message || 'Không xác định'}`, 'error');
             } else {
                 console.log('REJECT JOB SUCCESS:', data);
             }
         } catch (err) {
             console.error('Exception refuse request:', err);
-            alert('❌ Có lỗi xảy ra, vui lòng thử lại');
+            showToast(`Có lỗi xảy ra, vui lòng thử lại`, 'error');
         }
     };
-
-
-
-    // ===================== UI =====================
     return (
         <>
             {/* ===== POPUP NOTIFICATION ===== */}

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function Invoice() {
     const [status, setStatus] = useState('unpaid');
+    const { showToast } = useToast();
 
     // xem chi tiết
     const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -66,7 +68,7 @@ export default function Invoice() {
     
 
     const handlePayment = async () => {
-        console.log("toeken: " + token);
+        // console.log("toeken: " + token);
         const payload = {
             bank: selectedBank,
             amount: payInvoice.amount,
@@ -91,7 +93,7 @@ export default function Invoice() {
             window.location.href = paymentUrl;
         } catch (err) {
             console.error(err);
-            alert('Thanh toán thất bại');
+            showToast('Thanh toán thất bại', 'error');
         }
     };
 

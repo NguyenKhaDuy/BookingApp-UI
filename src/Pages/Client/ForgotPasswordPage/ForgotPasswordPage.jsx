@@ -2,25 +2,29 @@ import React, { useState } from 'react';
 import ForgotEmailForm from '../../../Components/Client/ForgotEmailForm/ForgotEmailForm';
 import OtpForm from '../../../Components/Client/OtpForm/OtpForm';
 import ResetPasswordForm from '../../../Components/Client/ResetPasswordForm/ResetPasswordForm';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
+    const { showToast } = useToast();
 
     const sendOtp = (userEmail) => {
-        if (!userEmail) return alert('Vui lòng nhập email');
+        if (!userEmail) {
+            showToast('Vui lòng nhập email', 'error');
+            return;
+        }
 
         setEmail(userEmail);
-        alert('Mã OTP đã gửi về email của bạn!');
+        showToast('Mã OTP đã gửi về email của bạn!', 'success');
         setStep(2);
     };
 
     const verifyOtp = (otp) => {
         if (otp.length !== 6) {
-            return alert('OTP phải có 6 số');
+            showToast('OTP phải có 6 số', 'error');
         }
-
-        alert('Xác thực thành công!');
+        showToast('Xác thực thành công!', 'success');
         setStep(3); // 👉 chuyển sang form reset password
     };
 

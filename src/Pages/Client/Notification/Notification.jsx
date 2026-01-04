@@ -18,6 +18,18 @@ export default function NotificationDetail() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const user = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
+
+        if (!user || !token) {
+            navigate('/login', { replace: true });
+            return;
+        }
+
+        setLoading(false);
+    }, [navigate]);
+
+    useEffect(() => {
         const fetchDetail = async () => {
             try {
                 const res = await axios.get(`http://localhost:8081/api/user/notification/`, {

@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import ServiceSelect from '../../../Components/Client/ServiceSelect/ServiceSelect';
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function BookingTechnicianForm() {
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const calendarRef = useRef(null);
     const { idTech } = useParams();
@@ -56,7 +58,7 @@ export default function BookingTechnicianForm() {
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
         if (image_request.length + files.length > 5) {
-            alert('Tối đa 5 ảnh!');
+            showToast('Tối đa 5 ảnh!', 'error');
             return;
         }
         setImages([...image_request, ...files]);
@@ -89,7 +91,7 @@ export default function BookingTechnicianForm() {
         }
 
         if (!form.id_service || !form.scheduled_date || !form.scheduled_time || !form.location) {
-            alert('Vui lòng nhập đầy đủ thông tin');
+            showToast('Vui lòng nhập đầy đủ thông tin', 'error');
             return;
         }
 

@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterForm from '../../../Components/Client/RegisterForm/RegisterForm';
 import OtpForm from '../../../Components/Client/OtpForm/OtpForm';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function Register() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
+     const { showToast } = useToast();
     const navigate = useNavigate();
 
     const onRegisterSuccess = (userEmail) => {
@@ -15,7 +17,8 @@ export default function Register() {
 
     const verifyOtp = async (otp) => {
         if (otp.length !== 6) {
-            return alert('OTP phải có 6 số');
+            showToast('OTP phải có 6 số', 'error');
+            return;
         }
 
         const res = await fetch('http://localhost:8081/api/verify-otp/', {
@@ -28,12 +31,12 @@ export default function Register() {
         const data = await res.json();
 
         if (!res.ok) {
-            alert(data.message);
+            showToast(data.message, 'error');
             setStep(1);
             navigate('/register')
             return;
         } else {
-            alert('🎉 Đăng ký thành công!');
+            showToast('Đăng ký thành công!', 'success');
             navigate('/login'); // ✅ CHUYỂN SANG TRANG LOGIN
         }
     };

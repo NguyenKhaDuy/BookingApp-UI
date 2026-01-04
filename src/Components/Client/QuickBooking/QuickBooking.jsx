@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ServiceSelect from '../ServiceSelect/ServiceSelect';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function QuickBooking() {
     const navigate = useNavigate();
+     const { showToast } = useToast();
 
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -57,7 +59,7 @@ export default function QuickBooking() {
         }
 
         if (!form.id_service || !form.scheduled_date || !form.scheduled_time || !form.location) {
-            alert('Vui lòng nhập đầy đủ thông tin');
+            showToast('Vui lòng nhập đầy đủ thông tin', 'error');
             return;
         }
 

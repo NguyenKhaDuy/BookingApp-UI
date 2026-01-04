@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import RequestDetailModal from '../RequestDetailModal/RequestDetailModal';
 import RatingModal from '../RatingModal/RatingModal';
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { useToast } from '../../../Context/ToastContext';
+import { m } from 'framer-motion';
 
 /* ================= UTILS ================= */
 const formatDateTime = (dateArr, timeArr) => {
@@ -21,7 +23,7 @@ export default function RepairStatusPage() {
     const [showRating, setShowRating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [requestId, setRequestId] = useState(null);
-
+    const { showToast } = useToast();
     const location = useLocation();
     const navigate = useNavigate();
     const formData = location.state?.formData;
@@ -51,11 +53,10 @@ export default function RepairStatusPage() {
             if (json.message === 'Success') {
                 setRequests(json.data);
             } else {
-                alert(json.message || 'Không lấy được danh sách yêu cầu');
+                showToast(json.message || 'Không lấy được danh sách yêu cầu', 'error');
             }
         } catch (err) {
-            console.error(err);
-            alert('Lỗi kết nối server');
+            showToast('Lỗi kết nối server', 'error');
         } finally {
             setLoading(false);
         }
@@ -105,12 +106,11 @@ export default function RepairStatusPage() {
                     await fetchRequests();
                     setActive('WAITING_FOR_TECHNICIAN');
                 } else {
-                    alert(data.message || 'Tạo yêu cầu thất bại');
+                    showToast(data.message || 'Tạo yêu cầu thất bại', 'error');
                     setActive('CANCEL');
                 }
             } catch (err) {
-                console.error(err);
-                alert('Lỗi hệ thống');
+                showToast('Lỗi hệ thống', 'error');
                 setActive('CANCEL');
             } finally {
                 navigate(location.pathname, { replace: true, state: {} });
@@ -140,7 +140,7 @@ export default function RepairStatusPage() {
             connectWebSocket(token);
     
             addWebSocketListener((msg) => {
-                alert(`🔔 ${msg.title}\n${msg.body}`);
+                showToast(`🔔 ${msg.title}\n${msg.body}`, 'success');
                 if (msg) {
                     fetchRequests();
                 }

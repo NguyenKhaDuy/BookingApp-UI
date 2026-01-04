@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function InvoiceCreate({ orderId, onClose }) {
     const [paid, setPaid] = useState(false);
     const [items, setItems] = useState([{ name: '', quantity: 1, price: 0 }]);
     const [laborCost, setLaborCost] = useState(0);
+    const { showToast } = useToast();
 
     const addItem = () => setItems([...items, { name: '', quantity: 1, price: 0 }]);
     const removeItem = (i) => setItems(items.filter((_, idx) => idx !== i));
@@ -20,7 +22,7 @@ export default function InvoiceCreate({ orderId, onClose }) {
 
     const createInvoice = () => {
         setPaid(true);
-        alert('Khách hàng đã thanh toán thành công!');
+         showToast('Khách hàng đã thanh toán thành công!', 'success');
         onClose();
     };
 
