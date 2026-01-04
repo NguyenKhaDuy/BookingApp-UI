@@ -27,9 +27,9 @@ export default function HomePage() {
         // Kết nối WS với token mới
         connectWebSocket(token);
 
-        addWebSocketListener((msg) => {
-            alert(`🔔 ${msg.title}\n${msg.body}`);
-        });
+        // addWebSocketListener((msg) => {
+        //     alert(`🔔 ${msg.title}\n${msg.body}`);
+        // });
     }, []); // Chỉ chạy một lần khi mount
 
     return (

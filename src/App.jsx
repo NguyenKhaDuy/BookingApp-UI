@@ -24,7 +24,7 @@ function App() {
                 {/* ================= CLIENT LAYOUT ================= */}
                 <Route element={<ClientLayout />}>
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/notification" element={<Notification />} />
+                    <Route path="/notification/:id" element={<Notification />} />
                     <Route path="/services" element={<ServicePage />} />
                     <Route path="/technicians" element={<TechnicianPage />} />
                     <Route path="/technicians/techniciandetail/:id_user" element={<TechnicianDetailPage />} />
@@ -34,11 +34,12 @@ function App() {
                     <Route path="/request" element={<RequestPage />} />
                     <Route path="/forgot-password" element={<ForgotPassword />} />
                     <Route path="/booking" element={<BookingPage />} />
+                    <Route path="/booking/:idTech" element={<BookingPage />} />
                     <Route path="/contact" element={<ContactPage />} />
                 </Route>
 
                 {/* ================= ADMIN LAYOUT ================= */}
-                <Route path='/admin/home' element={<DashboardLayout />} />
+                <Route path="/admin/home" element={<DashboardLayout />} />
                 {/* <Route path="/admin/home" element={<AdminHome />} /> */}
                 {/* <Route path="/admin/users" element={<AdminCustomer />} /> */}
                 {/* </Route> */}

@@ -1,28 +1,86 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Bell } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
 import default_avatar from '../../../assets/default-avatar.jpg'
 
+const formatTimeFromArray = (arr) => {
+    if (!arr || arr.length < 6) return '';
+    // JS month bắt đầu từ 0 → arr[1]-1
+    const date = new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]);
+    return date.toLocaleString(); // hoặc dùng toLocaleDateString/toLocaleTimeString tuỳ ý
+};
+
+
 export default function HeaderBooking() {
+    const navigate = useNavigate();
     const [open, setOpen] = useState(false); // mobile menu
     const [notifOpen, setNotifOpen] = useState(false);
     const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
     const [servicesDesktopOpen, setServicesDesktopOpen] = useState(false);
     const [servicesMobileOpen, setServicesMobileOpen] = useState(false);
     const [services, setServices] = useState([]);
+    const [notifications, setNotifications] = useState([]);
 
     const { user, setUser } = useContext(UserContext);
     const isLoggedIn = !!user;
 
-    const notifications = [
-        { id: 1, title: 'Đơn sửa chữa đã được xác nhận', time: '5 phút trước', unread: true },
-        { id: 2, title: 'Kỹ thuật viên đang trên đường', time: '20 phút trước', unread: false },
-        { id: 3, title: 'Hoàn tất dịch vụ – vui lòng đánh giá', time: '1 giờ trước', unread: false },
-    ];
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            if (!user || !user.id_user) return;
+
+            try {
+                const res = await axios.get(`http://localhost:8081/api/user/notification/id_user=${user.id_user}`, {
+                    withCredentials: true,
+                });
+
+                if (res.data.data) {
+                    const notifs = res.data.data
+                        .map((n) => ({
+                            id: n.id_notify,
+                            title: n.title,
+                            message: n.message,
+                            type: n.type,
+                            id_type: n.id_type,
+                            unread: n.status_id === 2,
+                            time: formatTimeFromArray(n.created_at),
+                            createdAtArray: n.created_at, // giữ mảng để sort
+                        }))
+                        .sort((a, b) => {
+                            // Chuyển array → Date để so sánh
+                            const dateA = new Date(
+                                a.createdAtArray[0],
+                                a.createdAtArray[1] - 1,
+                                a.createdAtArray[2],
+                                a.createdAtArray[3],
+                                a.createdAtArray[4],
+                                a.createdAtArray[5],
+                            );
+                            const dateB = new Date(
+                                b.createdAtArray[0],
+                                b.createdAtArray[1] - 1,
+                                b.createdAtArray[2],
+                                b.createdAtArray[3],
+                                b.createdAtArray[4],
+                                b.createdAtArray[5],
+                            );
+                            return dateB - dateA; // mới → cũ
+                        });
+
+                    setNotifications(notifs);
+                }
+            } catch (err) {
+                console.error('Failed to fetch notifications:', err);
+            }
+        };
+
+        fetchNotifications();
+    }, [user]);
+
+
 
     // Fetch services
     useEffect(() => {
@@ -54,6 +112,11 @@ export default function HeaderBooking() {
          };
          fetchUser();
      }, []);
+
+     const markLocalAsRead = (id) => {
+         setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+     };
+
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -128,15 +191,16 @@ export default function HeaderBooking() {
                     <div className="flex items-center space-x-2">
                         {/* Notification icon */}
                         {isLoggedIn && (
-                            <div className="relative">
-                                <button
-                                    onClick={() => {
-                                        setNotifOpen(!notifOpen);
-                                        setOpen(false);
-                                        setAvatarMenuOpen(false);
-                                    }}
-                                    className="relative flex items-center justify-center w-10 h-10"
-                                >
+                            <div
+                                className="relative"
+                                onMouseEnter={() => {
+                                    setNotifOpen(true);
+                                    setOpen(false);
+                                    setAvatarMenuOpen(false);
+                                }}
+                                onMouseLeave={() => setNotifOpen(false)}
+                            >
+                                <button className="relative flex items-center justify-center w-10 h-10">
                                     <Bell className="w-7 h-7 text-white hover:text-orange-500 transition" />
                                     {notifications.filter((n) => n.unread).length > 0 && (
                                         <span className="absolute top-0 right-0 bg-orange-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
@@ -151,22 +215,44 @@ export default function HeaderBooking() {
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
-                                            className="absolute right-0 mt-3 w-80 bg-[#0f1f36] text-white rounded-xl shadow-xl border border-white/10 overflow-hidden"
+                                            className="absolute right-0 mt-3 w-80 bg-[#0f1f36] rounded-xl overflow-hidden border border-white/10"
                                         >
-                                            <div className="p-4 font-bold border-b border-white/10 text-orange-500 uppercase">
+                                            {/* Header */}
+                                            <div className="p-4 text-orange-500 font-bold border-b border-white/10">
                                                 Thông báo
                                             </div>
+
+                                            {/* List */}
                                             <div className="max-h-80 overflow-y-auto">
+                                                {notifications.length === 0 && (
+                                                    <div className="px-4 py-6 text-center text-gray-400 text-sm">
+                                                        Không có thông báo
+                                                    </div>
+                                                )}
+
                                                 {notifications.map((n) => (
                                                     <Link
                                                         key={n.id}
-                                                        to="/notification"
-                                                        className={`w-full text-left px-4 py-3 flex flex-col gap-1 border-b border-white/5 hover:bg-white/5 transition ${
-                                                            n.unread ? 'bg-orange-500/10' : ''
-                                                        }`}
+                                                        to={`/notification/${n.id}`}
+                                                        onClick={() => {
+                                                            markLocalAsRead(n.id); //cập nhật badge ngay
+                                                            setNotifOpen(false);
+                                                        }}
+                                                        className={`px-4 py-3 flex justify-between items-center border-b border-white/5 transition
+        hover:bg-white/5
+        ${n.unread ? 'bg-orange-500/10' : ''}
+    `}
                                                     >
-                                                        <span className="font-medium">{n.title}</span>
-                                                        <span className="text-xs text-gray-400">{n.time}</span>
+                                                        <div className="flex-1 pr-2">
+                                                            <p className="text-white font-medium line-clamp-2">
+                                                                {n.title}
+                                                            </p>
+                                                            <p className="text-xs text-gray-400 mt-1">{n.time}</p>
+                                                        </div>
+
+                                                        {n.unread && (
+                                                            <span className="w-2.5 h-2.5 bg-orange-500 rounded-full shrink-0" />
+                                                        )}
                                                     </Link>
                                                 ))}
                                             </div>
@@ -223,16 +309,41 @@ export default function HeaderBooking() {
                                             initial={{ opacity: 0, y: -10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -10 }}
-                                            className="absolute right-0 top-full mt-2 w-40 bg-[#0f1f36] text-white rounded-xl shadow-xl border border-white/10 overflow-hidden z-50"
+                                            className="absolute right-0 top-full mt-2 w-44 bg-[#0f1f36] text-white rounded-xl shadow-xl border border-white/10 overflow-hidden z-50"
                                         >
+                                            {/* Hồ sơ */}
                                             <button
-                                                onClick={handleLogout}
-                                                className="w-full text-left px-4 py-3 flex items-center gap-2 hover:bg-white/10 transition"
+                                                onClick={() => navigate('/profile')}
+                                                className="group w-full text-left px-4 py-3 flex items-center gap-2 transition hover:bg-white/5"
                                             >
-                                                {/* SVG icon logout */}
                                                 <svg
                                                     xmlns="http://www.w3.org/2000/svg"
-                                                    className="w-5 h-5 text-orange-500"
+                                                    className="w-5 h-5 text-white group-hover:text-orange-500 transition"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke="currentColor"
+                                                    strokeWidth={2}
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                                                    />
+                                                </svg>
+                                                <span className="text-white group-hover:text-orange-500 transition">
+                                                    Hồ sơ
+                                                </span>
+                                            </button>
+
+                                            {/* Đăng xuất - nổi bật */}
+                                            <button
+                                                onClick={handleLogout}
+                                                className="group w-full text-left px-4 py-3 flex items-center gap-2 transition 
+                           bg-orange-500/10 hover:bg-orange-500/20"
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    className="w-5 h-5 text-orange-400 group-hover:text-orange-500 transition"
                                                     fill="none"
                                                     viewBox="0 0 24 24"
                                                     stroke="currentColor"
@@ -244,7 +355,9 @@ export default function HeaderBooking() {
                                                         d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"
                                                     />
                                                 </svg>
-                                                <span className="text-orange-500">Đăng xuất</span>
+                                                <span className="text-orange-400 font-medium group-hover:text-orange-500 transition">
+                                                    Đăng xuất
+                                                </span>
                                             </button>
                                         </motion.div>
                                     )}

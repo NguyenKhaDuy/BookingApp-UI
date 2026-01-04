@@ -1,6 +1,7 @@
 import { Star, MapPin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import defaultAvatar from '../../../assets/default-avatar.jpg';
 
 export default function TechnicianCard({ tech }) {
     return (
@@ -10,9 +11,18 @@ export default function TechnicianCard({ tech }) {
             transition={{ duration: 0.4 }}
             className="bg-white rounded-2xl shadow-lg border border-gray-200 p-5 hover:shadow-xl transition cursor-pointer"
         >
-            <img src={tech.avatar} className="w-28 h-28 rounded-xl object-cover mx-auto mb-4 shadow" />
+            <img
+                src={tech.avatar || defaultAvatar}
+                alt={tech.name}
+                onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = defaultAvatar;
+                }}
+                className="w-28 h-28 rounded-xl object-cover mx-auto mb-4 shadow"
+            />
 
             <h3 className="text-xl font-semibold text-gray-800 text-center">{tech.name}</h3>
+
             <p className="text-orange-500 text-center font-medium mt-1">{tech.skill}</p>
 
             <div className="flex justify-center gap-1 mt-2">
@@ -33,7 +43,7 @@ export default function TechnicianCard({ tech }) {
             </div>
 
             <Link
-                to="/technicians/techniciandetail"
+                to={`/technicians/techniciandetail/${tech.id}`}
                 className="mt-4 block w-full bg-orange-500 text-white py-2 rounded-lg font-semibold text-center hover:bg-orange-600 transition"
             >
                 Xem chi tiết

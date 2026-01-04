@@ -5,7 +5,7 @@ import SockJS from 'sockjs-client';
 let stompClient = null;
 let isConnected = false;
 
-let globalListeners = []; // Danh sách hàm callback muốn nhận message WS
+let globalListeners = [];
 
 export function connectWebSocket(token = null) {
     if (isConnected && stompClient) {
@@ -17,7 +17,7 @@ export function connectWebSocket(token = null) {
     stompClient = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
-        connectHeaders: token ? { Authorization: 'Bearer ' + token } : {}, // 👈 CHƯA login thì KHÔNG gửi token
+        connectHeaders: token ? { Authorization: 'Bearer ' + token } : {},
         debug: (str) => console.log('[WS]', str),
     });
 
@@ -25,13 +25,11 @@ export function connectWebSocket(token = null) {
         isConnected = true;
         console.log('✅ WebSocket CONNECTED');
 
-        // GLOBAL – ai cũng nhận
         stompClient.subscribe('/topic/notify', (msg) => {
             const data = JSON.parse(msg.body);
             globalListeners.forEach((fn) => fn(data));
         });
 
-        // PERSONAL – chỉ khi login
         stompClient.subscribe('/user/queue/notify', (msg) => {
             const data = JSON.parse(msg.body);
             globalListeners.forEach((fn) => fn(data));
@@ -42,7 +40,12 @@ export function connectWebSocket(token = null) {
     return stompClient;
 }
 
-// Cho Home đăng ký hàm nhận thông báo
+// ✅ FIX CHÍNH Ở ĐÂY
 export function addWebSocketListener(callback) {
     globalListeners.push(callback);
+
+    // 👉 TRẢ VỀ HÀM UNSUBSCRIBE
+    return () => {
+        globalListeners = globalListeners.filter((fn) => fn !== callback);
+    };
 }
