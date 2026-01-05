@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -9,37 +9,26 @@ import ProfilePassword from '../../../Components/Client/SecurityCard/SecurityCar
 import ProfileSettings from '../../../Components/Client/SettingCard/SettingCard';
 import ProfileMobileHeader from '../../../Components/Client/ProfileMobileHeader/ProfileMobileHeader';
 import ProfileEmail from '../../../Components/Client/ProfileEmail/ProfileEmail';
+import ProfileFeedback from '../../../Components/Client/ProfileFeedback/ProfileFeedback';
+
+import { UserContext } from '../../../Context/UserContext';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
+    const { user, initialized } = useContext(UserContext);
 
     const [active, setActive] = useState('profile');
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    /* ================= CHECK LOGIN ================= */
-    useEffect(() => {
-        const user = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
-
-        if (!user || !token) {
-            navigate('/login', { replace: true });
-            return;
-        }
-
-        setLoading(false);
-    }, [navigate]);
-
     /* ================= FETCH PROFILE ================= */
     const fetchProfile = useCallback(async () => {
+        if (!user?.id_user) return;
+
         try {
             const token = localStorage.getItem('token');
-            const user = JSON.parse(localStorage.getItem('user'));
-            const idCustomer = user?.id_user;
 
-            if (!idCustomer) return;
-
-            const res = await axios.get(`http://localhost:8081/api/customer/profile/id=${idCustomer}`, {
+            const res = await axios.get(`http://localhost:8081/api/customer/profile/id=${user.id_user}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -49,9 +38,23 @@ export default function ProfilePage() {
         } catch (error) {
             console.error('Lỗi lấy profile:', error);
         }
-    }, []);
+    }, [user]);
 
-    /* ================= INIT ================= */
+    /* ================= CHECK LOGIN + INIT ================= */
+    useEffect(() => {
+        if (!initialized) return; // ⛔ chờ Context hydrate xong
+
+        const token = localStorage.getItem('token');
+
+        if (!user || !token) {
+            navigate('/login', { replace: true });
+            return;
+        }
+
+        setLoading(false);
+    }, [initialized, user, navigate]);
+
+    /* ================= FETCH DATA ================= */
     useEffect(() => {
         if (!loading) {
             fetchProfile();
@@ -61,7 +64,9 @@ export default function ProfilePage() {
     /* ================= LOADING ================= */
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center text-white">Đang kiểm tra đăng nhập...</div>
+            <div className="min-h-screen flex items-center justify-center text-white">
+                Đang tải thông tin tài khoản...
+            </div>
         );
     }
 
@@ -83,6 +88,7 @@ export default function ProfilePage() {
 
                 {active === 'email' && <ProfileEmail profile={profile} onEmailUpdated={fetchProfile} />}
 
+                {active === 'help' && <ProfileFeedback />}
                 {active === 'password' && <ProfilePassword />}
                 {active === 'settings' && <ProfileSettings />}
             </div>

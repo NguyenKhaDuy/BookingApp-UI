@@ -1,4 +1,4 @@
-import { User, Lock, Settings, Camera, Mail } from 'lucide-react';
+import { User, Lock, Settings, Camera, Mail, HelpCircle } from 'lucide-react';
 import { useRef, useState } from 'react';
 import axios from 'axios';
 import avatarDefault from '../../../assets/default-avatar.jpg';
@@ -107,6 +107,16 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
                 >
                     <Lock className="w-5 h-5" />
                     Đổi mật khẩu
+                </button>
+
+                {/* Feedback */}
+                <button
+                    onClick={() => setActive('help')}
+                    className={`flex items-center gap-3 p-3 rounded-xl mb-2 transition
+                    ${active === 'help' ? 'bg-orange-500 text-white shadow' : 'hover:bg-orange-100'}`}
+                >
+                    <HelpCircle className="w-5 h-5" />
+                    Trợ giúp
                 </button>
 
                 {/* SETTINGS */}

@@ -57,17 +57,23 @@ export default function TechnicianHome({ active }) {
             return;
         }
 
-        const decoded = jwtDecode(token);
+        //LƯU TOKEN NGAY
+        localStorage.setItem('token', token);
+
+        let decoded;
+        try {
+            decoded = jwtDecode(token);
+        } catch (err) {
+            navigate('/login');
+            return;
+        }
+
         const roles = decoded.roles || [];
 
         if (!roles.includes('TECHNICIAN')) {
             navigate('/login');
             return;
         }
-
-        localStorage.setItem('token', token);
-
-        connectWebSocket(token);
 
         const unsubscribe = addWebSocketListener((msg) => {
             setNotification(msg);
@@ -76,9 +82,10 @@ export default function TechnicianHome({ active }) {
         });
 
         return () => {
-            unsubscribe(); // 🔥 QUAN TRỌNG
+            unsubscribe();
         };
     }, [navigate]);
+
 
     // ===================== COUNTDOWN 60s =====================
     useEffect(() => {

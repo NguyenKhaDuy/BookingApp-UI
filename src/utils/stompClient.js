@@ -4,13 +4,10 @@ import SockJS from 'sockjs-client';
 
 let stompClient = null;
 let isConnected = false;
-
 let globalListeners = [];
 
-export function connectWebSocket(token = null) {
-    if (isConnected && stompClient) {
-        return stompClient;
-    }
+export function connectWebSocket(token) {
+    if (isConnected && stompClient) return stompClient;
 
     const socket = new SockJS('http://localhost:8081/ws');
 
@@ -36,15 +33,27 @@ export function connectWebSocket(token = null) {
         });
     };
 
+    stompClient.onDisconnect = () => {
+        console.log('❌ WebSocket DISCONNECTED');
+        isConnected = false;
+        stompClient = null;
+    };
+
     stompClient.activate();
     return stompClient;
 }
 
-// ✅ FIX CHÍNH Ở ĐÂY
+export function disconnectWebSocket() {
+    if (stompClient) {
+        stompClient.deactivate();
+        stompClient = null;
+        isConnected = false;
+    }
+}
+
 export function addWebSocketListener(callback) {
     globalListeners.push(callback);
 
-    // 👉 TRẢ VỀ HÀM UNSUBSCRIBE
     return () => {
         globalListeners = globalListeners.filter((fn) => fn !== callback);
     };

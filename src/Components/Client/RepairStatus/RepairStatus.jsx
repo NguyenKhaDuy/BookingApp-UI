@@ -122,30 +122,31 @@ export default function RepairStatusPage() {
 
 
     useEffect(() => {
-            // Lấy cookie token/email sau khi redirect OAuth2
-            const getCookie = (name) => {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-            };
-    
-            const token = getCookie('token');
-            console.log(token);
-    
-            if (token) {
-                localStorage.setItem('token', token);
+        // Lấy cookie token sau OAuth
+        const getCookie = (name) => {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        };
+
+        const token = getCookie('token');
+        if (token) {
+            localStorage.setItem('token', token);
+        }
+
+        const unsubscribe = addWebSocketListener((msg) => {
+            showToast(`🔔 ${msg.title}\n${msg.body}`, 'success');
+
+            if (msg) {
+                fetchRequests();
             }
-    
-            // Kết nối WS với token mới
-            connectWebSocket(token);
-    
-            addWebSocketListener((msg) => {
-                showToast(`🔔 ${msg.title}\n${msg.body}`, 'success');
-                if (msg) {
-                    fetchRequests();
-                }
-            });
-        }, []); // Chỉ chạy một lần khi mount
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, []);
+
 
     /* ================= STATUS LIST ================= */
     const statusList = [

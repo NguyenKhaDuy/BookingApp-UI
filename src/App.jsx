@@ -17,37 +17,40 @@ import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
 import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
 import TechnicianHome from './Pages/Technician/TechnicianHome/TechnicianHome'
+import { WebSocketProvider } from './Context/WebSocketProvider';
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                {/* ================= CLIENT LAYOUT ================= */}
-                <Route element={<ClientLayout />}>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/notification/:id" element={<Notification />} />
-                    <Route path="/services" element={<ServicePage />} />
-                    <Route path="/technicians" element={<TechnicianPage />} />
-                    <Route path="/technicians/techniciandetail/:id_user" element={<TechnicianDetailPage />} />
-                    <Route path="/login" element={<LoginPage />} />
-                    <Route path="/register" element={<Register />} />
-                    <Route path="/profile" element={<ProfilePage />} />
-                    <Route path="/request" element={<RequestPage />} />
-                    <Route path="/forgot-password" element={<ForgotPassword />} />
-                    <Route path="/booking" element={<BookingPage />} />
-                    <Route path="/booking/:idTech" element={<BookingPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                </Route>
+        <WebSocketProvider>
+            <BrowserRouter>
+                <Routes>
+                    {/* ================= CLIENT LAYOUT ================= */}
+                    <Route element={<ClientLayout />}>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/notification/:id" element={<Notification />} />
+                        <Route path="/services" element={<ServicePage />} />
+                        <Route path="/technicians" element={<TechnicianPage />} />
+                        <Route path="/technicians/techniciandetail/:id_user" element={<TechnicianDetailPage />} />
+                        <Route path="/login" element={<LoginPage />} />
+                        <Route path="/register" element={<Register />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/request" element={<RequestPage />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/booking" element={<BookingPage />} />
+                        <Route path="/booking/:idTech" element={<BookingPage />} />
+                        <Route path="/contact" element={<ContactPage />} />
+                    </Route>
 
-                {/* ================= ADMIN LAYOUT ================= */}
-                <Route path="/admin/home" element={<DashboardLayout />} />
-                {/* <Route path="/admin/home" element={<AdminHome />} /> */}
-                {/* <Route path="/admin/users" element={<AdminCustomer />} /> */}
-                {/* </Route> */}
+                    {/* ================= ADMIN LAYOUT ================= */}
+                    <Route path="/admin/home" element={<DashboardLayout />} />
+                    {/* <Route path="/admin/home" element={<AdminHome />} /> */}
+                    {/* <Route path="/admin/users" element={<AdminCustomer />} /> */}
+                    {/* </Route> */}
 
-                {/* ================= TECHNICIAN LAYOUT ================= */}
-                <Route path="/technician/home" element={<TechnicianLayout />} />
-            </Routes>
-        </BrowserRouter>
+                    {/* ================= TECHNICIAN LAYOUT ================= */}
+                    <Route path="/technician/home" element={<TechnicianLayout />} />
+                </Routes>
+            </BrowserRouter>
+        </WebSocketProvider>
     );
 }
 
