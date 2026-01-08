@@ -1,10 +1,27 @@
-import React, { Fragment, useState, useEffect } from 'react';
+import React, { Fragment, useState, useEffect, useContext } from 'react';
 import RepairStatus from '../../../Components/Client/RepairStatus/RepairStatus';
 import RequestHeader from '../../../Components/Client/RequestHeader/RequestHeader';
 import Invoice from '../../../Components/Client/Invoice/Invoice';
+import { UserContext } from '../../../Context/UserContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function RequestPage() {
     const [tab, setTab] = useState('request');
+    const navigate = useNavigate();
+    const { user } = useContext(UserContext);
+    const [loading, setLoading] = useState(true);
+
+     useEffect(() => {
+         const user = localStorage.getItem('user');
+         const token = localStorage.getItem('token');
+
+         if (!user || !token) {
+             navigate('/login', { replace: true });
+             return;
+         }
+
+         setLoading(false);
+     }, [navigate]);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);

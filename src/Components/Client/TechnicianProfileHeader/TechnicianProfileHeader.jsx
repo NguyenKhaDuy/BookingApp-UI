@@ -1,8 +1,10 @@
-export default function TechnicianProfileHeader({ tech = {} }) {
+import { useNavigate } from "react-router-dom";
+import avatar from '../../../assets/default-avatar.jpg'
+
+export default function TechnicianProfileHeader({ tech }) {
     const maxStars = 5;
-
-    const isOnline = tech.status_technician === '' || tech.isOnline === true;
-
+    const isOnline = tech.status_technician === 'ONLINE';
+    const navigate = useNavigate();
     return (
         <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col items-center text-center relative">
             {/* Status badge */}
@@ -16,7 +18,7 @@ export default function TechnicianProfileHeader({ tech = {} }) {
 
             {/* Avatar */}
             <img
-                src={tech.avatarBase64 ? `data:image/jpeg;base64,${tech.avatarBase64}` : '/avatar-default.png'}
+                src={tech.avatarBase64 ? `data:image/jpeg;base64,${tech.avatarBase64}` : avatar}
                 alt={tech.full_name || 'Technician'}
                 className="w-28 h-28 rounded-full object-cover shadow-md"
             />
@@ -42,6 +44,7 @@ export default function TechnicianProfileHeader({ tech = {} }) {
             {/* Action Buttons */}
             <div className="flex gap-3 mt-4">
                 <button
+                    onClick={() => navigate(`/booking/${tech.id_user}`)}
                     disabled={!isOnline}
                     className={`px-5 py-2 rounded-xl shadow
             ${

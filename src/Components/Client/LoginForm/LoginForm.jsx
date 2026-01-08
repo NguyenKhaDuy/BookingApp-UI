@@ -3,11 +3,13 @@ import axios from 'axios';
 import { Mail, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
+import { useToast } from '../../../Context/ToastContext';
 
 
 let stompClient = null;
 
 export default function LoginForm() {
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const { setUser } = useContext(UserContext); // Lấy setUser từ context
 
@@ -26,8 +28,8 @@ export default function LoginForm() {
         try {
             const res = await axios.post('http://localhost:8081/api/login/', form, { withCredentials: true });
 
-            // 🔥 LƯU USER INFO
-            // localStorage.setItem('user', JSON.stringify(res.data));
+            //LƯU USER INFO
+            localStorage.setItem('user', JSON.stringify(res.data));
             setUser(res.data); // cập nhật ngay UI Header
 
             const roles = res.data.roles || [];
@@ -44,7 +46,7 @@ export default function LoginForm() {
 
             navigate('/');
         } catch (error) {
-            alert('Sai email hoặc mật khẩu!');
+            showToast('Sai email hoặc mật khẩu', 'error');
         }
     };
 

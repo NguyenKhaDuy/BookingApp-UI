@@ -4,20 +4,17 @@ import SockJS from 'sockjs-client';
 
 let stompClient = null;
 let isConnected = false;
+let globalListeners = [];
 
-let globalListeners = []; // Danh sách hàm callback muốn nhận message WS
-
-export function connectWebSocket(token = null) {
-    if (isConnected && stompClient) {
-        return stompClient;
-    }
+export function connectWebSocket(token) {
+    if (isConnected && stompClient) return stompClient;
 
     const socket = new SockJS('http://localhost:8081/ws');
 
     stompClient = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,
-        connectHeaders: token ? { Authorization: 'Bearer ' + token } : {}, // 👈 CHƯA login thì KHÔNG gửi token
+        connectHeaders: token ? { Authorization: 'Bearer ' + token } : {},
         debug: (str) => console.log('[WS]', str),
     });
 
@@ -25,24 +22,39 @@ export function connectWebSocket(token = null) {
         isConnected = true;
         console.log('✅ WebSocket CONNECTED');
 
-        // GLOBAL – ai cũng nhận
         stompClient.subscribe('/topic/notify', (msg) => {
             const data = JSON.parse(msg.body);
             globalListeners.forEach((fn) => fn(data));
         });
 
-        // PERSONAL – chỉ khi login
         stompClient.subscribe('/user/queue/notify', (msg) => {
             const data = JSON.parse(msg.body);
             globalListeners.forEach((fn) => fn(data));
         });
     };
 
+    stompClient.onDisconnect = () => {
+        console.log('❌ WebSocket DISCONNECTED');
+        isConnected = false;
+        stompClient = null;
+    };
+
     stompClient.activate();
     return stompClient;
 }
 
-// Cho Home đăng ký hàm nhận thông báo
+export function disconnectWebSocket() {
+    if (stompClient) {
+        stompClient.deactivate();
+        stompClient = null;
+        isConnected = false;
+    }
+}
+
 export function addWebSocketListener(callback) {
     globalListeners.push(callback);
+
+    return () => {
+        globalListeners = globalListeners.filter((fn) => fn !== callback);
+    };
 }

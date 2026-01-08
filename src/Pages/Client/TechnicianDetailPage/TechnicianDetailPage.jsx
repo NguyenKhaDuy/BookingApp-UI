@@ -24,7 +24,7 @@ export default function TechnicianDetailPage() {
         axios
             .get(`http://localhost:8081/api/detail-technician/id=${id_user}`)
             .then((res) => {
-                setTechData(res.data.data); // 👈 data backend trả về
+                setTechData(res.data.data);// 👈 data backend trả về
                 setLoading(false);
             })
             .catch((err) => {

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
+import axios from 'axios';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function OtpForm({ email, onVerify }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(300);
     const inputRefs = useRef([]);
+    const { showToast } = useToast();
 
     useEffect(() => {
         if (timer <= 0) return;
@@ -33,13 +36,26 @@ export default function OtpForm({ email, onVerify }) {
         }
     };
 
-    const resendOtp = () => {
+    const resendOtp = async () => {
         if (timer > 0) return;
-        setTimer(300);
-        setOtp(['', '', '', '', '', '']);
-        inputRefs.current[0].focus();
-        alert('Mã OTP mới đã được gửi');
+
+        try {
+            const res = await axios.post(
+                'http://localhost:8081/api/resend-otp/',
+                {},
+                { withCredentials: true }, // ⭐ gửi session
+            );
+
+            setTimer(300);
+            setOtp(['', '', '', '', '', '']);
+            inputRefs.current[0].focus();
+            showToast(res.data.message, 'success');
+        } catch (error) {
+            // console.error(error);
+            showToast(error.response?.data?.message || 'Gửi OTP thất bại', 'error');
+        }
     };
+
 
     const handleVerify = () => {
         onVerify(otp.join(''));

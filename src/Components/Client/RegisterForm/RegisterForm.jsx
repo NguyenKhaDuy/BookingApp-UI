@@ -1,114 +1,112 @@
 import { useState } from 'react';
 import logo from '../../../assets/logo.png';
-import { User, Mail, Phone, Lock } from 'lucide-react';
+import { User, Mail, Phone, Lock, MapPin, Calendar, Users } from 'lucide-react';
 
-export default function RegisterForm({ onSendOtp }) {
+export default function RegisterForm({ onRegisterSuccess }) {
     const [form, setForm] = useState({
-        fullName: '',
+        full_name: '',
         email: '',
-        phone: '',
+        phone_number: '',
+        address: '',
         password: '',
         confirmPassword: '',
+        dob: '',
+        gender: 'MALE',
     });
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const inputClass =
-        'w-full pl-10 pr-4 py-3 border rounded-lg bg-white ' +
-        'focus:border-orange-500 focus:ring-2 focus:ring-orange-300 ' +
-        'outline-none transition';
+    const handleRegister = async () => {
+        setError('');
 
-    const iconClass =
-        'w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 ' +
-        'group-focus-within:text-orange-500 transition';
+        if (form.password !== form.confirmPassword) {
+            setError('Mật khẩu xác nhận không khớp');
+            return;
+        }
+
+        const payload = {
+            full_name: form.full_name,
+            email: form.email,
+            phone_number: form.phone_number,
+            address: form.address,
+            password: form.password,
+            dob: form.dob,
+            gender: form.gender,
+        };
+
+        try {
+            setLoading(true);
+            const res = await fetch('http://localhost:8081/api/register/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include', // ⭐⭐⭐ QUAN TRỌNG
+                body: JSON.stringify(payload),
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+
+            onRegisterSuccess(form.email);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
 
     return (
-        <>
-            {/* HEADER */}
+        <div>
             <div className="text-center mb-6">
-                <img src={logo} alt="logo" className="w-20 h-20 object-contain mx-auto" />
+                <img src={logo} className="w-20 h-20 mx-auto" />
                 <h1 className="text-2xl font-bold mt-4">Đăng ký</h1>
-                <p className="text-gray-500 text-sm mt-1">Nhập thông tin để tạo tài khoản mới</p>
             </div>
 
-            {/* FORM INPUTS */}
             <div className="space-y-4">
-                {/* Họ tên */}
-                <div className="relative group">
-                    <User className={iconClass} />
-                    <input
-                        type="text"
-                        name="fullName"
-                        placeholder="Họ và tên"
-                        value={form.fullName}
-                        onChange={handleChange}
-                        className={inputClass}
-                    />
-                </div>
+                <Input icon={User} name="full_name" placeholder="Họ tên" onChange={handleChange} />
+                <Input icon={Mail} name="email" placeholder="Email" onChange={handleChange} />
+                <Input icon={Phone} name="phone_number" placeholder="SĐT" onChange={handleChange} />
+                <Input icon={MapPin} name="address" placeholder="Địa chỉ" onChange={handleChange} />
 
-                {/* Email */}
-                <div className="relative group">
-                    <Mail className={iconClass} />
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                        value={form.email}
-                        onChange={handleChange}
-                        className={inputClass}
-                    />
-                </div>
+                <input type="date" name="dob" onChange={handleChange} className="w-full border p-3 rounded" />
 
-                {/* Số điện thoại */}
-                <div className="relative group">
-                    <Phone className={iconClass} />
-                    <input
-                        type="text"
-                        name="phone"
-                        placeholder="Số điện thoại"
-                        value={form.phone}
-                        onChange={handleChange}
-                        className={inputClass}
-                    />
-                </div>
+                <select name="gender" onChange={handleChange} className="w-full border p-3 rounded">
+                    <option value="MALE">Nam</option>
+                    <option value="FEMALE">Nữ</option>
+                </select>
 
-                {/* Mật khẩu */}
-                <div className="relative group">
-                    <Lock className={iconClass} />
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Mật khẩu"
-                        value={form.password}
-                        onChange={handleChange}
-                        className={inputClass}
-                    />
-                </div>
+                <Input icon={Lock} type="password" name="password" placeholder="Mật khẩu" onChange={handleChange} />
+                <Input
+                    icon={Lock}
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Xác nhận mật khẩu"
+                    onChange={handleChange}
+                />
 
-                {/* Xác nhận mật khẩu */}
-                <div className="relative group">
-                    <Lock className={iconClass} />
-                    <input
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Xác nhận mật khẩu"
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                        className={inputClass}
-                    />
-                </div>
+                {error && <p className="text-red-500">{error}</p>}
 
-                {/* BUTTON */}
                 <button
-                    onClick={() => onSendOtp(form.email)}
-                    className="w-full bg-orange-500 text-white py-3 rounded-lg 
-                    font-semibold shadow-md hover:bg-orange-600 transition"
+                    onClick={handleRegister}
+                    disabled={loading}
+                    className="w-full bg-orange-500 text-white py-3 rounded-lg"
                 >
-                    Đăng ký
+                    {loading ? 'Đang xử lý...' : 'Đăng ký'}
                 </button>
             </div>
-        </>
+        </div>
+    );
+}
+
+function Input({ icon: Icon, ...props }) {
+    return (
+        <div className="relative">
+            <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input {...props} className="w-full pl-10 p-3 border rounded" />
+        </div>
     );
 }
