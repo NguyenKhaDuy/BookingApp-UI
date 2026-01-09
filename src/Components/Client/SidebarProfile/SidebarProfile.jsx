@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import axios from 'axios';
 import avatarDefault from '../../../assets/default-avatar.jpg';
 import { useToast } from '../../../Context/ToastContext';
+import getCookie from '../../../utils/getToken';
 
 export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) {
     const fileInputRef = useRef(null);
@@ -22,7 +23,7 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
         if (!file) return;
 
         const user = JSON.parse(localStorage.getItem('user'));
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
 
         const formData = new FormData();
         formData.append('id_user', user.id_user);

@@ -3,9 +3,9 @@ import { CheckCircle, Clock, XCircle } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import RequestDetailModal from '../RequestDetailModal/RequestDetailModal';
 import RatingModal from '../RatingModal/RatingModal';
-import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
-import { m } from 'framer-motion';
+import getCookie from '../../../utils/getToken';
 
 /* ================= UTILS ================= */
 const formatDateTime = (dateArr, timeArr) => {
@@ -23,15 +23,13 @@ export default function RepairStatusPage() {
     const [showRating, setShowRating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [requestId, setRequestId] = useState(null);
+
     const { showToast } = useToast();
     const location = useLocation();
     const navigate = useNavigate();
     const formData = location.state?.formData;
     const images = location.state?.image_request;
 
-    // console.log(formData)
-
-    // 🔥 FLAG chặn create chạy 2 lần (React 18 StrictMode)
     const hasCreatedRef = useRef(false);
 
     /* ================= FETCH REQUESTS ================= */
@@ -39,7 +37,7 @@ export default function RepairStatusPage() {
         try {
             setLoading(true);
 
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
             const user = JSON.parse(localStorage.getItem('user'));
 
             if (!token || !user?.id_user) return;
@@ -55,48 +53,43 @@ export default function RepairStatusPage() {
             } else {
                 showToast(json.message || 'Không lấy được danh sách yêu cầu', 'error');
             }
-        } catch (err) {
+        } catch {
             showToast('Lỗi kết nối server', 'error');
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [showToast]);
 
     /* ================= LOAD FIRST TIME ================= */
     useEffect(() => {
         fetchRequests();
     }, [fetchRequests]);
 
-    /* ================= CREATE REQUEST (RUN ONLY ONCE) ================= */
+    /* ================= CREATE REQUEST (RUN ONCE) ================= */
     useEffect(() => {
         if (!formData) return;
-
         if (hasCreatedRef.current) return;
         hasCreatedRef.current = true;
 
         const createRequest = async () => {
             try {
-                const token = localStorage.getItem('token');
+                const token = getCookie('token');
                 if (!token) return;
 
                 const fd = new FormData();
-                // Thêm các field formData
                 Object.keys(formData).forEach((key) => {
                     fd.append(key, formData[key]);
                 });
 
-                // 🔥 Thêm ảnh nếu có
-                if (images && images.length > 0) {
-                    images.forEach((file, index) => {
-                        fd.append('imageRequest', file); // key 'images' giống backend nhận array
+                if (images?.length) {
+                    images.forEach((file) => {
+                        fd.append('imageRequest', file);
                     });
                 }
 
                 const res = await fetch('http://localhost:8081/api/customer/request/', {
                     method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
+                    headers: { Authorization: `Bearer ${token}` },
                     body: fd,
                 });
 
@@ -109,7 +102,7 @@ export default function RepairStatusPage() {
                     showToast(data.message || 'Tạo yêu cầu thất bại', 'error');
                     setActive('CANCEL');
                 }
-            } catch (err) {
+            } catch {
                 showToast('Lỗi hệ thống', 'error');
                 setActive('CANCEL');
             } finally {
@@ -118,34 +111,25 @@ export default function RepairStatusPage() {
         };
 
         createRequest();
-    }, [formData, images, fetchRequests, navigate, location.pathname]);
+    }, [formData, images, fetchRequests, navigate, location.pathname, showToast]);
 
-
+    /* ================= WEBSOCKET ================= */
     useEffect(() => {
-        // Lấy cookie token sau OAuth
-        const getCookie = (name) => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        };
-
-        const token = getCookie('token');
-        if (token) {
-            localStorage.setItem('token', token);
-        }
-
         const unsubscribe = addWebSocketListener((msg) => {
             showToast(`🔔 ${msg.title}\n${msg.body}`, 'success');
-
-            if (msg) {
-                fetchRequests();
-            }
+            fetchRequests();
         });
 
-        return () => {
-            unsubscribe();
-        };
-    }, []);
+        return unsubscribe;
+    }, [fetchRequests, showToast]);
+
+    const statusCountMap = requests.reduce((acc, r) => {
+        // Gộp SEARCHING vào WAITING_FOR_TECHNICIAN
+        const key = r.status_code === 'SEARCHING' ? 'WAITING_FOR_TECHNICIAN' : r.status_code;
+
+        acc[key] = (acc[key] || 0) + 1;
+        return acc;
+    }, {});
 
 
     /* ================= STATUS LIST ================= */
@@ -177,8 +161,34 @@ export default function RepairStatusPage() {
         },
     ];
 
-    /* ================= FILTER ================= */
-    const filteredRequests = requests.filter((r) => r.status_code === active);
+    /* ================= FILTER (FIX SEARCHING) ================= */
+    const filteredRequests = requests.filter((r) =>
+        active === 'WAITING_FOR_TECHNICIAN'
+            ? r.status_code === 'WAITING_FOR_TECHNICIAN' || r.status_code === 'SEARCHING'
+            : r.status_code === active,
+    );
+
+    /* ================= CANCEL ================= */
+    const handleCancelRequest = async (id) => {
+        try {
+            const token = getCookie('token');
+
+            const res = await fetch(`http://localhost:8081/api/customer/request/cancel/id=${id}`, {
+                method: 'PUT',
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                showToast(err.message || 'Hủy yêu cầu thất bại', 'error');
+                return;
+            }
+
+            fetchRequests();
+        } catch {
+            showToast('Có lỗi xảy ra', 'error');
+        }
+    };
 
     /* ================= UI ================= */
     return (
@@ -192,18 +202,27 @@ export default function RepairStatusPage() {
                         <div
                             key={s.key}
                             onClick={() => setActive(s.key)}
-                            className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition border
-                                ${
-                                    active === s.key
-                                        ? 'bg-orange-50 border-orange-400'
-                                        : 'hover:bg-gray-100 border-transparent'
-                                }
-                            `}
+                            className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition border
+        ${active === s.key ? 'bg-orange-50 border-orange-400' : 'hover:bg-gray-100 border-transparent'}`}
                         >
-                            {s.icon}
-                            <span className={`font-medium ${active === s.key ? 'text-orange-600' : 'text-gray-700'}`}>
-                                {s.label}
-                            </span>
+                            <div className="flex items-center gap-3">
+                                {s.icon}
+                                <span
+                                    className={`font-medium ${active === s.key ? 'text-orange-600' : 'text-gray-700'}`}
+                                >
+                                    {s.label}
+                                </span>
+                            </div>
+
+                            {/* 🔢 Số lượng */}
+                            {statusCountMap[s.key] > 0 && (
+                                <span
+                                    className={`min-w-[28px] text-center text-sm font-semibold px-2 py-0.5 rounded-full
+                ${active === s.key ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-700'}`}
+                                >
+                                    {statusCountMap[s.key]}
+                                </span>
+                            )}
                         </div>
                     ))}
                 </div>
@@ -238,12 +257,26 @@ export default function RepairStatusPage() {
                                 )}
                             </div>
 
-                            <div className="flex items-center gap-4">
-                                {item.status_code === 'WAITING_FOR_TECHNICIAN' && (
-                                    <div className="flex items-center gap-2 text-orange-500">
-                                        <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                                        <span>Đang tìm thợ</span>
-                                    </div>
+                            <div className="flex items-center gap-3">
+                                {(item.status_code === 'SEARCHING' ||
+                                    item.status_code === 'WAITING_FOR_TECHNICIAN') && (
+                                    <>
+                                        <div className="flex items-center gap-2 text-orange-500">
+                                            <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                                            <span>
+                                                {item.status_code === 'SEARCHING'
+                                                    ? 'Đang tìm thợ'
+                                                    : 'Đang chờ thợ nhận'}
+                                            </span>
+                                        </div>
+
+                                        <button
+                                            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                            onClick={() => handleCancelRequest(item.id_request)}
+                                        >
+                                            Hủy
+                                        </button>
+                                    </>
                                 )}
 
                                 <button
@@ -255,12 +288,12 @@ export default function RepairStatusPage() {
                                 >
                                     Chi tiết
                                 </button>
-                                {/* ⭐ Đánh giá - CHỈ KHI HOÀN THÀNH */}
+
                                 {item.status_code === 'COMPLETED' && (
                                     <button
                                         className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                                         onClick={() => {
-                                            setSelected(item); // 👈 truyền item cho RatingModal
+                                            setSelected(item);
                                             setShowRating(true);
                                         }}
                                     >
@@ -278,7 +311,7 @@ export default function RepairStatusPage() {
                 requestId={requestId}
                 onClose={() => {
                     setShowModal(false);
-                    setRequestId(null); // 👈 FIX BUG NGẦM
+                    setRequestId(null);
                 }}
             />
 
@@ -286,3 +319,4 @@ export default function RepairStatusPage() {
         </div>
     );
 }
+

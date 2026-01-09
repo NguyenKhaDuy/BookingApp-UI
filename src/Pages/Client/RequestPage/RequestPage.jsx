@@ -4,41 +4,48 @@ import RequestHeader from '../../../Components/Client/RequestHeader/RequestHeade
 import Invoice from '../../../Components/Client/Invoice/Invoice';
 import { UserContext } from '../../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
-
+import getCookie from '../../../utils/getToken';
+import { useToast } from '../../../Context/ToastContext';
 export default function RequestPage() {
     const [tab, setTab] = useState('request');
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
     const [loading, setLoading] = useState(true);
 
-     useEffect(() => {
-         const user = localStorage.getItem('user');
-         const token = localStorage.getItem('token');
+    useEffect(() => {
+        const user = localStorage.getItem('user');
+        const token = getCookie('token');
 
-         if (!user || !token) {
-             navigate('/login', { replace: true });
-             return;
-         }
+        if (!user || !token) {
+            navigate('/login', { replace: true });
+            return;
+        }
 
-         setLoading(false);
-     }, [navigate]);
+        setLoading(false);
+    }, [navigate]);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const code = params.get('vnp_ResponseCode');
         const txnRef = params.get('vnp_TxnRef');
 
-        if (code === '00' && txnRef) {
-            // ✅ tự chuyển sang tab hóa đơn
+        // ⛔ Không phải redirect từ VNPAY → bỏ qua
+        if (!code || !txnRef) return;
+
+        if (code === '00') {
             setTab('invoice');
 
-            // ✅ gọi backend cập nhật trạng thái
             fetch(`http://localhost:8081/api/payment-info/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}`);
 
-            // ✅ xoá query param cho sạch URL
-            window.history.replaceState({}, document.title, '/request');
+            showToast('Thanh toán thành công', 'success');
+        } else {
+            showToast('Thanh toán không thành công', 'error');
         }
-    }, []);
+
+        // 🧹 Clear URL
+        window.history.replaceState({}, document.title, '/request');
+    }, [showToast]);
 
     return (
         <Fragment>

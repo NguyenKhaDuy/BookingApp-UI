@@ -13,6 +13,7 @@ import { UserContext } from '../../../Context/UserContext';
 
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
+import getCookie from '../../../utils/getToken';
 
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
@@ -44,11 +45,6 @@ export default function TechnicianHome({ active }) {
 
     // ===================== AUTH + WEBSOCKET =====================
     useEffect(() => {
-        const getCookie = (name) => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        };
 
         const token = getCookie('token');
 
@@ -56,9 +52,6 @@ export default function TechnicianHome({ active }) {
             navigate('/login');
             return;
         }
-
-        //LƯU TOKEN NGAY
-        localStorage.setItem('token', token);
 
         let decoded;
         try {
@@ -77,14 +70,21 @@ export default function TechnicianHome({ active }) {
 
         const unsubscribe = addWebSocketListener((msg) => {
             setNotification(msg);
-            setOpen(true);
-            setCountdown(60);
+            if (msg.type === "REQUEST_CANCEL") {
+                showToast(msg.body, 'success');
+                setOpen(false);
+                setNotification(null);
+            } else {
+                setOpen(true);
+                setCountdown(60);
+            }
         });
 
         return () => {
             unsubscribe();
         };
     }, [navigate]);
+   
 
 
     // ===================== COUNTDOWN 60s =====================
@@ -122,7 +122,7 @@ export default function TechnicianHome({ active }) {
         if (!notification) return;
         try {
             // Lấy id_technician từ token
-            const token = localStorage.getItem('token');;
+            const token = getCookie('token');;
             const id_technician = getTechnicianId(); 
 
             // Lấy id_request từ notification
@@ -163,7 +163,7 @@ export default function TechnicianHome({ active }) {
 
         try {
             // Lấy token và id_technician
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
             const id_technician = getTechnicianId(); // hàm của bạn lấy từ token
 
             // Lấy id_request từ notification

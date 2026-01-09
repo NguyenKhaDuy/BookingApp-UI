@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Bell } from 'lucide-react';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
+import getCookie from '../../../utils/getToken';
 
 const formatTime = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -19,7 +20,7 @@ export default function NotificationDetail() {
 
     useEffect(() => {
         const user = localStorage.getItem('user');
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
 
         if (!user || !token) {
             navigate('/login', { replace: true });

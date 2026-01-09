@@ -120,7 +120,6 @@ export default function HeaderBooking() {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
         setUser(null);
         setAvatarMenuOpen(false);
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
@@ -278,9 +277,9 @@ export default function HeaderBooking() {
                                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                                     <path d="M9 3h6v4H9z" />
                                 </svg>
-                                <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full shadow">
+                                {/* <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full shadow">
                                     3
-                                </span>
+                                </span> */}
                             </Link>
                         )}
 

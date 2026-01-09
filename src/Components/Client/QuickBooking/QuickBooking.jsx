@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ServiceSelect from '../ServiceSelect/ServiceSelect';
 import { useToast } from '../../../Context/ToastContext';
-
+import getCookie from '../../../utils/getToken';
 export default function QuickBooking() {
     const navigate = useNavigate();
      const { showToast } = useToast();
@@ -49,7 +49,7 @@ export default function QuickBooking() {
     };
 
     const handleSubmit = () => {
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
         const idCustomer = getCustomerId();
         const nameCustomer = getCustomerName();
 

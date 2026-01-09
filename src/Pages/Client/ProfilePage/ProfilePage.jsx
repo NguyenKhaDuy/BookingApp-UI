@@ -12,6 +12,7 @@ import ProfileEmail from '../../../Components/Client/ProfileEmail/ProfileEmail';
 import ProfileFeedback from '../../../Components/Client/ProfileFeedback/ProfileFeedback';
 
 import { UserContext } from '../../../Context/UserContext';
+import getCookie from '../../../utils/getToken';
 
 export default function ProfilePage() {
     const navigate = useNavigate();
@@ -26,7 +27,7 @@ export default function ProfilePage() {
         if (!user?.id_user) return;
 
         try {
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
 
             const res = await axios.get(`http://localhost:8081/api/customer/profile/id=${user.id_user}`, {
                 headers: {
@@ -44,7 +45,7 @@ export default function ProfilePage() {
     useEffect(() => {
         if (!initialized) return; // ⛔ chờ Context hydrate xong
 
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
 
         if (!user || !token) {
             navigate('/login', { replace: true });
@@ -88,8 +89,8 @@ export default function ProfilePage() {
 
                 {active === 'email' && <ProfileEmail profile={profile} onEmailUpdated={fetchProfile} />}
 
-                {active === 'help' && <ProfileFeedback />}
-                {active === 'password' && <ProfilePassword />}
+                {active === 'help' && <ProfileFeedback profile={profile} />}
+                {active === 'password' && <ProfilePassword profile={profile} />}
                 {active === 'settings' && <ProfileSettings />}
             </div>
         </div>

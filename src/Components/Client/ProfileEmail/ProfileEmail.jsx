@@ -5,6 +5,7 @@ import OtpForm from '../OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
+import getCookie from '../../../utils/getToken';
 
 export default function ProfileEmail({ profile, onEmailUpdated }) {
     const [step, setStep] = useState(1);
@@ -19,7 +20,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
     /* ================= SEND OTP ================= */
     const handleSendOtp = async () => {
         try {
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
 
             await axios.put(
                 'http://localhost:8081/api/customer/email',
@@ -44,7 +45,6 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
         setUser(null);
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };

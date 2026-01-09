@@ -4,6 +4,7 @@ import ServiceSelect from '../../../Components/Client/ServiceSelect/ServiceSelec
 import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useToast } from '../../../Context/ToastContext';
+import getCookie from '../../../utils/getToken';
 
 export default function BookingTechnicianForm() {
     const { showToast } = useToast();
@@ -81,7 +82,7 @@ export default function BookingTechnicianForm() {
 
     // Submit form
     const handleSubmit = () => {
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
         const idCustomer = getCustomerId();
         const nameCustomer = getCustomerName();
 

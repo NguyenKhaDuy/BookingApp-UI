@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../../Context/ToastContext';
+import getCookie from '../../../utils/getToken';
 
 /* ================= FORMAT DOB ================= */
 const formatDobToInput = (dob) => {
@@ -66,7 +67,7 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
         try {
             setLoading(true);
 
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
             const user = JSON.parse(localStorage.getItem('user'));
 
             const payload = {
