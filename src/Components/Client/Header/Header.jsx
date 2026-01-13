@@ -122,6 +122,7 @@ export default function HeaderBooking() {
         localStorage.removeItem('user');
         setUser(null);
         setAvatarMenuOpen(false);
+        navigate('/');
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
@@ -138,7 +139,9 @@ export default function HeaderBooking() {
                         >
                             <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-2xl" />
                         </motion.div>
-                        <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">BookingApp</span>
+                        <span className="text-3xl font-extrabold tracking-wide text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]">
+                            KingTech
+                        </span>
                     </div>
                 </Link>
 

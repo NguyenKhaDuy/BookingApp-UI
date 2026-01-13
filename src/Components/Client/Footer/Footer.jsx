@@ -8,7 +8,7 @@ export default function Footer() {
                 <div>
                     <div className="d-flex align-items-center gap-3">
                         <img src={logo} alt="logo" className="w-20 h-20 object-contain" />
-                        <h2 className="text-2xl font-bold text-white mb-4">BookingApp</h2>
+                        <h2 className="text-2xl font-bold text-white mb-4">KingTech</h2>
                     </div>
 
                     <p className="text-gray-400 leading-relaxed">
@@ -84,7 +84,7 @@ export default function Footer() {
                         </li>
                         <li className="flex items-start gap-3">
                             <Mail className="w-5 h-5 text-orange-500 mt-1" />
-                            <span>bookingappsince2025@gmail.com</span>
+                            <span>KingTechSince2025@gmail.com</span>
                         </li>
                     </ul>
                 </div>
@@ -92,7 +92,7 @@ export default function Footer() {
 
             {/* Divider */}
             <div className="border-t border-white/10 mt-16 pt-6 text-center text-gray-500 text-sm">
-                © {new Date().getFullYear()} <span className="text-orange-500">BookingApp</span>. All rights reserved.
+                © {new Date().getFullYear()} <span className="text-orange-500">KingTech</span>. All rights reserved.
             </div>
         </footer>
     );

@@ -6,6 +6,7 @@ import TechnicianHome from '../../Pages/Technician/TechnicianHome/TechnicianHome
 
 export default function TechnicianLayout() {
     const [active, setActive] = useState('dashboard');
+    
     return (
         <div className="flex">
             {/* Sidebar */}

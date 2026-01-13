@@ -7,17 +7,16 @@ import Notification from '../../../Components/Technician/Notifications/Notificat
 import Account from '../../../Components/Technician/Account/Account';
 import SkillManager from '../../../Components/Technician/SkillManager/SkillManager';
 import LocationManager from '../../../Components/Technician/LocationManager/LocationManager';
-import TechnicianInvoiceList from '../../../Components/Technician/TechnicianInvoiceList/TechnicianInvoiceList';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
-
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
 
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
-     const { showToast } = useToast();
+    const { showToast } = useToast();
     const { user, setUser } = useContext(UserContext);
     const [open, setOpen] = useState(false);
 
@@ -225,7 +224,7 @@ export default function TechnicianHome({ active }) {
                 {active === 'dashboard' && <TechnicianDashboard />}
                 {active === 'orders' && <RepairRequest />}
                 {active === 'notifications' && <Notification />}
-                {active === 'invoiceList' && <TechnicianInvoiceList />}
+                {active === 'schedules' && <TechnicianScheduleList />}
                 {active === 'location' && <LocationManager />}
                 {active === 'skills' && <SkillManager />}
                 {active === 'account' && <Account />}

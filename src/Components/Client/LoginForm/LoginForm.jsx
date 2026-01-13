@@ -44,7 +44,10 @@ export default function LoginForm() {
                 return;
             }
 
-            navigate('/');
+            if (roles.includes('CUSTOMER')) {
+                navigate('/');
+                return;
+            }
         } catch (error) {
             showToast('Sai email hoặc mật khẩu', 'error');
         }

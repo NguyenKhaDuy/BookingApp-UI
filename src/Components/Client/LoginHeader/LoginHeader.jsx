@@ -13,7 +13,7 @@ export default function LoginHeader() {
 
             <p className="text-sm text-gray-500 max-w-xs leading-relaxed">
                 Đăng nhập để tiếp tục sử dụng dịch vụ của
-                <span className="font-semibold"> BookingApp</span>.
+                <span className="font-semibold"> KingTech</span>.
             </p>
         </div>
     );

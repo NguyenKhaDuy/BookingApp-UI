@@ -1,13 +1,46 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
+import getCookie from '../../../utils/getToken';
 
-export default function InvoiceCreate({ orderId, onClose }) {
+export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) {
     const [paid, setPaid] = useState(false);
     const [items, setItems] = useState([{ name: '', quantity: 1, price: 0 }]);
     const [laborCost, setLaborCost] = useState(0);
-    const { showToast } = useToast();
+    const [loading, setLoading] = useState(false);
+    
+    /* ===== PAYMENT ===== */
+    const [paymentMethods, setPaymentMethods] = useState([]);
+    const [paymentMethodId, setPaymentMethodId] = useState('');
 
+    const { showToast } = useToast();
+    const token = getCookie('token');
+
+    /* ================== LOAD PAYMENT METHOD ================== */
+    useEffect(() => {
+        fetchPaymentMethods();
+    }, []);
+
+    const fetchPaymentMethods = async () => {
+        try {
+            const res = await axios.get('http://localhost:8081/api/paymentmethod/', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const methods = res.data?.data || [];
+            setPaymentMethods(methods);
+
+            // auto chọn cái đầu tiên
+            if (methods.length > 0) {
+                setPaymentMethodId(methods[0].id_method);
+            }
+        } catch (err) {
+            showToast('Không lấy được phương thức thanh toán', 'error');
+        }
+    };
+
+    /* ================== MATERIAL ================== */
     const addItem = () => setItems([...items, { name: '', quantity: 1, price: 0 }]);
     const removeItem = (i) => setItems(items.filter((_, idx) => idx !== i));
 
@@ -17,14 +50,68 @@ export default function InvoiceCreate({ orderId, onClose }) {
         setItems(updated);
     };
 
+    /* ================== TOTAL ================== */
     const totalMaterial = items.reduce((s, it) => s + it.quantity * it.price, 0);
     const total = totalMaterial + Number(laborCost || 0);
 
-    const createInvoice = () => {
-        setPaid(true);
-         showToast('Khách hàng đã thanh toán thành công!', 'success');
-        onClose();
+    /* ================== API CREATE ================== */
+    const createInvoice = async () => {
+        try {
+            if (!paymentMethodId) {
+                showToast('Vui lòng chọn phương thức thanh toán', 'error');
+                return;
+            }
+
+            if (items.some((i) => !i.name || i.quantity <= 0 || i.price <= 0)) {
+                showToast('Vui lòng nhập đầy đủ thông tin vật liệu', 'error');
+                return;
+            }
+
+            setLoading(true);
+
+            // ===== MATERIAL DETAILS =====
+            const detailInvoiceDTOS = items.map((it) => ({
+                name: it.name,
+                quantity: it.quantity,
+                price: it.price,
+                total_price: it.quantity * it.price,
+            }));
+
+            // ===== ADD LABOR COST AS DETAIL =====
+            if (Number(laborCost) > 0) {
+                detailInvoiceDTOS.push({
+                    name: 'Công thợ',
+                    quantity: 1,
+                    price: Number(laborCost),
+                    total_price: Number(laborCost),
+                });
+            }
+
+            const payload = {
+                request_id: orderId,
+                customer_id: customer.id_user,
+                payment_method_id: paymentMethodId,
+                detailInvoiceDTOS, //CÔNG THỢ NẰM Ở ĐÂY
+            };
+
+            await axios.post('http://localhost:8081/api/technician/invoices/', payload, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            setPaid(true);
+            showToast('Tạo hóa đơn thành công!', 'success');
+            onSuccess?.();
+            onClose();
+        } catch (err) {
+            showToast(err.response?.data?.message || 'Tạo hóa đơn thất bại', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
+
 
     return (
         <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
@@ -45,8 +132,24 @@ export default function InvoiceCreate({ orderId, onClose }) {
                     <span className="text-orange-600 font-semibold"> #{orderId}</span>
                 </div>
 
-                {/* ======= BODY SCROLL ======= */}
+                {/* ======= BODY ======= */}
                 <div className="overflow-y-auto max-h-[70vh] pr-2">
+                    {/* Payment method */}
+                    <div className="mb-6">
+                        <label className="font-semibold block mb-1">Phương thức thanh toán</label>
+                        <select
+                            value={paymentMethodId}
+                            onChange={(e) => setPaymentMethodId(Number(e.target.value))}
+                            className="p-4 rounded-xl border border-gray-300 outline-orange-500 w-full"
+                        >
+                            {paymentMethods.map((pm) => (
+                                <option key={pm.id_method} value={pm.id_method}>
+                                    {pm.name_method} {pm.provider ? `- ${pm.provider}` : ''}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
                     {/* Header row */}
                     <div className="grid grid-cols-12 gap-4 font-semibold text-gray-700 mb-2">
                         <div className="col-span-5">Tên vật liệu</div>
@@ -55,38 +158,30 @@ export default function InvoiceCreate({ orderId, onClose }) {
                         <div className="col-span-2">Xóa</div>
                     </div>
 
-                    {/* SCROLL materials */}
-                    <div
-                        className={`
-                            pr-2 mb-4 bg-white
-                            ${items.length >= 2 ? 'max-h-32 overflow-y-auto' : ''}
-                        `}
-                    >
+                    {/* Materials */}
+                    <div className={`${items.length >= 2 ? 'max-h-32 overflow-y-auto' : ''} pr-2 mb-4`}>
                         {items.map((item, i) => (
                             <div key={i} className="grid grid-cols-12 gap-4 mb-3 items-center">
                                 <input
-                                    className="col-span-5 border p-2 rounded"
+                                    className="col-span-5 p-4 rounded-xl border border-gray-300 outline-orange-500"
                                     placeholder="VD: Ốc vít, dây điện..."
                                     value={item.name}
                                     onChange={(e) => updateItem(i, 'name', e.target.value)}
                                 />
-
                                 <input
                                     type="number"
-                                    className="col-span-2 border p-2 rounded"
+                                    className="col-span-2 p-4 rounded-xl border border-gray-300 outline-orange-500"
                                     value={item.quantity}
                                     onChange={(e) => updateItem(i, 'quantity', Number(e.target.value))}
                                 />
-
                                 <input
                                     type="number"
-                                    className="col-span-3 border p-2 rounded"
+                                    className="col-span-3 p-4 rounded-xl border border-gray-300 outline-orange-500"
                                     value={item.price}
                                     onChange={(e) => updateItem(i, 'price', Number(e.target.value))}
                                 />
-
                                 <button
-                                    className="col-span-2 text-red-500 hover:text-red-600"
+                                    className="col-span-2 text-red-500 hover:text-red-600 align-content-center"
                                     onClick={() => removeItem(i)}
                                 >
                                     <Trash2 />
@@ -107,7 +202,7 @@ export default function InvoiceCreate({ orderId, onClose }) {
                         <label className="font-semibold block mb-1">Tiền công thợ</label>
                         <input
                             type="number"
-                            className="border p-3 rounded w-full"
+                            className="p-4 rounded-xl border border-gray-300 outline-orange-500 w-full"
                             value={laborCost}
                             onChange={(e) => setLaborCost(e.target.value)}
                             placeholder="Nhập tiền công"
@@ -121,12 +216,15 @@ export default function InvoiceCreate({ orderId, onClose }) {
                     </div>
                 </div>
 
-                {/* ======= FOOTER (luôn cố định, không bị mất) ======= */}
+                {/* ======= FOOTER ======= */}
                 <button
+                    disabled={loading || paid}
                     onClick={createInvoice}
-                    className="bg-orange-500 hover:bg-orange-600 text-white p-3 rounded font-semibold w-full mt-2"
+                    className={`p-3 rounded font-semibold w-full mt-2 text-white
+                        ${paid ? 'bg-green-600' : 'bg-orange-500 hover:bg-orange-600'}
+                    `}
                 >
-                    {paid ? 'Đã thanh toán' : 'Tạo hóa đơn'}
+                    {paid ? 'Đã thanh toán' : loading ? 'Đang tạo...' : 'Tạo hóa đơn'}
                 </button>
             </div>
         </div>
