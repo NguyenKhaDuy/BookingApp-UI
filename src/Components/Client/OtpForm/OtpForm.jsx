@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../../Context/ToastContext';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function OtpForm({ email, onVerify }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(300);
     const inputRefs = useRef([]);
     const { showToast } = useToast();
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (timer <= 0) return;
@@ -40,10 +42,11 @@ export default function OtpForm({ email, onVerify }) {
         if (timer > 0) return;
 
         try {
+            setLoading(true);
             const res = await axios.post(
                 'http://localhost:8081/api/resend-otp/',
                 {},
-                { withCredentials: true }, // ⭐ gửi session
+                { withCredentials: true }, //gửi session
             );
 
             setTimer(300);
@@ -53,6 +56,8 @@ export default function OtpForm({ email, onVerify }) {
         } catch (error) {
             // console.error(error);
             showToast(error.response?.data?.message || 'Gửi OTP thất bại', 'error');
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -118,6 +123,8 @@ export default function OtpForm({ email, onVerify }) {
                     Gửi lại mã OTP
                 </button>
             </div>
+
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

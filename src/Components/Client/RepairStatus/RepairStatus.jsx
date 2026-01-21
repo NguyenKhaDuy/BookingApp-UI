@@ -6,6 +6,7 @@ import RatingModal from '../RatingModal/RatingModal';
 import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 /* ================= UTILS ================= */
 const formatDateTime = (dateArr, timeArr) => {
@@ -23,7 +24,7 @@ export default function RepairStatusPage() {
     const [showRating, setShowRating] = useState(false);
     const [loading, setLoading] = useState(true);
     const [requestId, setRequestId] = useState(null);
-
+    const [loadingOverLay, setLoadingOverLay] = useState(false);
     const { showToast } = useToast();
     const location = useLocation();
     const navigate = useNavigate();
@@ -87,6 +88,8 @@ export default function RepairStatusPage() {
                     });
                 }
 
+                setLoadingOverLay(true);
+
                 const res = await fetch('http://localhost:8081/api/customer/request/', {
                     method: 'POST',
                     headers: { Authorization: `Bearer ${token}` },
@@ -107,6 +110,7 @@ export default function RepairStatusPage() {
                 setActive('CANCEL');
             } finally {
                 navigate(location.pathname, { replace: true, state: {} });
+                setLoadingOverLay(false);
             }
         };
 
@@ -130,7 +134,6 @@ export default function RepairStatusPage() {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
     }, {});
-
 
     /* ================= STATUS LIST ================= */
     const statusList = [
@@ -173,6 +176,8 @@ export default function RepairStatusPage() {
         try {
             const token = getCookie('token');
 
+            setLoadingOverLay(true);
+
             const res = await fetch(`http://localhost:8081/api/customer/request/cancel/id=${id}`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` },
@@ -187,6 +192,8 @@ export default function RepairStatusPage() {
             fetchRequests();
         } catch {
             showToast('Có lỗi xảy ra', 'error');
+        } finally {
+            setLoadingOverLay(false);
         }
     };
 
@@ -316,7 +323,7 @@ export default function RepairStatusPage() {
             />
 
             <RatingModal open={showRating} data={selected} onClose={() => setShowRating(false)} />
+            <LoadingOverlay show={loadingOverLay} />
         </div>
     );
 }
-

@@ -3,11 +3,15 @@ import { useState, useContext } from 'react';
 import axios from 'axios';
 import OtpForm from '../OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
+import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
-export default function ProfilePassword({profile}) {
+export default function ProfilePassword({ profile }) {
+    const [loading, setLoading] = useState(false);
     const { setUser } = useContext(UserContext);
+    const navigate = useNavigate();
     const { showToast } = useToast();
     const [step, setStep] = useState(1);
     const [oldPassword, setOldPassword] = useState('');
@@ -52,6 +56,7 @@ export default function ProfilePassword({profile}) {
     /* ================= VERIFY OTP ================= */
     const verifyOtp = async (otp) => {
         try {
+            setLoading(true);
             const res = await fetch('http://localhost:8081/api/verify-otp/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -70,12 +75,14 @@ export default function ProfilePassword({profile}) {
             setStep(1);
 
             handleLogout();
-
+            navigate('/login', { replace: true });
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
         } catch {
             showToast('Lỗi xác thực OTP', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -140,6 +147,7 @@ export default function ProfilePassword({profile}) {
                 <ShieldCheck className="w-5 h-5" />
                 Đổi mật khẩu
             </button>
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

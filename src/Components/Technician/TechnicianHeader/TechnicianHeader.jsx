@@ -37,7 +37,7 @@ export default function TechnicianHeader() {
         navigate('/login');
     };
 
-    const avatarSrc = user?.avatar_base64 ? `data:image/jpeg;base64,${user.avatar_base64}` : avatarDefault;
+    const avatarSrc = user?.avatarBase64 ? `data:image/jpeg;base64,${user.avatarBase64}` : avatarDefault;
 
     return (
         <header className="bg-white shadow-sm border-b px-6 py-3 flex justify-between items-center">
@@ -53,7 +53,7 @@ export default function TechnicianHeader() {
                         alt="avatar"
                         className="
             w-10 h-10 rounded-full
-            border-2 border-green-500
+            border-2 border-orange-500
             cursor-pointer object-cover
         "
                     />

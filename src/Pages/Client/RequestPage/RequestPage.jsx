@@ -30,7 +30,7 @@ export default function RequestPage() {
         const code = params.get('vnp_ResponseCode');
         const txnRef = params.get('vnp_TxnRef');
 
-        // ⛔ Không phải redirect từ VNPAY → bỏ qua
+        //Không phải redirect từ VNPAY → bỏ qua
         if (!code || !txnRef) return;
 
         if (code === '00') {
@@ -43,7 +43,7 @@ export default function RequestPage() {
             showToast('Thanh toán không thành công', 'error');
         }
 
-        // 🧹 Clear URL
+        //Clear URL
         window.history.replaceState({}, document.title, '/request');
     }, [showToast]);
 

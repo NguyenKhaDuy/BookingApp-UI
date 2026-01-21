@@ -13,7 +13,8 @@ import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClie
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
-
+import EmailManager from '../../../Components/Technician/EmailManager/EmailManager'
+import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -39,7 +40,9 @@ export default function TechnicianHome({ active }) {
                }
            };
            fetchUser();
-       }, []);
+  }, []);
+    
+    console.log(user)
 
 
     // ===================== AUTH + WEBSOCKET =====================
@@ -227,6 +230,8 @@ export default function TechnicianHome({ active }) {
                 {active === 'schedules' && <TechnicianScheduleList />}
                 {active === 'location' && <LocationManager />}
                 {active === 'skills' && <SkillManager />}
+                {active === 'email' && <EmailManager />}
+                {active === 'password' && <PasswordManager />}
                 {active === 'account' && <Account />}
             </div>
         </>

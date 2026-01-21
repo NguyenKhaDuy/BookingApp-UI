@@ -1,10 +1,7 @@
-import Sidebar from '../../Components/Admin/Sidebar/Sidebar';
 import AdminSidebar from '../../Components/Admin/Sidebar/AdminSidebar';
 import Header from '../../Components/Admin/Header/Header';
-import { Outlet } from 'react-router-dom';
 import AdminHome from '../../Pages/Admin/AdminHome/AdminHome';
-import { useEffect } from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function DashboardLayout() {
     useEffect(() => {
@@ -12,19 +9,17 @@ export default function DashboardLayout() {
     }, []);
 
     const [active, setActive] = useState('dashboard');
+    const [open, setOpen] = useState(true); // điều khiển mở/đóng sidebar
 
     return (
-        <div className="flex min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 flex">
             {/* Sidebar */}
-            <AdminSidebar active={active} setActive={setActive} />
+            <AdminSidebar active={active} setActive={setActive} open={open} setOpen={setOpen} />
 
-            {/* Main */}
-            <div className="flex-1">
+            {/* Main content */}
+            <div className={`flex-1 flex flex-col transition-all duration-300 ${open ? 'ml-64' : 'ml-20'}`}>
                 <Header />
 
-                {/* Render trang con */}
-                {/* <Outlet /> */}
-                {/* Nội dung trang hiển thị theo active */}
                 <div className="p-6">
                     <AdminHome active={active} />
                 </div>

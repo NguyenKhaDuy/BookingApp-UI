@@ -6,11 +6,12 @@ import RepairRequestDetail from '../RepairRequestDetail/RepairRequestDetail';
 import InvoiceDetailModal from '../InvoiceDetailModal/InvoiceDetailModal';
 import getCookie from '../../../utils/getToken';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function RepairRequest() {
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
-
+    const [loading, setLoading] = useState(false);
     const [openInvoice, setOpenInvoice] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);
     const [openInvoiceDetail, setOpenInvoiceDetail] = useState(false);
@@ -29,7 +30,7 @@ export default function RepairRequest() {
         try {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user?.id_user) return;
-
+            setLoading(true);
             const res = await axios.get(`http://localhost:8081/api/technician/request/id_tech=${user.id_user}`, {
                 params: { pageNo },
                 headers: { Authorization: `Bearer ${token}` },
@@ -40,6 +41,8 @@ export default function RepairRequest() {
             setTotalPage(res.data?.total_page || 1);
         } catch (err) {
             console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
     /* ===== STATUS ===== */
@@ -284,6 +287,7 @@ export default function RepairRequest() {
             {openInvoiceDetail && selectedOrder && (
                 <InvoiceDetailModal invoice={selectedOrder.invoices} onClose={() => setOpenInvoiceDetail(false)} />
             )}
+             <LoadingOverlay show={loading} />
         </div>
     );
 }

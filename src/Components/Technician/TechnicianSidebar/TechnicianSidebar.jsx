@@ -1,10 +1,24 @@
 import { useEffect, useState, useContext } from 'react';
-import { Menu, Bell, ClipboardList, FileText, User, Receipt, Wrench, MapPin, LogOut, Calendar } from 'lucide-react';
+import {
+    Menu,
+    Bell,
+    ClipboardList,
+    FileText,
+    User,
+    Receipt,
+    Wrench,
+    MapPin,
+    LogOut,
+    Calendar,
+    Mail,
+    KeyRound,
+} from 'lucide-react';
 import logo from '../../../assets/logo.png';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { UserContext } from '../../../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
+import avatarDefault from '../../../assets/default-avatar.jpg'
 
 export default function TechnicianSidebar({ active, setActive }) {
     const [open, setOpen] = useState(true);
@@ -19,6 +33,8 @@ export default function TechnicianSidebar({ active, setActive }) {
         { key: 'schedules', label: 'Quản lí lịch làm việc', icon: Calendar },
         { key: 'skills', label: 'Quản lý kỹ năng', icon: Wrench },
         { key: 'location', label: 'Quản lý vị trí', icon: MapPin },
+        { key: 'email', label: 'Quản lý Email', icon: Mail },
+        { key: 'password', label: 'Quản lý Mật khẩu', icon: KeyRound },
         { key: 'account', label: 'Tài khoản', icon: User, avatar: true },
         { key: 'logout', label: 'Đăng xuất', icon: LogOut },
     ];
@@ -74,9 +90,9 @@ export default function TechnicianSidebar({ active, setActive }) {
      };
 
     return (
-        <div className={`${open ? 'w-64' : 'w-20'} bg-white border-r shadow-sm h-screen transition-all relative`}>
-            {/* Logo */}
-            <div className="flex items-center gap-3 border-b p-3">
+        <div className={`${open ? 'w-64' : 'w-20'} bg-white border-r shadow-sm h-screen flex flex-col transition-all`}>
+            {/* HEADER (không scroll) */}
+            <div className="flex items-center gap-3 border-b p-3 flex-none">
                 <img src={logo} className="w-10" />
                 <h1
                     className={`text-xl font-semibold text-orange-500 transition-all ${
@@ -87,40 +103,33 @@ export default function TechnicianSidebar({ active, setActive }) {
                 </h1>
             </div>
 
-            {/* Toggle */}
-            <button
-                onClick={() => setOpen(!open)}
-                className="absolute -right-3 top-5 bg-white border p-1 rounded-full shadow"
-            >
-                <Menu size={18} />
-            </button>
-
-            {/* Menu */}
-            <div className="mt-4 flex flex-col gap-2 px-3">
+            {/* MENU LIST (scroll riêng) */}
+            <div className="flex-1 overflow-y-auto px-3 py-4 custom-scroll">
                 {menu.map((m) => {
                     const Icon = m.icon;
-
                     return (
                         <button
                             key={m.key}
                             onClick={() => {
-                                if (m.key === 'logout') {
-                                    handleLogout();
-                                } else {
-                                    setActive(m.key);
-                                }
+                                if (m.key === 'logout') handleLogout();
+                                else setActive(m.key);
                             }}
-                            className={`flex items-center justify-between p-3 rounded-lg transition-colors
-                                ${
-                                    active === m.key
-                                        ? 'bg-orange-200 text-orange-700 font-medium'
-                                        : 'text-gray-700 hover:bg-orange-100'
-                                }
-                            `}
+                            className={`flex items-center justify-between p-3 mb-1 rounded-lg transition-colors ${
+                                active === m.key
+                                    ? 'bg-orange-200 text-orange-700 font-medium'
+                                    : 'text-gray-700 hover:bg-orange-100'
+                            }`}
                         >
                             <div className="flex items-center gap-3">
                                 {m.avatar ? (
-                                    <img src="https://i.pravatar.cc/50" className="w-6 h-6 rounded-full" />
+                                    <img
+                                        src={
+                                            user?.avatarBase64
+                                                ? `data:image/jpeg;base64,${user.avatarBase64}`
+                                                : avatarDefault
+                                        }
+                                        className="w-6 h-6 border-2 border-orange-500 rounded-full"
+                                    />
                                 ) : (
                                     <Icon size={20} />
                                 )}
@@ -136,6 +145,15 @@ export default function TechnicianSidebar({ active, setActive }) {
                     );
                 })}
             </div>
+
+            {/* TOGGLE (không scroll) */}
+            <button
+                onClick={() => setOpen(!open)}
+                className="flex-none mx-auto mb-3 bg-white border p-1 rounded-full shadow"
+            >
+                <Menu size={18} />
+            </button>
         </div>
     );
+
 }

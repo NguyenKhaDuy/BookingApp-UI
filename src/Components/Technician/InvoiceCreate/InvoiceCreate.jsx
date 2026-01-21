@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2, X } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) {
     const [paid, setPaid] = useState(false);
@@ -227,6 +228,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
                     {paid ? 'Đã thanh toán' : loading ? 'Đang tạo...' : 'Tạo hóa đơn'}
                 </button>
             </div>
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

@@ -3,9 +3,10 @@ import axios from 'axios';
 import { Calendar, Clock, Edit3, Trash, Wifi, WifiOff, Plus, Moon, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
-
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 export default function TechnicianScheduleList() {
     const { showToast } = useToast();
+    const [loading, setLoading] = useState(false);
 
     const getTechnicianId = () => {
         const localUser = localStorage.getItem('user');
@@ -84,6 +85,7 @@ export default function TechnicianScheduleList() {
         };
 
         try {
+            setLoading(true);
             if (editData) {
                 await axios.put(`http://localhost:8081/api/technician/schedule/`, payload, {
                     headers: {
@@ -108,6 +110,8 @@ export default function TechnicianScheduleList() {
         } catch (err) {
             console.error('Lỗi khi lưu:', err);
             showToast('Lưu thất bại!', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -311,6 +315,7 @@ export default function TechnicianScheduleList() {
                     </div>
                 </div>
             )}
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

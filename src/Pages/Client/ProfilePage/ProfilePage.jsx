@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import { ProfileSidebar } from '../../../Components/Client/SidebarProfile/SidebarProfile';
 import { ProfileMobileTabs } from '../../../Components/Client/ProfileMobileTabs/ProfileMobileTabs';
 import ProfileInfo from '../../../Components/Client/ProfileInfoCard/ProfileInfoCard';

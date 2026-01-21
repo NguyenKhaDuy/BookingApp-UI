@@ -73,7 +73,7 @@ export default function QuickBooking() {
             scheduled_time: `${form.scheduled_time}:00`,
         };
 
-        // 👉 CHUYỂN SANG TRANG REQUEST
+        //CHUYỂN SANG TRANG REQUEST
         navigate('/request', {
             state: {
                 formData,
