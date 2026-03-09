@@ -23,6 +23,7 @@ export default function AdminHome({ active }) {
             {active === 'dashboard' && <StatisticsChart />}
             {active === 'users-customer' && <AdminCustomers />}
             {active === 'users-technician' && <AdminTechnicians />}
+
             {active === 'manage-level' && <ManageLevel />}
             {active === 'manage-feedback' && <ManageFeedback />}
             {active === 'manage-requests' && <ManageRequest />}
