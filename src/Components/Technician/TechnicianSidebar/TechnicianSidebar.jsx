@@ -19,12 +19,14 @@ import getCookie from '../../../utils/getToken';
 import { UserContext } from '../../../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import avatarDefault from '../../../assets/default-avatar.jpg'
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function TechnicianSidebar({ active, setActive }) {
     const [open, setOpen] = useState(true);
     const [notificationCount, setNotificationCount] = useState(0);
     const { user, setUser } = useContext(UserContext);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const menu = [
         { key: 'dashboard', label: 'Dashboard', icon: ClipboardList },
@@ -83,9 +85,11 @@ export default function TechnicianSidebar({ active, setActive }) {
 
 
      const handleLogout = () => {
+         setLoading(true);
          localStorage.removeItem('user');
          setUser(null);
          navigate('/login');
+         setLoading(false);
          document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
      };
 
@@ -153,6 +157,7 @@ export default function TechnicianSidebar({ active, setActive }) {
             >
                 <Menu size={18} />
             </button>
+            <LoadingOverlay show={loading}/>
         </div>
     );
 

@@ -19,8 +19,7 @@ export default function DashboardLayout() {
             {/* Main content */}
             <div className={`flex-1 flex flex-col transition-all duration-300 ${open ? 'ml-64' : 'ml-20'}`}>
                 <Header />
-
-                <div className="p-6">
+                <div className="p-6 overflow-y-auto">
                     <AdminHome active={active} />
                 </div>
             </div>

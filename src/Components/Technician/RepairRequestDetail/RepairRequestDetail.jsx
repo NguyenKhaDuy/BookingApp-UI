@@ -1,4 +1,4 @@
-import formatDate from "../../../utils/formatDate";
+import {formatDateArray, formatTime} from '../../../utils/formatDate'
 export default function RepairRequestDetail({ data, onClose }) {
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -19,10 +19,10 @@ export default function RepairRequestDetail({ data, onClose }) {
                         <b>Trạng thái:</b> {data.status_code}
                     </div>
                     <div>
-                        <b>Ngày hẹn:</b> {formatDate(data.scheduled_date)}
+                        <b>Ngày hẹn:</b> {formatDateArray(data.scheduled_date)}
                     </div>
                     <div>
-                        <b>Giờ hẹn:</b> {data.scheduled_time}
+                        <b>Giờ hẹn:</b> {formatTime(data.scheduled_time)}
                     </div>
                     <div className="col-span-2">
                         <b>Địa chỉ:</b> {data.location}

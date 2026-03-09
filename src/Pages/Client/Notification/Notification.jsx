@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Bell } from 'lucide-react';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
@@ -11,13 +11,14 @@ const formatTime = (arr) => {
 };
 
 export default function NotificationDetail() {
-    const { id } = useParams(); // id_notify
     const navigate = useNavigate();
     const { user } = useContext(UserContext);
 
     const [notification, setNotification] = useState(null);
     const [loading, setLoading] = useState(true);
-
+    const { state } = useLocation();
+    const idUserNotify = state?.id_user_notify;
+    const idNotify = state?.id_notify;
     useEffect(() => {
         const user = localStorage.getItem('user');
         const token = getCookie('token');
@@ -33,15 +34,22 @@ export default function NotificationDetail() {
     useEffect(() => {
         const fetchDetail = async () => {
             try {
+                const token = getCookie('token');
+                if (!token || !user) return;
+
                 const res = await axios.get(`http://localhost:8081/api/user/notification/`, {
                     params: {
-                        id_user: user.id_user,
-                        id_notify: id,
+                        id_user_notifi: idUserNotify,
+                        id_notify: idNotify,
                     },
                     withCredentials: true,
                 });
 
                 const n = res.data.data;
+                if (!n) {
+                    console.log('Không có data');
+                    return;
+                }
 
                 setNotification({
                     title: n.title,
@@ -58,7 +66,8 @@ export default function NotificationDetail() {
         };
 
         fetchDetail();
-    }, [id, user]);
+    }, [idNotify, user]);
+
 
     if (loading) return null;
     if (!notification) return null;

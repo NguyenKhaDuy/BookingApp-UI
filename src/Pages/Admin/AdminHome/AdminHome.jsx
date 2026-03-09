@@ -14,12 +14,13 @@ import RoleManager from '../../../Components/Admin/RoleManager/RoleManager';
 import ServiceManager from '../../../Components/Admin/ServiceManager/ServiceManager';
 import SkillManager from '../../../Components/Admin/SkillManager/SkillManager';
 import StatusManager from '../../../Components/Admin/StatusManager/StatusManager';
+import StatisticsChart from '../../../Components/Admin/StatisticsChart/StatisticsChart';
 
 
 export default function AdminHome({ active }) {
     return (
         <Fragment>
-            {active === 'dashboard' && <StatsGrid />}
+            {active === 'dashboard' && <StatisticsChart />}
             {active === 'users-customer' && <AdminCustomers />}
             {active === 'users-technician' && <AdminTechnicians />}
             {active === 'manage-level' && <ManageLevel />}

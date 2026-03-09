@@ -177,7 +177,7 @@ export default function ManageLevel() {
                                         </button>
                                         <button
                                             onClick={() => setConfirmDeleteId(lv.id_level)}
-                                            className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 transition"
+                                            className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                         </button>

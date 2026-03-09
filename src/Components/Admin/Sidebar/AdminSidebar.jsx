@@ -20,11 +20,16 @@ import {
     CreditCard,
 } from 'lucide-react';
 import logo from '../../../assets/logo.png';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
+import { UserContext } from '../../../Context/UserContext';
+import { Link, useNavigate } from 'react-router-dom';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function AdminSidebar({ active, setActive, open, setOpen }) {
     const [openUserSubmenu, setOpenUserSubmenu] = useState(false);
-
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(UserContext);
+    const [loading, setLoading] = useState(false);
     const menu = [
         { key: 'dashboard', label: 'Dashboard', icon: ClipboardList },
         {
@@ -48,12 +53,16 @@ export default function AdminSidebar({ active, setActive, open, setOpen }) {
         { key: 'manage-service', label: 'Quản lí dịch vụ', icon: Grid2X2 },
         { key: 'manage-skill', label: 'Quản lí kĩ năng', icon: Wrench },
         { key: 'manage-status', label: 'Quản lí trạng thái', icon: ListChecks },
-        { key: 'reports', label: 'Báo cáo', icon: BarChart3 },
-        { key: 'settings', label: 'Cài đặt', icon: Settings },
+        ,
     ];
 
     const handleLogout = () => {
-        console.log('Logging out...');
+        setLoading(true);
+        localStorage.removeItem('user');
+        setUser(null);
+        navigate('/login');
+        setLoading(false);
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
     return (
@@ -141,6 +150,7 @@ export default function AdminSidebar({ active, setActive, open, setOpen }) {
             >
                 <Menu size={18} />
             </button>
+            <LoadingOverlay show={loading}/>
         </div>
     );
 }

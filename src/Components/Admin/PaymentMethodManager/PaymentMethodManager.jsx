@@ -1,42 +1,51 @@
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, CreditCard, ChevronLeft, ChevronRight } from 'lucide-react';
+import axios from 'axios';
+import getCookie from '../../../utils/getToken';
+import { useToast } from '../../../Context/ToastContext';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
-// Fake service gọi API mô phỏng
-const getPaymentMethods = (page, size) =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            const total = 32;
-            const data = Array.from({ length: size }).map((_, i) => {
-                const id = page * size + i + 1;
-                return {
-                    id_method: id,
-                    name_method: `Phương thức ${id}`,
-                    provider: id % 2 === 0 ? 'MoMo' : 'VNPay',
-                    iconBase64: null,
-                    created_at: '01-01-2026 12:00:00',
-                };
-            });
-            resolve({ data, total });
-        }, 450);
-    });
 
 export default function PaymentMethodManager() {
     const [methods, setMethods] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
     const [modalOpen, setModalOpen] = useState(false);
     const [editData, setEditData] = useState(null);
 
     const [page, setPage] = useState(0);
-    const size = 10;
     const [totalPages, setTotalPages] = useState(0);
 
+    // Modal fields
+    const [name, setName] = useState('');
+    const [provider, setProvider] = useState('');
+    const [iconFile, setIconFile] = useState(null);
+    const [preview, setPreview] = useState(null);
+
+    // Confirm delete popup
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+
+    const token = getCookie('token');
+
     const loadData = async (p = 0) => {
-        setLoading(true);
-        const res = await getPaymentMethods(p, size);
-        setMethods(res.data);
-        setTotalPages(Math.ceil(res.total / size));
-        setPage(p);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const res = await axios.get(`http://localhost:8081/api/admin/paymentmethod/?pageNo=${p + 1}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            setMethods(res.data.data || []);
+            setTotalPages(res.data.total_page || 0);
+            setPage(p);
+        } catch (err) {
+            console.error(err);
+            showToast('Không thể tải dữ liệu phương thức thanh toán!', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -45,17 +54,93 @@ export default function PaymentMethodManager() {
 
     const openAdd = () => {
         setEditData(null);
+        setName('');
+        setProvider('');
+        setIconFile(null);
+        setPreview(null);
         setModalOpen(true);
     };
 
     const openEdit = (item) => {
         setEditData(item);
+        setName(item.name_method);
+        setProvider(item.provider);
+        setPreview(item.iconBase64 ? `data:image/png;base64,${item.iconBase64}` : null);
+        setIconFile(null);
         setModalOpen(true);
     };
 
-    const deleteItem = (id) => {
-        if (window.confirm('Bạn có chắc muốn xóa phương thức này?')) {
-            setMethods((prev) => prev.filter((x) => x.id_method !== id));
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setIconFile(file);
+
+        const reader = new FileReader();
+        reader.onloadend = () => setPreview(reader.result);
+        reader.readAsDataURL(file);
+    };
+
+    const saveModal = async () => {
+        if (!name.trim()) {
+            showToast('Tên phương thức không được để trống!', 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        if (editData) formData.append('id_method', editData.id_method);
+        formData.append('name_method', name);
+        formData.append('provider', provider);
+
+        if (iconFile) {
+            formData.append('iconBase64', iconFile);
+        }
+
+        try {
+            setLoading(true);
+            await axios({
+                method: editData ? 'put' : 'post',
+                url: 'http://localhost:8081/api/admin/payment/',
+                data: formData,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            showToast(editData ? 'Cập nhật thành công!' : 'Thêm mới thành công!', 'success');
+            setModalOpen(false);
+            loadData(page);
+        } catch (err) {
+            console.error(err);
+            showToast('Lưu thất bại!', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openDeleteConfirm = (id) => {
+        setDeleteId(id);
+        setConfirmOpen(true);
+    };
+
+    const deletePayment = async () => {
+        if (!deleteId) return;
+        try {
+            setLoading(true);
+            await axios.delete(`http://localhost:8081/api/admin/payment/id-payment=${deleteId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            showToast('Xoá thành công!', 'success');
+            setConfirmOpen(false);
+            loadData(page);
+        } catch (err) {
+            console.error(err);
+            showToast('Xoá thất bại!', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -110,7 +195,6 @@ export default function PaymentMethodManager() {
                                             {item.iconBase64 ? (
                                                 <img
                                                     src={`data:image/png;base64,${item.iconBase64}`}
-                                                    alt=""
                                                     className="w-8 h-8 rounded"
                                                 />
                                             ) : (
@@ -124,8 +208,9 @@ export default function PaymentMethodManager() {
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
+
                                             <button
-                                                onClick={() => deleteItem(item.id_method)}
+                                                onClick={() => openDeleteConfirm(item.id_method)}
                                                 className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -138,11 +223,12 @@ export default function PaymentMethodManager() {
                     </table>
                 </div>
 
+                {/* Pagination */}
                 <div className="flex items-center justify-center gap-2 p-4 bg-white">
                     <button
                         disabled={page === 0}
                         onClick={() => loadData(page - 1)}
-                        className="p-2 rounded-lg border hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg border disabled:opacity-40"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -152,7 +238,7 @@ export default function PaymentMethodManager() {
                             key={i}
                             onClick={() => loadData(i)}
                             className={`px-3 py-1 rounded-lg text-sm border ${
-                                i === page ? 'bg-orange-600 text-white border-orange-600' : 'hover:bg-orange-50'
+                                i === page ? 'bg-orange-600 text-white border-orange-600' : ''
                             }`}
                         >
                             {i + 1}
@@ -162,95 +248,86 @@ export default function PaymentMethodManager() {
                     <button
                         disabled={page === totalPages - 1}
                         onClick={() => loadData(page + 1)}
-                        className="p-2 rounded-lg border hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg border disabled:opacity-40"
                     >
                         <ChevronRight className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
+            {/* Modal */}
             {modalOpen && (
-                <PaymentMethodModal
-                    data={editData}
-                    onClose={() => setModalOpen(false)}
-                    onSave={(obj) => {
-                        if (editData) {
-                            setMethods((prev) => prev.map((x) => (x.id_method === obj.id_method ? obj : x)));
-                        } else {
-                            setMethods((prev) => [...prev, { ...obj, id_method: prev.length + 1 }]);
-                        }
-                        setModalOpen(false);
-                    }}
-                />
-            )}
-        </div>
-    );
-}
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                    <div className="bg-white w-[450px] p-5 rounded-xl shadow animate-scaleIn">
+                        <h3 className="text-lg font-semibold mb-3">
+                            {editData ? 'Sửa phương thức' : 'Thêm phương thức'}
+                        </h3>
 
-// ===== Modal Component =====
-function PaymentMethodModal({ data, onClose, onSave }) {
-    const [name, setName] = useState(data?.name_method || '');
-    const [provider, setProvider] = useState(data?.provider || '');
-    const [iconBase64, setIconBase64] = useState(data?.iconBase64 || null);
-    const [preview, setPreview] = useState(data?.iconBase64 ? `data:image/png;base64,${data.iconBase64}` : null);
+                        <div className="flex flex-col gap-3">
+                            <input
+                                className="p-4 rounded-xl border border-gray-300 outline-orange-500"
+                                placeholder="Tên phương thức"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                            />
+                            <input
+                                className="p-4 rounded-xl border border-gray-300 outline-orange-500"
+                                placeholder="Nhà cung cấp"
+                                value={provider}
+                                onChange={(e) => setProvider(e.target.value)}
+                            />
 
-    const handleFileChange = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Icon</label>
+                                <input type="file" accept="image/*" onChange={handleFileChange} />
+                                {preview && (
+                                    <img src={preview} className="w-16 h-16 mt-2 rounded border object-cover" />
+                                )}
+                            </div>
+                        </div>
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            const base64String = reader.result.split(',')[1];
-            setIconBase64(base64String);
-            setPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-    };
-
-    const submit = () => {
-        if (!name.trim()) return alert('Tên phương thức không được bỏ trống');
-        onSave({ ...data, name_method: name, provider, iconBase64 });
-    };
-
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-            <div className="bg-white w-[450px] p-5 rounded-xl shadow">
-                <h3 className="text-lg font-semibold mb-3">{data ? 'Sửa phương thức' : 'Thêm phương thức'}</h3>
-
-                <div className="flex flex-col gap-3">
-                    <input
-                        className="border p-2 rounded"
-                        placeholder="Tên phương thức"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-
-                    <input
-                        className="border p-2 rounded"
-                        placeholder="Nhà cung cấp (VD: MoMo, VNPay...)"
-                        value={provider}
-                        onChange={(e) => setProvider(e.target.value)}
-                    />
-
-                    {/* Upload Icon */}
-                    <div>
-                        <label className="block text-sm font-medium mb-1">Icon</label>
-                        <input type="file" accept="image/*" onChange={handleFileChange} />
-                        {preview && (
-                            <img src={preview} alt="preview" className="w-16 h-16 mt-2 rounded border object-cover" />
-                        )}
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button onClick={() => setModalOpen(false)} className="px-4 py-2 border rounded-lg">
+                                Hủy
+                            </button>
+                            <button onClick={saveModal} className="px-4 py-2 bg-orange-600 text-white rounded-lg">
+                                Lưu
+                            </button>
+                        </div>
                     </div>
                 </div>
+            )}
 
-                <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={onClose} className="px-4 py-2 border rounded-lg">
-                        Hủy
-                    </button>
-                    <button onClick={submit} className="px-4 py-2 bg-orange-600 text-white rounded-lg">
-                        Lưu
-                    </button>
+            {/* Confirm Delete Popup */}
+            {confirmOpen && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white w-[380px] p-6 rounded-2xl shadow-xl animate-scaleIn">
+                        <h3 className="text-xl font-semibold text-gray-800">Xác nhận xóa</h3>
+                        <p className="text-gray-600 mt-2 leading-relaxed">
+                            Bạn có chắc chắn muốn xóa phương thức thanh toán này không?
+                            <br />
+                            Hành động này <span className="font-semibold">không thể hoàn tác</span>.
+                        </p>
+
+                        <div className="flex justify-end gap-2 mt-5">
+                            <button
+                                onClick={() => setConfirmOpen(false)}
+                                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
+                            >
+                                Hủy
+                            </button>
+
+                            <button
+                                onClick={deletePayment}
+                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                            >
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
+            <LoadingOverlay show={loading}/>
         </div>
     );
 }

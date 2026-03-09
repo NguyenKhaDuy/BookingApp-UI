@@ -26,7 +26,7 @@ function App() {
                     {/* ================= CLIENT LAYOUT ================= */}
                     <Route element={<ClientLayout />}>
                         <Route path="/" element={<HomePage />} />
-                        <Route path="/notification/:id" element={<Notification />} />
+                        <Route path="/notification/detail" element={<Notification />} />
                         <Route path="/services" element={<ServicePage />} />
                         <Route path="/technicians" element={<TechnicianPage />} />
                         <Route path="/technicians/techniciandetail/:id_user" element={<TechnicianDetailPage />} />

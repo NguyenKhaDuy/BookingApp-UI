@@ -5,8 +5,9 @@ import InvoiceCreate from '../InvoiceCreate/InvoiceCreate';
 import RepairRequestDetail from '../RepairRequestDetail/RepairRequestDetail';
 import InvoiceDetailModal from '../InvoiceDetailModal/InvoiceDetailModal';
 import getCookie from '../../../utils/getToken';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Wrench } from 'lucide-react'; // >>> ADDED ICON
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { useToast } from '../../../Context/ToastContext';
 
 export default function RepairRequest() {
     const [orders, setOrders] = useState([]);
@@ -15,12 +16,16 @@ export default function RepairRequest() {
     const [openInvoice, setOpenInvoice] = useState(false);
     const [openDetail, setOpenDetail] = useState(false);
     const [openInvoiceDetail, setOpenInvoiceDetail] = useState(false);
-
+    const { showToast } = useToast();
     // ===== PAGINATION =====
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
 
     const token = getCookie('token');
+
+    // >>> ADDED: popup state
+    const [openStatus, setOpenStatus] = useState(false);
+    const [newStatus, setNewStatus] = useState(null);
 
     useEffect(() => {
         fetchOrders(page);
@@ -45,11 +50,13 @@ export default function RepairRequest() {
             setLoading(false);
         }
     };
+
     /* ===== STATUS ===== */
     const STATUS = {
         COMPLETED: 'COMPLETED',
         RECEIVING: 'RECEIVING',
         CANCEL: 'CANCEL',
+        RECEIVED: 'RECEIVED',
     };
 
     const isCompleted = (status) => status === STATUS.COMPLETED;
@@ -65,6 +72,31 @@ export default function RepairRequest() {
                 return 'text-red-600 bg-red-50';
             default:
                 return 'text-gray-600 bg-gray-100';
+        }
+    };
+
+    const updateStatusAPI = async () => {
+        if (!newStatus || !selectedOrder) return;
+        try {
+            setLoading(true);
+            await axios.put(
+                'http://localhost:8081/api/technician/update-staus/request/',
+                {
+                    id_request: selectedOrder.id_request,
+                    id_status: newStatus,
+                },
+                {
+                    headers: { Authorization: `Bearer ${token}` },
+                },
+            );
+            setOpenStatus(false);
+            fetchOrders(page);
+            showToast('Cập nhật trạng thái yêu cầu thành công', 'success');
+        } catch (err) {
+            showToast('Cập nhật trạng thái yêu cầu không thành công', 'error');
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -116,6 +148,27 @@ export default function RepairRequest() {
                                                 Chi tiết
                                             </button>
 
+                                            {/* >>> ADDED: nút cập nhật trạng thái */}
+                                            <button
+                                                disabled={
+                                                    o.status_code !== STATUS.RECEIVED &&
+                                                    o.status_code !== STATUS.RECEIVING
+                                                }
+                                                onClick={() => {
+                                                    setSelectedOrder(o);
+                                                    setOpenStatus(true);
+                                                }}
+                                                className={`flex items-center gap-2 px-3 h-9 rounded-lg text-sm ${
+                                                    o.status_code === STATUS.RECEIVED ||
+                                                    o.status_code === STATUS.RECEIVING
+                                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                                        : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                                }`}
+                                            >
+                                                <Wrench size={16} />
+                                                Cập nhật trạng thái
+                                            </button>
+
                                             {/* Tạo hóa đơn */}
                                             <button
                                                 disabled={!isCompleted(o.status_code) || hasInvoice(o)}
@@ -156,80 +209,9 @@ export default function RepairRequest() {
                     </table>
                 </div>
 
-                {/* MOBILE */}
-                <div className="md:hidden space-y-4">
-                    {orders.map((o) => (
-                        <div key={o.id_request} className="border rounded-xl p-4 shadow-sm bg-white">
-                            {/* Khách hàng */}
-                            <div className="flex justify-between mb-2">
-                                <span className="text-gray-500 text-sm">Khách hàng</span>
-                                <span className="font-medium">{o.customer?.full_name}</span>
-                            </div>
-
-                            {/* Dịch vụ */}
-                            <div className="flex justify-between mb-2">
-                                <span className="text-gray-500 text-sm">Dịch vụ</span>
-                                <span>{o.name_service}</span>
-                            </div>
-
-                            {/* Trạng thái */}
-                            <div className="flex justify-between mb-3">
-                                <span className="text-gray-500 text-sm">Trạng thái</span>
-                                <span className={`px-3 py-1 rounded-full text-xs ${statusClass(o.status_code)}`}>
-                                    {o.status_code}
-                                </span>
-                            </div>
-
-                            {/* Actions */}
-                            <div className="flex gap-2 flex-wrap">
-                                <button
-                                    onClick={() => {
-                                        setSelectedOrder(o);
-                                        setOpenDetail(true);
-                                    }}
-                                    className="flex-1 flex items-center justify-center gap-2 px-3 h-9 border rounded-lg text-sm"
-                                >
-                                    <Eye size={16} />
-                                    Chi tiết
-                                </button>
-
-                                <button
-                                    disabled={!isCompleted(o.status_code) || hasInvoice(o)}
-                                    onClick={() => {
-                                        setSelectedOrder(o);
-                                        setOpenInvoice(true);
-                                    }}
-                                    className={`flex-1 h-9 rounded-lg text-sm ${
-                                        !isCompleted(o.status_code) || hasInvoice(o)
-                                            ? 'bg-gray-200 text-gray-400'
-                                            : 'bg-orange-500 text-white'
-                                    }`}
-                                >
-                                    Tạo hóa đơn
-                                </button>
-
-                                <button
-                                    disabled={!hasInvoice(o)}
-                                    onClick={() => {
-                                        setSelectedOrder(o);
-                                        setOpenInvoiceDetail(true);
-                                    }}
-                                    className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-lg text-sm ${
-                                        hasInvoice(o) ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-400'
-                                    }`}
-                                >
-                                    <FileText size={16} />
-                                    Xem hóa đơn
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
                 {/* PAGINATION */}
                 {totalPage > 0 && (
                     <div className="flex justify-center gap-2 mt-6">
-                        {/* Nút Trước */}
                         <button
                             disabled={page === 1}
                             onClick={() => setPage(page - 1)}
@@ -239,7 +221,6 @@ export default function RepairRequest() {
                             <span>Trước</span>
                         </button>
 
-                        {/* Nút số trang */}
                         {[...Array(totalPage)].map((_, i) => (
                             <button
                                 key={i}
@@ -254,7 +235,6 @@ export default function RepairRequest() {
                             </button>
                         ))}
 
-                        {/* Nút Sau */}
                         <button
                             disabled={page === totalPage}
                             onClick={() => setPage(page + 1)}
@@ -279,7 +259,7 @@ export default function RepairRequest() {
                     onClose={() => setOpenInvoice(false)}
                     onSuccess={() => {
                         setOpenInvoice(false);
-                        fetchOrders(page); // 🔥 reload list
+                        fetchOrders(page);
                     }}
                 />
             )}
@@ -287,7 +267,49 @@ export default function RepairRequest() {
             {openInvoiceDetail && selectedOrder && (
                 <InvoiceDetailModal invoice={selectedOrder.invoices} onClose={() => setOpenInvoiceDetail(false)} />
             )}
-             <LoadingOverlay show={loading} />
+
+            {/* >>> ADDED: MODAL UPDATE STATUS */}
+            {openStatus && selectedOrder && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="bg-white p-5 rounded-xl w-80 shadow-md">
+                        <h2 className="font-semibold text-lg mb-3 text-center">Cập nhật trạng thái yêu cầu</h2>
+
+                        <select
+                            className="w-full border p-2 rounded mb-4"
+                            onChange={(e) => setNewStatus(Number(e.target.value))}
+                            defaultValue=""
+                        >
+                            <option value="">-- Chọn trạng thái --</option>
+
+                            {selectedOrder.status_code === STATUS.RECEIVED && (
+                                <>
+                                    <option value="7">Đang tiếp nhận</option>
+                                    <option value="14">Hủy yêu cầu</option>
+                                </>
+                            )}
+
+                            {selectedOrder.status_code === STATUS.RECEIVING && (
+                                <>
+                                    <option value="8">Hoàn thành</option>
+                                    <option value="9">Chưa hoàn thành</option>
+                                    <option value="14">Hủy yêu cầu</option>
+                                </>
+                            )}
+                        </select>
+
+                        <div className="flex justify-between">
+                            <button onClick={() => setOpenStatus(false)} className="px-4 py-2 border rounded">
+                                Hủy
+                            </button>
+                            <button onClick={updateStatusAPI} className="px-4 py-2 bg-blue-600 text-white rounded">
+                                Lưu
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

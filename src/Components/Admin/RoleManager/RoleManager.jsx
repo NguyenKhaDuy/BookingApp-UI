@@ -1,40 +1,46 @@
 import { useEffect, useState } from 'react';
 import { Plus, Edit, Trash2, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
-
-// Fake API mô phỏng lấy danh sách role + phân trang
-const getRoles = (page, size) =>
-    new Promise((resolve) => {
-        setTimeout(() => {
-            const total = 47;
-            const data = Array.from({ length: size }).map((_, i) => {
-                const id = page * size + i + 1;
-                return {
-                    id_role: id,
-                    role_name: `Role ${id}`,
-                    created_at: '01-01-2026 12:00:00',
-                };
-            });
-            resolve({ data, total });
-        }, 400);
-    });
+import axios from 'axios';
+import getCookie from '../../../utils/getToken';
+import { useToast } from '../../../Context/ToastContext';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { formatDateTimeArray } from '../../../utils/formatDate';
 
 export default function RoleManager() {
     const [roles, setRoles] = useState([]);
     const [loading, setLoading] = useState(false);
+    const { showToast } = useToast();
     const [modalOpen, setModalOpen] = useState(false);
     const [editData, setEditData] = useState(null);
 
-    const [page, setPage] = useState(0);
-    const size = 10;
+    const [page, setPage] = useState(0); // page index (0-based)
     const [totalPages, setTotalPages] = useState(0);
 
+    // Modal fields
+    const [roleName, setRoleName] = useState('');
+
+    // Confirm delete popup
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState(null);
+
+    const token = getCookie('token');
+
     const loadData = async (p = 0) => {
-        setLoading(true);
-        const res = await getRoles(p, size);
-        setRoles(res.data);
-        setTotalPages(Math.ceil(res.total / size));
-        setPage(p);
-        setLoading(false);
+        try {
+            setLoading(true);
+            const res = await axios.get(`http://localhost:8081/api/admin/role/?pageNo=${p + 1}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            setRoles(res.data.data || []);
+            setTotalPages(res.data.total_page || 0);
+            setPage(p);
+        } catch (err) {
+            console.error(err);
+            showToast('Không thể tải dữ liệu Role!', 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -43,24 +49,75 @@ export default function RoleManager() {
 
     const openAdd = () => {
         setEditData(null);
+        setRoleName('');
         setModalOpen(true);
     };
 
     const openEdit = (item) => {
         setEditData(item);
+        setRoleName(item.role_name);
         setModalOpen(true);
     };
 
-    const deleteItem = (id) => {
-        if (window.confirm('Bạn có chắc muốn xóa role này?')) {
-            setRoles((prev) => prev.filter((x) => x.id_role !== id));
+    const saveModal = async () => {
+        if (!roleName.trim()) {
+            showToast('Tên role không được để trống!', 'error');
+            return;
+        }
+
+        try {
+            setLoading(true);
+
+            const payload = {
+                id_role: editData?.id_role,
+                role_name: roleName,
+            };
+
+            await axios({
+                method: editData ? 'put' : 'post',
+                url: 'http://localhost:8081/api/admin/role/',
+                data: payload,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            showToast(editData ? 'Cập nhật thành công!' : 'Thêm mới thành công!', 'success');
+            setModalOpen(false);
+            loadData(page);
+        } catch (err) {
+            console.error(err);
+            showToast('Lưu thất bại!', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const openDeleteConfirm = (id) => {
+        setDeleteId(id);
+        setConfirmOpen(true);
+    };
+
+    const deleteRole = async () => {
+        if (!deleteId) return;
+        try {
+            setLoading(true);
+            await axios.delete(`http://localhost:8081/api/admin/role/id-role=${deleteId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            showToast('Xoá Role thành công!', 'success');
+            setConfirmOpen(false);
+            loadData(page);
+        } catch (err) {
+            console.error(err);
+            showToast('Xoá thất bại!', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
             <div className="max-w-4xl mx-auto bg-white shadow rounded-xl p-6">
-                {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                     <h2 className="text-2xl font-semibold text-gray-800 flex items-center gap-2">
                         <Shield className="w-6 h-6 text-orange-600" />
@@ -75,7 +132,6 @@ export default function RoleManager() {
                     </button>
                 </div>
 
-                {/* Table */}
                 <div className="overflow-x-auto border rounded-lg">
                     <table className="w-full text-sm text-left">
                         <thead className="bg-gray-50 text-gray-700">
@@ -104,7 +160,7 @@ export default function RoleManager() {
                                     <tr key={item.id_role} className="border-b hover:bg-gray-50">
                                         <td className="p-3">{item.id_role}</td>
                                         <td className="p-3 font-medium">{item.role_name}</td>
-                                        <td className="p-3">{item.created_at}</td>
+                                        <td className="p-3">{formatDateTimeArray(item.created_at) || '-'}</td>
                                         <td className="p-3 flex gap-2">
                                             <button
                                                 onClick={() => openEdit(item)}
@@ -112,8 +168,9 @@ export default function RoleManager() {
                                             >
                                                 <Edit className="w-4 h-4" />
                                             </button>
+
                                             <button
-                                                onClick={() => deleteItem(item.id_role)}
+                                                onClick={() => openDeleteConfirm(item.id_role)}
                                                 className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
                                             >
                                                 <Trash2 className="w-4 h-4" />
@@ -126,12 +183,11 @@ export default function RoleManager() {
                     </table>
                 </div>
 
-                {/* Pagination */}
                 <div className="flex items-center justify-center gap-2 p-4 bg-white">
                     <button
                         disabled={page === 0}
                         onClick={() => loadData(page - 1)}
-                        className="p-2 rounded-lg border hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg border disabled:opacity-40"
                     >
                         <ChevronLeft className="w-4 h-4" />
                     </button>
@@ -141,7 +197,7 @@ export default function RoleManager() {
                             key={i}
                             onClick={() => loadData(i)}
                             className={`px-3 py-1 rounded-lg text-sm border ${
-                                i === page ? 'bg-orange-600 text-white border-orange-600' : 'hover:bg-orange-50'
+                                i === page ? 'bg-orange-600 text-white border-orange-600' : ''
                             }`}
                         >
                             {i + 1}
@@ -151,61 +207,67 @@ export default function RoleManager() {
                     <button
                         disabled={page === totalPages - 1}
                         onClick={() => loadData(page + 1)}
-                        className="p-2 rounded-lg border hover:bg-orange-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        className="p-2 rounded-lg border disabled:opacity-40"
                     >
                         <ChevronRight className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
+            {/* Modal */}
             {modalOpen && (
-                <RoleModal
-                    data={editData}
-                    onClose={() => setModalOpen(false)}
-                    onSave={(obj) => {
-                        if (editData) {
-                            setRoles((prev) => prev.map((x) => (x.id_role === obj.id_role ? obj : x)));
-                        } else {
-                            setRoles((prev) => [...prev, { ...obj, id_role: prev.length + 1 }]);
-                        }
-                        setModalOpen(false);
-                    }}
-                />
-            )}
-        </div>
-    );
-}
+                <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
+                    <div className="bg-white w-[400px] p-5 rounded-xl shadow animate-scaleIn">
+                        <h3 className="text-lg font-semibold mb-3">{editData ? 'Sửa Role' : 'Thêm Role'}</h3>
 
-// ===== Modal Component =====
-function RoleModal({ data, onClose, onSave }) {
-    const [name, setName] = useState(data?.role_name || '');
+                        <div className="flex flex-col gap-3">
+                            <input
+                                className=" p-4 rounded-xl border border-gray-300 outline-orange-500"
+                                placeholder="Tên Role (VD: ADMIN, USER...)"
+                                value={roleName}
+                                onChange={(e) => setRoleName(e.target.value)}
+                            />
+                        </div>
 
-    const submit = () => {
-        if (!name.trim()) return alert('Tên role không được bỏ trống');
-        onSave({ ...data, role_name: name });
-    };
-
-    return (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-            <div className="bg-white w-[400px] p-5 rounded-xl shadow">
-                <h3 className="text-lg font-semibold mb-3">{data ? 'Sửa Role' : 'Thêm Role'}</h3>
-
-                <input
-                    className="border p-2 w-full rounded"
-                    placeholder="Tên role (VD: ADMIN, USER...)"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                />
-
-                <div className="flex justify-end gap-2 mt-4">
-                    <button onClick={onClose} className="px-4 py-2 border rounded-lg">
-                        Hủy
-                    </button>
-                    <button onClick={submit} className="px-4 py-2 bg-orange-600 text-white rounded-lg">
-                        Lưu
-                    </button>
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button onClick={() => setModalOpen(false)} className="px-4 py-2 border rounded-lg">
+                                Hủy
+                            </button>
+                            <button onClick={saveModal} className="px-4 py-2 bg-orange-600 text-white rounded-lg">
+                                Lưu
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
+
+            {/* Confirm Delete */}
+            {confirmOpen && (
+                <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white w-[350px] p-6 rounded-xl shadow-xl animate-scaleIn">
+                        <h3 className="text-xl font-semibold text-gray-800">Xác nhận xóa</h3>
+                        <p className="text-gray-600 mt-2">
+                            Bạn có chắc chắn muốn xóa Role này không?
+                            <br />
+                            Hành động này <b>không thể hoàn tác</b>.
+                        </p>
+
+                        <div className="flex justify-end gap-2 mt-5">
+                            <button
+                                onClick={() => setConfirmOpen(false)}
+                                className="px-4 py-2 rounded-lg border text-gray-700"
+                            >
+                                Hủy
+                            </button>
+                            <button onClick={deleteRole} className="px-4 py-2 rounded-lg bg-red-600 text-white">
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

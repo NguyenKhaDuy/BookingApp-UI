@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { X, Search, SlidersHorizontal, Eye, ChevronLeft, ChevronRight, ClipboardList, FileWarning } from 'lucide-react';
-
+import { X, Search, SlidersHorizontal, Eye, ChevronLeft, ChevronRight, FileWarning, Receipt } from 'lucide-react';
+import getCookie from '../../../utils/getToken';
+import { formatDateTimeArray, formatDateArray, formatTime } from '../../../utils/formatDate';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 export default function ManageRequest() {
-    const [allData, setAllData] = useState([]);
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [preview, setPreview] = useState(null);
 
     const [page, setPage] = useState(0);
     const size = 5;
@@ -16,68 +18,55 @@ export default function ManageRequest() {
     const [open, setOpen] = useState(false);
     const [detail, setDetail] = useState(null);
 
-    const mockData = [
-        {
-            id_request: 1,
-            customer: { name: 'Nguyễn Văn A' },
-            name_service: 'Sửa máy lạnh',
-            scheduled_date: '2026-01-20',
-            scheduled_time: '14:00',
-            technicicanDTO: { name: 'KTV Hùng' },
-            status_code: 'PENDING',
-            description: 'Máy lạnh chảy nước',
-            image_request: ['https://picsum.photos/200/200?random=1', 'https://picsum.photos/200/200?random=2'],
-        },
-        {
-            id_request: 2,
-            customer: { name: 'Trần Thị B' },
-            name_service: 'Sửa nước',
-            scheduled_date: '2026-01-22',
-            scheduled_time: '10:00',
-            technicicanDTO: null,
-            status_code: 'ACCEPTED',
-            description: 'Ống nước bể',
-            image_request: ['https://picsum.photos/200/200?random=3'],
-        },
-    ];
+    const token = getCookie('token');
 
-    useEffect(() => {
-        setLoading(true);
-        setTimeout(() => {
-            setAllData(mockData);
-            setTotalPages(Math.ceil(mockData.length / size));
+    // Fetch API
+    const loadData = async (p) => {
+        try {
+            setLoading(true);
+            const res = await fetch(`http://localhost:8081/api/admin/request/?pageNo=${p + 1}`, {
+                headers: { Authorization: token ? `Bearer ${token}` : '' },
+            });
+            const json = await res.json();
+            setRequests(json.data || []);
+            setTotalPages(json.total_page || 0);
             setLoading(false);
-        }, 500);
-    }, []);
+        } catch (err) {
+            console.log(err);
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        let filtered = [...allData];
+        loadData(page);
+    }, [page]);
 
-        if (search.trim() !== '')
-            filtered = filtered.filter(
-                (item) =>
-                    item.customer?.name.toLowerCase().includes(search.toLowerCase()) ||
-                    item.id_request.toString().includes(search),
-            );
+    const filteredRequests = requests.filter((r) => {
+        let ok = true;
 
-        if (statusFilter.trim() !== '') filtered = filtered.filter((item) => item.status_code === statusFilter);
+        if (search.trim() !== '') {
+            ok =
+                ok &&
+                (r.customer?.full_name?.toLowerCase().includes(search.toLowerCase()) ||
+                    r.id_request?.toString().includes(search));
+        }
+        if (statusFilter.trim() !== '') {
+            ok = ok && r.status_code === statusFilter;
+        }
+        return ok;
+    });
 
-        setTotalPages(Math.ceil(filtered.length / size));
-
-        const start = page * size;
-        setRequests(filtered.slice(start, start + size));
-    }, [page, search, statusFilter, allData]);
-
-    const badge = (st) => {
-        const color = {
+    const badge = (st) =>
+        ({
             PENDING: 'bg-yellow-500',
-            ACCEPTED: 'bg-blue-500',
-            DONE: 'bg-green-600',
+            RECEIVED: 'bg-blue-500',
+            COMPLETED: 'bg-green-600',
+            INCOMPLETE: 'bg-orange-500',
+            RECEIVING: 'bg-purple-600',
             CANCEL: 'bg-red-500',
             CLOSED: 'bg-gray-500',
-        };
-        return color[st] || 'bg-gray-400';
-    };
+        })[st] || 'bg-gray-400';
+
 
     return (
         <div className="p-6">
@@ -86,28 +75,26 @@ export default function ManageRequest() {
                 Quản lý yêu cầu
             </h2>
 
-            {/* FILTER BAR */}
+            {/* FILTER */}
             <div className="flex items-center flex-wrap gap-3 mb-5">
-                {/* Ô tìm kiếm */}
-                <div className="flex items-center bg-white border rounded-lg px-3 py-2 shadow-sm hover:shadow focus-within:ring-2 focus-within:ring-orange-400 transition">
+                <div className="flex items-center bg-white border rounded-lg px-3 py-2 shadow-sm">
                     <Search className="w-4 text-gray-500 mr-2" />
                     <input
-                        placeholder="Tìm bằng tên khách hoặc mã..."
-                        className="outline-none text-sm w-44 md:w-64"
+                        placeholder="Tìm tên khách/mã..."
+                        className="outline-none text-sm w-52"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                     />
                 </div>
 
-                {/* Filter trạng thái */}
-                <div className="flex items-center bg-white border rounded-lg px-3 py-2 shadow-sm hover:shadow focus-within:ring-2 focus-within:ring-orange-400 transition">
+                <div className="flex items-center bg-white border rounded-lg px-3 py-2 shadow-sm">
                     <SlidersHorizontal className="w-4 text-gray-500 mr-2" />
                     <select
                         className="outline-none text-sm bg-transparent"
                         value={statusFilter}
                         onChange={(e) => setStatusFilter(e.target.value)}
                     >
-                        <option value="">Tất cả trạng thái</option>
+                        <option value="">Tất cả</option>
                         <option value="PENDING">PENDING</option>
                         <option value="ACCEPTED">ACCEPTED</option>
                         <option value="DONE">DONE</option>
@@ -131,21 +118,30 @@ export default function ManageRequest() {
                             <th className="px-4 py-3 text-center">Thao tác</th>
                         </tr>
                     </thead>
+
                     <tbody>
                         {loading ? (
                             <tr>
-                                <td colSpan="7" className="text-center py-4 text-gray-500">
+                                <td colSpan="7" className="text-center py-4">
                                     Loading...
                                 </td>
                             </tr>
-                        ) : requests.length > 0 ? (
-                            requests.map((r) => (
-                                <tr key={r.id_request} className="border-b hover:bg-gray-50 transition">
+                        ) : filteredRequests.length === 0 ? (
+                            <tr>
+                                <td colSpan="7" className="text-center py-4 italic text-gray-500">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        ) : (
+                            filteredRequests.map((r) => (
+                                <tr key={r.id_request} className="border-b hover:bg-gray-50">
                                     <td className="px-4 py-3">{r.id_request}</td>
-                                    <td className="px-4 py-3">{r.customer?.name}</td>
+                                    <td className="px-4 py-3">{r.customer?.full_name}</td>
                                     <td className="px-4 py-3">{r.name_service}</td>
-                                    <td className="px-4 py-3">{r.scheduled_date + ' ' + r.scheduled_time}</td>
-                                    <td className="px-4 py-3">{r.technicicanDTO?.name || 'Chưa gán'}</td>
+                                    <td className="px-4 py-3">
+                                        {formatDateArray(r.scheduled_date)} {formatTime(r.scheduled_time)}
+                                    </td>
+                                    <td className="px-4 py-3">{r.technicicanDTO?.full_name || 'Chưa gán'}</td>
                                     <td className="px-4 py-3">
                                         <span
                                             className={`${badge(r.status_code)} text-white px-2 py-1 rounded-full text-xs`}
@@ -159,152 +155,228 @@ export default function ManageRequest() {
                                                 setDetail(r);
                                                 setOpen(true);
                                             }}
-                                            className="flex items-center gap-1 mx-auto bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded-md text-xs transition"
+                                            className="bg-orange-500 hover:bg-orange-600 text-white px-3 py-1 rounded text-xs flex items-center gap-1 mx-auto"
                                         >
-                                            <Eye size={14} />
-                                            Chi tiết
+                                            <Eye size={14} /> Chi tiết
                                         </button>
                                     </td>
                                 </tr>
                             ))
-                        ) : (
-                            <tr>
-                                <td colSpan="7" className="text-center py-4 text-gray-500">
-                                    Không có dữ liệu
-                                </td>
-                            </tr>
                         )}
                     </tbody>
                 </table>
             </div>
 
             {/* PAGINATION */}
-            <div className="flex items-center justify-center gap-2 mt-5 select-none">
-                {/* Prev */}
+            <div className="flex items-center justify-center gap-2 mt-5">
                 <button
                     disabled={page === 0}
                     onClick={() => setPage(page - 1)}
-                    className={`p-2 rounded-lg border transition
-            ${page === 0 ? 'opacity-40 cursor-not-allowed' : 'hover:bg-orange-50 border-orange-400 text-orange-600'}`}
+                    className="p-2 border rounded disabled:opacity-40"
                 >
-                    <ChevronLeft className="w-4 h-4" />
+                    <ChevronLeft size={16} />
                 </button>
 
-                {/* Page numbers */}
-                <div className="flex items-center gap-1">
-                    {Array.from({ length: totalPages }).map((_, idx) => (
-                        <button
-                            key={idx}
-                            onClick={() => setPage(idx)}
-                            className={`px-3 py-1.5 rounded-lg text-sm border transition 
-                    ${
-                        idx === page
-                            ? 'bg-orange-500 text-white border-orange-500 shadow-sm'
-                            : 'hover:bg-orange-50 border-orange-300 text-orange-700'
-                    }`}
-                        >
-                            {idx + 1}
-                        </button>
-                    ))}
-                </div>
+                {Array.from({ length: totalPages }).map((_, i) => (
+                    <button
+                        key={i}
+                        onClick={() => setPage(i)}
+                        className={`px-3 py-1 border rounded text-sm ${i === page ? 'bg-orange-500 text-white' : ''}`}
+                    >
+                        {i + 1}
+                    </button>
+                ))}
 
-                {/* Next */}
                 <button
-                    disabled={page === totalPages - 1 || totalPages === 0}
+                    disabled={page === totalPages - 1}
                     onClick={() => setPage(page + 1)}
-                    className={`p-2 rounded-lg border transition
-            ${
-                page === totalPages - 1 || totalPages === 0
-                    ? 'opacity-40 cursor-not-allowed'
-                    : 'hover:bg-orange-50 border-orange-400 text-orange-600'
-            }`}
+                    className="p-2 border rounded disabled:opacity-40"
                 >
-                    <ChevronRight className="w-4 h-4" />
+                    <ChevronRight size={16} />
                 </button>
             </div>
 
-            {/* MODAL */}
+            {/* DETAIL MODAL */}
             {open && detail && (
-                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
-                    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+                    <div className="bg-white w-full max-w-3xl rounded-xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
                         {/* HEADER */}
-                        <div className="flex justify-between items-center px-5 py-3 border-b bg-gray-50">
+                        <div className="flex items-center justify-between px-6 py-4 border-b bg-gray-50/80">
                             <div>
-                                <h3 className="font-semibold text-xl text-gray-800">Chi tiết yêu cầu</h3>
-                                <p className="text-xs text-gray-500 mt-0.5">Mã: {detail.id_request}</p>
+                                <h3 className="text-lg font-semibold text-gray-800 tracking-wide uppercase">
+                                    Chi tiết yêu cầu
+                                </h3>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                    Mã yêu cầu: <span className="font-medium text-gray-700">{detail.id_request}</span>
+                                </p>
                             </div>
                             <button
-                                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-200 transition"
                                 onClick={() => setOpen(false)}
+                                className="p-2 rounded-full hover:bg-gray-200 transition"
                             >
                                 <X size={18} />
                             </button>
                         </div>
 
-                        {/* BODY */}
-                        <div className="px-5 py-4 space-y-4 text-sm text-gray-700">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="font-medium text-gray-600">Khách hàng</p>
-                                    <p className="text-gray-900">{detail.customer?.name}</p>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-600">Dịch vụ</p>
-                                    <p className="text-gray-900">{detail.name_service}</p>
-                                </div>
+                        {/* BODY SCROLL */}
+                        <div className="px-6 py-5 space-y-5 text-sm text-gray-700 overflow-y-auto max-h-[75vh]">
+                            {/* INFO GRID */}
+                            <div className="grid grid-cols-2 gap-5">
+                                <InfoItem label="Khách hàng" value={detail.customer?.full_name} />
+                                <InfoItem label="Số điện thoại" value={detail.customer?.phone_number} />
+                                <InfoItem label="Dịch vụ" value={detail.name_service} />
+                                <InfoItem
+                                    label="Trạng thái"
+                                    value={
+                                        <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-600">
+                                            {detail.status_code}
+                                        </span>
+                                    }
+                                />
+                                <InfoItem
+                                    label="Kỹ thuật viên"
+                                    value={detail.technicicanDTO?.full_name || 'Chưa gán'}
+                                />
+
+                                <InfoItem
+                                    label="SĐT kỹ thuật"
+                                    value={detail.technicicanDTO?.phone_number || 'Chưa có'}
+                                />
+
+                                <InfoItem label="Email kỹ thuật" value={detail.technicicanDTO?.email || 'Chưa có'} />
+
+                                <InfoItem
+                                    label="Thời gian hẹn"
+                                    value={`${formatDateArray(detail.scheduled_date)} ${formatTime(detail.scheduled_time)}`}
+                                />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <p className="font-medium text-gray-600">Ngày hẹn</p>
-                                    <p className="text-gray-900">{detail.scheduled_date}</p>
-                                </div>
-                                <div>
-                                    <p className="font-medium text-gray-600">Giờ hẹn</p>
-                                    <p className="text-gray-900">{detail.scheduled_time}</p>
-                                </div>
-                            </div>
-
+                            {/* DESCRIPTION */}
                             <div>
-                                <p className="font-medium text-gray-600">Kỹ thuật viên</p>
-                                <p className="text-gray-900">{detail.technicicanDTO?.name || 'Chưa gán'}</p>
-                            </div>
-
-                            <div>
-                                <p className="font-medium text-gray-600">Mô tả</p>
-                                <div className="bg-gray-50 border rounded-lg p-3 text-gray-800 text-sm leading-relaxed">
+                                <Label>Mô tả</Label>
+                                <div className="mt-1 bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-800 leading-relaxed">
                                     {detail.description}
                                 </div>
                             </div>
 
-                            {/* IMAGE BLOCK */}
+                            {/* IMAGES */}
                             <div>
-                                <p className="font-medium text-gray-600 mb-2">Hình ảnh minh họa</p>
-                                {detail.image_request.length > 0 ? (
-                                    <div className="grid grid-cols-3 gap-3">
-                                        {detail.image_request.map((img, i) => (
-                                            <div
-                                                key={i}
-                                                className="rounded-xl overflow-hidden border border-gray-200 shadow-sm"
-                                            >
-                                                <img
-                                                    src={img}
-                                                    className="w-full h-24 object-cover hover:scale-105 transition"
-                                                />
-                                            </div>
+                                <Label>Hình ảnh</Label>
+                                {detail.image_request?.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-3 mt-2">
+                                        {detail.image_request.map((img, idx) => (
+                                            <img
+                                                key={idx}
+                                                src={`data:image/jpeg;base64,${img}`}
+                                                onClick={() => setPreview(`data:image/jpeg;base64,${img}`)}
+                                                className="h-24 w-full object-cover rounded-md border cursor-pointer hover:opacity-80 transition"
+                                            />
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-gray-500 italic">Không có hình ảnh đính kèm</p>
+                                    <p className="italic text-gray-500 mt-1">Không có hình</p>
                                 )}
                             </div>
+
+                            {/* INVOICE */}
+                            {detail.invoices && (
+                                <div className="border border-gray-200 rounded-lg p-4 bg-gray-50/70">
+                                    {/* HEADER */}
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Receipt size={16} className="text-gray-700" />
+                                        <p className="font-semibold text-gray-800">Hóa đơn</p>
+                                    </div>
+
+                                    {/* INFO */}
+                                    <div className="grid grid-cols-2 gap-y-1 text-sm mb-2">
+                                        <InfoItem label="Mã hóa đơn" value={detail.invoices.id_invoices} />
+                                        <InfoItem
+                                            label="Phương thức thanh toán"
+                                            value={detail.invoices.payment_method ?? '—'}
+                                        />
+
+                                        <InfoItem
+                                            label="Trạng thái thanh toán"
+                                            value={
+                                                detail.invoices.name_status === 'PAID' ? (
+                                                    <span className="text-green-600 font-medium">Đã thanh toán</span>
+                                                ) : (
+                                                    <span className="text-red-600 font-medium">Chưa thanh toán</span>
+                                                )
+                                            }
+                                        />
+
+                                        <InfoItem
+                                            label="Tổng tiền"
+                                            value={
+                                                <span className="font-semibold text-green-600">
+                                                    {detail.invoices.total_amount.toLocaleString()} VND
+                                                </span>
+                                            }
+                                        />
+
+                                        <InfoItem
+                                            label="Ngày thanh toán"
+                                            value={formatDateArray(detail.invoices.paid_at) ?? '—'}
+                                        />
+                                    </div>
+
+                                    {/* CHI TIẾT HÓA ĐƠN */}
+                                    {detail.invoices.detailInvoiceDTOS?.length > 0 && (
+                                        <div className="mt-3 bg-white border border-gray-200 rounded-md overflow-hidden">
+                                            <table className="w-full text-sm">
+                                                <thead className="bg-gray-100 border-b text-gray-700 font-medium">
+                                                    <tr>
+                                                        <th className="px-3 py-2 text-left">Tên mặt hàng</th>
+                                                        <th className="px-3 py-2 text-center">SL</th>
+                                                        <th className="px-3 py-2 text-right">Đơn giá</th>
+                                                        <th className="px-3 py-2 text-right">Thành tiền</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {detail.invoices.detailInvoiceDTOS.map((d, i) => (
+                                                        <tr key={i} className="border-b">
+                                                            <td className="px-3 py-2">{d.name}</td>
+                                                            <td className="px-3 py-2 text-center">{d.quantity}</td>
+                                                            <td className="px-3 py-2 text-right">
+                                                                {d.price.toLocaleString()} VND
+                                                            </td>
+                                                            <td className="px-3 py-2 text-right font-medium">
+                                                                {d.total_price.toLocaleString()} VND
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* FEEDBACK */}
+                            {detail.feedback?.length > 0 && (
+                                <div>
+                                    <Label>Feedback từ khách hàng</Label>
+                                    <div className="space-y-2 mt-2">
+                                        {detail.feedback.map((f) => (
+                                            <div
+                                                key={f.id_feedback}
+                                                className="border border-gray-200 rounded-md p-3 bg-white shadow-sm"
+                                            >
+                                                <p className="font-medium text-gray-800">{f.name_customer}</p>
+                                                <p className="text-gray-600 text-sm mt-1">{f.content}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* FOOTER */}
-                        <div className="px-5 py-3 border-t flex justify-end">
+                        <div className="px-6 py-4 border-t bg-white flex justify-end">
                             <button
                                 onClick={() => setOpen(false)}
-                                className="px-4 py-2 rounded-lg bg-gray-800 text-white text-sm shadow hover:bg-gray-900 transition"
+                                className="px-4 py-2 rounded-md bg-gray-900 text-white text-xs font-medium hover:bg-black transition"
                             >
                                 Đóng
                             </button>
@@ -312,6 +384,29 @@ export default function ManageRequest() {
                     </div>
                 </div>
             )}
+
+            {/* IMAGE PREVIEW OVERLAY */}
+            {preview && (
+                <div
+                    onClick={() => setPreview(null)}
+                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000]"
+                >
+                    <img src={preview} className="max-h-[90vh] max-w-[90vw] rounded-lg" />
+                </div>
+            )}
+            <LoadingOverlay show={loading} />
         </div>
     );
 }
+
+const InfoItem = ({ label, value }) => (
+    <div className="flex flex-col">
+        <span className="text-xs text-gray-500">{label}</span>
+        <span className="font-medium text-gray-800">{value}</span>
+    </div>
+);
+
+const Label = ({ children }) => (
+    <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide">{children}</p>
+);
+

@@ -41,8 +41,6 @@ export default function TechnicianHome({ active }) {
            };
            fetchUser();
   }, []);
-    
-    console.log(user)
 
 
     // ===================== AUTH + WEBSOCKET =====================
@@ -51,7 +49,7 @@ export default function TechnicianHome({ active }) {
         const token = getCookie('token');
 
         if (!token) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
 
@@ -59,14 +57,14 @@ export default function TechnicianHome({ active }) {
         try {
             decoded = jwtDecode(token);
         } catch (err) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
 
         const roles = decoded.roles || [];
 
         if (!roles.includes('TECHNICIAN')) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
 

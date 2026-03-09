@@ -47,6 +47,12 @@ export const formatDateArray = (arr) => {
     return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
 };
 
+export const formatTime = (arr) => {
+    if (!arr || !Array.isArray(arr) || arr.length < 2) return 'N/A';
+    const [h, m] = arr;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+
 // =========================
 // DEFAULT EXPORT (để tiện import)
 // =========================
@@ -54,4 +60,5 @@ export default {
     formatDateString,
     formatDateArray,
     formatDateTimeArray,
+    formatTime
 };
