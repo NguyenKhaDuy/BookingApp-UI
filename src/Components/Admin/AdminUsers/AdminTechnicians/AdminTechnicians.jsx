@@ -1,185 +1,96 @@
-import React, { useState } from 'react';
-import { Camera, EyeIcon, Plus } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { EyeIcon, Plus, X } from 'lucide-react';
+import getCookie from '../../../../utils/getToken';
+import avatarDefault from '../../../../assets/default-avatar.jpg';
+import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
+
+const formatDateTime = (arr) => {
+    if (!arr || arr.length < 6) return '';
+    const [year, month, day, hour, minute, second] = arr;
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year} ${hour
+        .toString()
+        .padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
+};
+
+const formatDate = (arr) => {
+    if (!arr || arr.length < 3) return '';
+    const [year, month, day] = arr;
+    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
+};
+
+const formatTime = (arr) => {
+    if (!arr || !Array.isArray(arr) || arr.length < 2) return 'N/A';
+    const [h, m] = arr;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
 
 export default function AdminTechnicians() {
     const [query, setQuery] = useState('');
+    const [technicians, setTechnicians] = useState([]);
+    const token = getCookie('token');
 
-    const [technicians, setTechnicians] = useState([
-        {
-            id_user: 'TECH001',
-            full_name: 'Nguyễn Minh Khang',
-            address: 'Quận 1, TP HCM',
-            phone_number: '0908123456',
-            email: 'khang.tech@example.com',
-            avatarBase64: 'https://i.pravatar.cc/150?img=11',
-            dob: '15-04-1995',
-            gender: 'Male',
-            working_area: 'TP HCM',
-            experience_year: 5,
-            status_technician: 'ACTIVE',
-            level: 'Senior',
-            total_star: 45,
-            technician_debt: 0,
-            roleDTOS: [{ role_name: 'TECHNICIAN' }],
-            nameServiceTechnician: ['Sửa điện', 'Lắp đặt máy lạnh'],
-            nameSkillTechnician: ['Điện dân dụng', 'Điện lạnh'],
-            locationTechnicianDTOS: [{ location_name: 'Quận 1' }, { location_name: 'Quận 3' }],
-            technicianWalletDTO: {
-                balance: 1200000,
-                total_income: 8500000,
-            },
-            created_at: '01-01-2024 09:00:00',
-            updated_at: '20-03-2024 14:30:00',
-        },
-        {
-            id_user: 'TECH002',
-            full_name: 'Trần Văn Hòa',
-            address: 'Quận Thanh Khê, Đà Nẵng',
-            phone_number: '0912348899',
-            email: 'hoa.tech@example.com',
-            avatarBase64: 'https://i.pravatar.cc/150?img=22',
-            dob: '10-09-1992',
-            gender: 'Male',
-            working_area: 'Đà Nẵng',
-            experience_year: 7,
-            status_technician: 'ACTIVE',
-            level: 'Expert',
-            total_star: 60,
-            technician_debt: 150000,
-            roleDTOS: [{ role_name: 'TECHNICIAN' }],
-            nameServiceTechnician: ['Sửa ống nước', 'Chống thấm'],
-            nameSkillTechnician: ['Cấp thoát nước', 'Xây dựng cơ bản'],
-            locationTechnicianDTOS: [{ location_name: 'Thanh Khê' }, { location_name: 'Hải Châu' }],
-            technicianWalletDTO: {
-                balance: 800000,
-                total_income: 12000000,
-            },
-            created_at: '05-02-2024 10:20:00',
-            updated_at: '18-03-2024 16:10:00',
-        },
-        {
-            id_user: 'TECH003',
-            full_name: 'Lê Thị Ngọc Anh',
-            address: 'Quận Bình Thạnh, TP HCM',
-            phone_number: '0934567788',
-            email: 'ngocanh.tech@example.com',
-            avatarBase64: 'https://i.pravatar.cc/150?img=32',
-            dob: '25-12-1998',
-            gender: 'Female',
-            working_area: 'TP HCM',
-            experience_year: 3,
-            status_technician: 'INACTIVE',
-            level: 'Junior',
-            total_star: 25,
-            technician_debt: 0,
-            roleDTOS: [{ role_name: 'TECHNICIAN' }],
-            nameServiceTechnician: ['Vệ sinh máy lạnh'],
-            nameSkillTechnician: ['Bảo trì thiết bị'],
-            locationTechnicianDTOS: [{ location_name: 'Bình Thạnh' }],
-            technicianWalletDTO: {
-                balance: 300000,
-                total_income: 2500000,
-            },
-            created_at: '10-03-2024 08:45:00',
-            updated_at: '15-03-2024 11:30:00',
-        },
-    ]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    // filtered list
+    const [loading, setLoading] = useState(false);
+
+    // MODAL DETAIL
+    const [showDetail, setShowDetail] = useState(false);
+    const [detailData, setDetailData] = useState(null);
+    const [loadingDetail, setLoadingDetail] = useState(false);
+
+    const fetchTechnicians = async (page = 1) => {
+        try {
+            setLoading(true);
+            const res = await axios.get(`http://localhost:8081/api/all/technician/?pageNo=${page}`);
+            if (res.data?.data) {
+                setTechnicians(res.data.data);
+                setTotalPages(res.data.total_page || 1);
+                setCurrentPage(res.data.current_page || 1);
+            }
+        } catch (err) {
+            console.error('Error fetching technicians:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTechnicians(currentPage);
+    }, [currentPage]);
+
     const filtered = technicians.filter((c) => {
         const q = query.trim().toLowerCase();
         if (!q) return true;
         return (
-            c.id_user.toLowerCase().includes(q) ||
-            c.full_name.toLowerCase().includes(q) ||
-            c.email.toLowerCase().includes(q) ||
-            c.phone_number.toLowerCase().includes(q)
+            c.id_user?.toLowerCase().includes(q) ||
+            c.full_name?.toLowerCase().includes(q) ||
+            c.email?.toLowerCase().includes(q) ||
+            c.phone_number?.toLowerCase().includes(q)
         );
     });
 
-    // pagination
-    const [currentPage, setCurrentPage] = useState(1);
-    const usersPerPage = 10;
-    const indexOfLastUser = currentPage * usersPerPage;
-    const indexOfFirstUser = indexOfLastUser - usersPerPage;
-    const currentUsers = filtered.slice(indexOfFirstUser, indexOfLastUser);
-    const totalPages = Math.ceil(filtered.length / usersPerPage);
-
-    // modal states
-    const [showEdit, setShowEdit] = useState(false);
-    const [showDelete, setShowDelete] = useState(false);
-    const [selected, setSelected] = useState(null);
-    const [showDetail, setShowDetail] = useState(false);
-
-    // form state for edit
-    const [form, setForm] = useState({
-        id_user: '',
-        full_name: '',
-        address: '',
-        phone_number: '',
-        email: '',
-        gender: '',
-        role: 'USER',
-    });
-
-    //sửa biến và các tham số trong edit modal cho phù hợp
-    function openEdit(t) {
-        setSelected(t);
-        setForm({
-            id_user: t.id_user,
-            full_name: t.full_name,
-            address: t.address,
-            phone_number: t.phone_number,
-            email: t.email,
-            avatarBase64: t.avatarBase64,
-
-            dob: t.dob,
-            gender: t.gender,
-            working_area: t.working_area,
-            experience_year: t.experience_year,
-            status_technician: t.status_technician,
-            level: t.level,
-
-            role: t.roleDTOS?.[0]?.role_name || 'TECHNICIAN',
-
-            nameServiceTechnician: t.nameServiceTechnician || [],
-            nameSkillTechnician: t.nameSkillTechnician || [],
-        });
-
-        setShowEdit(true);
-    }
-
-    function saveEdit() {
-        setTechnicians((prev) =>
-            prev.map((p) =>
-                p.id_user === selected.id_user ? { ...p, ...form, roleDTOS: [{ role_name: form.role }] } : p,
-            ),
-        );
-        setShowEdit(false);
-        setSelected(null);
-    }
-
-    function openDelete(c) {
-        setSelected(c);
-        setShowDelete(true);
-    }
-
-    function confirmDelete() {
-        setTechnicians((prev) => prev.filter((p) => p.id_user !== selected.id_user));
-        setShowDelete(false);
-        setSelected(null);
-    }
-
-    function openDetail(c) {
-        setSelected(c);
+    // ================= GET DETAIL API =================
+    const openDetail = async (item) => {
         setShowDetail(true);
-    }
+        setDetailData(null);
+        setLoadingDetail(true);
+        try {
+            const res = await axios.get(`http://localhost:8081/api/detail-technician/id=${item.id_user}`);
+            setDetailData(res.data.data);
+        } catch (error) {
+            console.error('Detail fetch error:', error);
+        } finally {
+            setLoadingDetail(false);
+        }
+    };
 
     return (
         <div className="p-6">
             <h1 className="text-2xl font-semibold text-gray-700 mb-4">Technician Management</h1>
 
-            {/* Search + Add (Add is static placeholder) */}
+            {/* Search */}
             <div className="flex items-center justify-between mb-4 gap-4">
                 <input
                     value={query}
@@ -188,30 +99,14 @@ export default function AdminTechnicians() {
                     placeholder="Search by id, name, email or phone..."
                     className="px-4 py-2 border rounded-lg w-80 focus:outline-none focus:ring focus:ring-orange-300"
                 />
-                <div className="flex items-center gap-2">
-                    <button
-                        onClick={() => {
-                            const newCus = {
-                                id_user: `CUS${String(technicians.length + 1).padStart(3, '0')}`,
-                                full_name: 'New Customer',
-                                address: 'Unknown',
-                                phone_number: '',
-                                email: '',
-                                avatarBase64: 'https://i.pravatar.cc/100?img=12',
-                                dob: '01-01-1990',
-                                gender: 'Male',
-                                roleDTOS: [{ role_name: 'USER' }],
-                                created_at: new Date().toLocaleString(),
-                                updated_at: new Date().toLocaleString(),
-                            };
-                            setTechnicians((s) => [newCus, ...s]);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-orange-500 text-white border border-orange-500 hover:bg-white hover:text-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-300 transition"
-                    >
-                        <Plus size={18} />
-                        Add Technician
-                    </button>
-                </div>
+
+                <button
+                    onClick={() => alert('TODO: Open add modal')}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-orange-500 text-white"
+                >
+                    <Plus size={18} />
+                    Add Technician
+                </button>
             </div>
 
             <div className="overflow-x-auto bg-white shadow rounded-lg border">
@@ -219,512 +114,299 @@ export default function AdminTechnicians() {
                     <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
                             <th className="p-3 text-left">Avatar</th>
-                            <th className="p-3 text-left">ID</th>
                             <th className="p-3 text-left">Full Name</th>
                             <th className="p-3 text-left">Email</th>
-                            <th className="p-3 text-left">Phone</th>
-                            <th className="p-3 text-left">Gender</th>
-                            <th className="p-3 text-left">Role</th>
-                            <th className="p-3 text-left">Created At</th>
                             <th className="p-3 text-left">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {currentUsers.map((c) => (
-                            <tr key={c.id_user} className="border-t hover:bg-gray-50 transition hover:scale-100">
+                        {filtered.map((c) => (
+                            <tr key={c.id_user} className="border-t hover:bg-gray-50">
                                 <td className="p-3">
                                     <img
-                                        src={c.avatarBase64}
-                                        className="w-12 h-12 rounded-full object-cover"
+                                        src={
+                                            c.avatarBase64
+                                                ? c.avatarBase64.startsWith('data:image')
+                                                    ? c.avatarBase64
+                                                    : `data:image/jpeg;base64,${c.avatarBase64}`
+                                                : avatarDefault
+                                        }
+                                        className="w-12 h-12 rounded-full object-cover border"
                                         alt="avatar"
                                     />
                                 </td>
-                                <td className="p-3">{c.id_user}</td>
                                 <td className="p-3">{c.full_name}</td>
                                 <td className="p-3">{c.email}</td>
-                                <td className="p-3">{c.phone_number}</td>
-                                <td className="p-3">{c.gender}</td>
-                                <td className="p-3">{c.roleDTOS.map((r) => r.role_name).join(', ')}</td>
-                                <td className="p-3">{c.created_at}</td>
-                                <td className="p-3 flex gap-2">
+                                <td className="p-3">
                                     <button
                                         onClick={() => openDetail(c)}
-                                        className="flex items-center gap-2 px-3 py-1 rounded-md bg-orange-500/15 text-orange-600 font-semibold hover:bg-orange-500 hover:text-white focus:outline-none focus:ring-2 focus:ring-orange-300 transition-all duration-200"
+                                        className="flex items-center gap-2 px-3 py-1 rounded-md bg-orange-500/15 text-orange-600 font-semibold hover:bg-orange-500 hover:text-white"
                                     >
                                         <EyeIcon size={16} />
                                         View
                                     </button>
-
-                                    {/* <button
-                                        onClick={() => openEdit(c)}
-                                        className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                                    >
-                                        Edit
-                                    </button>
-
-                                    <button
-                                        onClick={() => openDelete(c)}
-                                        className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                                    >
-                                        Delete
-                                    </button> */}
                                 </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                {/* Pagination */}
                 <div className="flex justify-center items-center gap-2 py-4 mt-4">
-                    {/* Prev */}
                     <button
                         onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                         disabled={currentPage === 1}
-                        className="
-            px-3 py-1 rounded-md border
-            bg-white text-gray-600
-            hover:bg-orange-100 hover:text-orange-600
-            disabled:opacity-40 disabled:cursor-not-allowed
-            transition
-        "
+                        className="px-3 py-1 rounded-md border bg-white text-gray-600 hover:bg-orange-100 hover:text-orange-600 disabled:opacity-40"
                     >
                         Prev
                     </button>
 
-                    {/* Pages */}
                     {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                         <button
                             key={page}
                             onClick={() => setCurrentPage(page)}
-                            className={`
-                min-w-[36px] h-9
-                rounded-md border
-                font-semibold
-                transition
-                ${
-                    currentPage === page
-                        ? 'bg-orange-500 text-white border-orange-500 shadow'
-                        : 'bg-white text-gray-700 hover:bg-orange-100 hover:text-orange-600'
-                }
-            `}
+                            className={`min-w-[36px] h-9 rounded-md border font-semibold ${
+                                currentPage === page
+                                    ? 'bg-orange-500 text-white border-orange-500'
+                                    : 'bg-white text-gray-700 hover:bg-orange-100 hover:text-orange-600'
+                            }`}
                         >
                             {page}
                         </button>
                     ))}
 
-                    {/* Next */}
                     <button
                         onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                         disabled={currentPage === totalPages}
-                        className="
-            px-3 py-1 rounded-md border
-            bg-white text-gray-600
-            hover:bg-orange-100 hover:text-orange-600
-            disabled:opacity-40 disabled:cursor-not-allowed
-            transition
-        "
+                        className="px-3 py-1 rounded-md border bg-white text-gray-600 hover:bg-orange-100 hover:text-orange-600 disabled:opacity-40"
                     >
                         Next
                     </button>
                 </div>
             </div>
 
-            {/* Edit Technician Modal */}
-            {showEdit && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-lg p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h2 className="text-lg font-semibold mb-4">Edit Technician</h2>
+            <LoadingOverlay show={loading} />
 
-                        <div className="space-y-4">
-                            {/* Avatar */}
-                            <div className="flex justify-center">
-                                <div className="relative w-24 h-24">
+            {/* ===================== DETAIL MODAL ===================== */}
+            {showDetail && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl w-full max-w-3xl p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
+                        {/* Close button */}
+                        <button
+                            onClick={() => setShowDetail(false)}
+                            className="absolute top-3 right-3 text-gray-500 hover:text-black"
+                        >
+                            <X size={20} />
+                        </button>
+
+                        {loadingDetail && (
+                            <div className="py-20 text-center font-semibold text-gray-600">Loading detail...</div>
+                        )}
+
+                        {detailData && (
+                            <>
+                                {/* HEADER */}
+                                <div className="flex items-center gap-4 mb-6">
                                     <img
-                                        src={form.avatarBase64 || 'https://i.pravatar.cc/150?img=12'}
-                                        alt="Avatar"
-                                        className="w-24 h-24 rounded-full object-cover border transition hover:scale-105"
-                                    />
-
-                                    <input
-                                        type="file"
-                                        accept="image/*"
-                                        id="avatar-upload"
-                                        className="hidden"
-                                        onChange={(e) => {
-                                            const file = e.target.files[0];
-                                            if (file) {
-                                                const reader = new FileReader();
-                                                reader.onload = () =>
-                                                    setForm((s) => ({ ...s, avatarBase64: reader.result }));
-                                                reader.readAsDataURL(file);
-                                            }
-                                        }}
-                                    />
-
-                                    <label
-                                        htmlFor="avatar-upload"
-                                        className="
-                                absolute bottom-1 right-1
-                                w-8 h-8 flex items-center justify-center
-                                rounded-full bg-black/50 text-white
-                                cursor-pointer
-                                hover:bg-orange-500 hover:ring-2 hover:ring-orange-300
-                                transition-all
-                            "
-                                    >
-                                        <Camera size={16} />
-                                    </label>
-                                </div>
-                            </div>
-
-                            {/* Full Name */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Full Name</label>
-                                <input
-                                    value={form.full_name}
-                                    onChange={(e) => setForm((s) => ({ ...s, full_name: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-
-                            {/* Email */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Email</label>
-                                <input
-                                    value={form.email}
-                                    onChange={(e) => setForm((s) => ({ ...s, email: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-
-                            {/* Phone */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Phone</label>
-                                <input
-                                    value={form.phone_number}
-                                    onChange={(e) => setForm((s) => ({ ...s, phone_number: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-
-                            {/* Address */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Address</label>
-                                <input
-                                    value={form.address}
-                                    onChange={(e) => setForm((s) => ({ ...s, address: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-
-                            {/* Working Area */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Working Area</label>
-                                <input
-                                    value={form.working_area}
-                                    onChange={(e) => setForm((s) => ({ ...s, working_area: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-
-                            {/* Experience + Level */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm text-gray-600">Experience (years)</label>
-                                    <input
-                                        type="number"
-                                        min="0"
-                                        value={form.experience_year}
-                                        onChange={(e) =>
-                                            setForm((s) => ({ ...s, experience_year: Number(e.target.value) }))
+                                        src={
+                                            detailData.avatarBase64
+                                                ? detailData.avatarBase64.startsWith('data:image')
+                                                    ? detailData.avatarBase64
+                                                    : `data:image/jpeg;base64,${detailData.avatarBase64}`
+                                                : avatarDefault
                                         }
-                                        className="w-full px-3 py-2 border rounded"
+                                        className="w-20 h-20 rounded-full border object-cover"
+                                        alt="avatar"
                                     />
+
+                                    <div>
+                                        <h2 className="text-xl font-bold text-gray-800">{detailData.full_name}</h2>
+                                        <p className="text-gray-600">{detailData.email}</p>
+                                        <p className="text-gray-600">{detailData.phone_number}</p>
+                                    </div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm text-gray-600">Level</label>
-                                    <select
-                                        value={form.level}
-                                        onChange={(e) => setForm((s) => ({ ...s, level: e.target.value }))}
-                                        className="w-full px-3 py-2 border rounded"
-                                    >
-                                        <option value="Junior">Junior</option>
-                                        <option value="Senior">Senior</option>
-                                        <option value="Expert">Expert</option>
-                                    </select>
+                                {/* BODY GRID */}
+                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                    <p>
+                                        <b>ID:</b> {detailData.id_user}
+                                    </p>
+                                    <p>
+                                        <b>Gender:</b> {detailData.gender}
+                                    </p>
+                                    <p>
+                                        <b>DOB:</b> {formatDate(detailData.dob)}
+                                    </p>
+                                    <p>
+                                        <b>Experience:</b> {detailData.experience_year} years
+                                    </p>
+                                    <p>
+                                        <b>Status:</b> {detailData.status_technician}
+                                    </p>
+                                    <p>
+                                        <b>Level:</b> {detailData.level}
+                                    </p>
+                                    <p>
+                                        <b>Total Star:</b> {detailData.total_star}
+                                    </p>
+                                    <p>
+                                        <b>Efficiency:</b> {detailData.efficiency}%
+                                    </p>
                                 </div>
-                            </div>
 
-                            {/* Gender + Status */}
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-sm text-gray-600">Gender</label>
-                                    <select
-                                        value={form.gender}
-                                        onChange={(e) => setForm((s) => ({ ...s, gender: e.target.value }))}
-                                        className="w-full px-3 py-2 border rounded"
-                                    >
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                    </select>
+                                {/* WORKING AREA */}
+                                <div className="mt-4">
+                                    <b>Working Area:</b>
+                                    <div className="mt-1 text-gray-700">{detailData.working_area}</div>
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm text-gray-600">Status</label>
-                                    <select
-                                        value={form.status_technician}
-                                        onChange={(e) => setForm((s) => ({ ...s, status_technician: e.target.value }))}
-                                        className="w-full px-3 py-2 border rounded"
-                                    >
-                                        <option value="ACTIVE">ACTIVE</option>
-                                        <option value="INACTIVE">INACTIVE</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Date of Birth */}
-                            <div>
-                                <label className="block text-sm text-gray-600">Date of Birth</label>
-                                <input
-                                    type="date"
-                                    value={form.dob}
-                                    onChange={(e) => setForm((s) => ({ ...s, dob: e.target.value }))}
-                                    className="w-full px-3 py-2 border rounded"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="mt-6 flex justify-end gap-2">
-                            <button
-                                onClick={() => {
-                                    setShowEdit(false);
-                                    setSelected(null);
-                                }}
-                                className="px-4 py-2 border rounded hover:bg-gray-50"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={saveEdit}
-                                className="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
-                            >
-                                Save
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Delete Modal */}
-            {showDelete && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-sm p-6 shadow-lg">
-                        <h3 className="text-lg font-semibold">Delete Customer?</h3>
-                        <p className="mt-2 text-sm text-gray-600">
-                            Are you sure you want to delete <strong>{selected?.full_name}</strong> ({selected?.id_user}
-                            )?
-                        </p>
-
-                        <div className="mt-4 flex justify-end gap-2">
-                            <button
-                                onClick={() => {
-                                    setShowDelete(false);
-                                    setSelected(null);
-                                }}
-                                className="px-3 py-2 border rounded"
-                            >
-                                Cancel
-                            </button>
-                            <button onClick={confirmDelete} className="px-3 py-2 bg-red-600 text-white rounded">
-                                Delete
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Technician Detail Modal */}
-            {showDetail && selected && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg w-full max-w-2xl p-6 shadow-lg overflow-y-auto max-h-[90vh]">
-                        <h3 className="text-xl font-semibold mb-6 text-center">Technician Details</h3>
-
-                        {/* Avatar + ID */}
-                        <div className="flex flex-col items-center gap-2 mb-6">
-                            <img
-                                src={selected.avatarBase64}
-                                alt="avatar"
-                                className="w-28 h-28 rounded-full object-cover border"
-                            />
-                            <span className="text-sm text-gray-500">ID: {selected.id_user}</span>
-                        </div>
-
-                        {/* Detail Info */}
-                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
-                            <div>
-                                <strong>Full Name:</strong>
-                                <div>{selected.full_name}</div>
-                            </div>
-
-                            <div>
-                                <strong>Email:</strong>
-                                <div>{selected.email}</div>
-                            </div>
-
-                            <div>
-                                <strong>Phone:</strong>
-                                <div>{selected.phone_number}</div>
-                            </div>
-
-                            <div>
-                                <strong>Gender:</strong>
-                                <div>{selected.gender}</div>
-                            </div>
-
-                            <div className="col-span-2">
-                                <strong>Address:</strong>
-                                <div>{selected.address}</div>
-                            </div>
-
-                            <div>
-                                <strong>Date of Birth:</strong>
-                                <div>{selected.dob}</div>
-                            </div>
-
-                            <div>
-                                <strong>Working Area:</strong>
-                                <div>{selected.working_area}</div>
-                            </div>
-                        </div>
-
-                        {/* Professional Info */}
-                        <div className="grid grid-cols-2 gap-4 text-sm mb-6">
-                            <div>
-                                <strong>Experience (years):</strong>
-                                <div>{selected.experience_year}</div>
-                            </div>
-
-                            <div>
-                                <strong>Level:</strong>
-                                <div>{selected.level}</div>
-                            </div>
-
-                            <div>
-                                <strong>Status:</strong>
-                                <span
-                                    className={`ml-2 px-2 py-0.5 rounded text-xs font-semibold
-                            ${
-                                selected.status_technician === 'ACTIVE'
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-gray-200 text-gray-600'
-                            }`}
-                                >
-                                    {selected.status_technician}
-                                </span>
-                            </div>
-
-                            <div>
-                                <strong>Total Star:</strong>
-                                <div>{selected.total_star ?? 0} ⭐</div>
-                            </div>
-
-                            <div>
-                                <strong>Technician Debt:</strong>
-                                <div>{selected.technician_debt ?? 0} đ</div>
-                            </div>
-                        </div>
-
-                        {/* Skills & Services */}
-                        <div className="text-sm mb-6 space-y-3">
-                            <div>
-                                <strong>Services:</strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {selected.nameServiceTechnician?.length ? (
-                                        selected.nameServiceTechnician.map((s, i) => (
+                                {/* SERVICES */}
+                                <div className="mt-4">
+                                    <b>Services:</b>
+                                    <div className="flex gap-2 flex-wrap mt-1">
+                                        {detailData.nameServiceTechnician?.map((x, i) => (
                                             <span
                                                 key={i}
-                                                className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs"
+                                                className="px-2 py-1 bg-orange-100 text-orange-700 rounded-md text-xs"
                                             >
-                                                {s}
+                                                {x}
                                             </span>
-                                        ))
+                                        ))}
+                                    </div>
+                                </div>
+                                {/* LOCATION LIST */}
+                                <div className="mt-6">
+                                    <h3 className="text-md font-semibold text-gray-700 mb-2">Working Locations</h3>
+                                    {detailData.locationTechnicianDTOS?.length > 0 ? (
+                                        <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto pr-1">
+                                            {detailData.locationTechnicianDTOS.map((loc, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="px-3 py-2 bg-gray-100 rounded-lg text-sm text-gray-700"
+                                                >
+                                                    {loc.ward}, {loc.district}, {loc.conscious}
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
-                                        <span className="text-gray-400">No services</span>
+                                        <p className="text-gray-500 text-sm">No locations</p>
                                     )}
                                 </div>
-                            </div>
 
-                            <div>
-                                <strong>Skills:</strong>
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                    {selected.nameSkillTechnician?.length ? (
-                                        selected.nameSkillTechnician.map((s, i) => (
-                                            <span
-                                                key={i}
-                                                className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs"
-                                            >
-                                                {s}
-                                            </span>
-                                        ))
+                                {/* SCHEDULE LIST */}
+                                <div className="mt-6">
+                                    <h3 className="text-md font-semibold text-gray-700 mb-2">Schedules</h3>
+                                    {detailData.technicianScheduleDTOS?.length > 0 ? (
+                                        <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                                            {detailData.technicianScheduleDTOS.map((s, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className="p-3 border rounded-lg flex justify-between items-center"
+                                                >
+                                                    <div>
+                                                        <div className="text-gray-800 font-medium">
+                                                            {formatDate(s.date)}
+                                                        </div>
+                                                        <div className="text-gray-600 text-sm">
+                                                            {formatTime(s.time_start)} → {formatTime(s.time_end)}
+                                                        </div>
+                                                    </div>
+                                                    <span
+                                                        className={`text-xs px-2 py-1 rounded ${
+                                                            s.status_code === 'ACTIVE'
+                                                                ? 'bg-green-100 text-green-700'
+                                                                : 'bg-gray-200 text-gray-700'
+                                                        }`}
+                                                    >
+                                                        {s.status_code}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     ) : (
-                                        <span className="text-gray-400">No skills</span>
+                                        <p className="text-gray-500 text-sm">No schedules</p>
                                     )}
                                 </div>
-                            </div>
-                        </div>
 
-                        {/* Meta */}
-                        <div className="grid grid-cols-2 gap-4 text-xs text-gray-500 mb-6">
-                            <div>
-                                <strong>Created At:</strong>
-                                <div>{selected.created_at}</div>
-                            </div>
+                                {/* ============== WALLET INFO ============== */}
+                                <div className="mt-6">
+                                    <h3 className="text-md font-semibold text-gray-700 mb-2">Technician Wallet</h3>
+                                    {detailData.technicianWalletDTO ? (
+                                        <div className="p-4 border rounded-lg bg-gray-50">
+                                            <p>
+                                                <b>Wallet ID:</b> {detailData.technicianWalletDTO.idWallet}
+                                            </p>
+                                            <p>
+                                                <b>Balance:</b> {detailData.technicianWalletDTO.balance} VND
+                                            </p>
+                                            <p>
+                                                <b>Code:</b> {detailData.technicianWalletDTO.code}
+                                            </p>
+                                            <p>
+                                                <b>Technician:</b> {detailData.technicianWalletDTO.technician_name}
+                                            </p>
 
-                            <div>
-                                <strong>Updated At:</strong>
-                                <div>{selected.updated_at}</div>
-                            </div>
-                        </div>
+                                            {/* Linked Banks */}
+                                            <div className="mt-2">
+                                                <b>Linked Bank Accounts:</b>
+                                                {detailData.technicianWalletDTO.linkBankAccountDTOS?.length > 0 ? (
+                                                    <ul className="list-disc list-inside text-sm mt-1">
+                                                        {detailData.technicianWalletDTO.linkBankAccountDTOS.map(
+                                                            (b, i) => (
+                                                                <li key={i}>
+                                                                    {b.bank_name} - {b.account_no}
+                                                                </li>
+                                                            ),
+                                                        )}
+                                                    </ul>
+                                                ) : (
+                                                    <p className="text-gray-500 text-sm">No linked banks</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No wallet info</p>
+                                    )}
+                                </div>
 
-                        {/* ACTIONS */}
-                        <div className="mt-5 flex justify-between items-center">
-                            {/* Close */}
-                            <button
-                                onClick={() => {
-                                    setShowDetail(false);
-                                    setSelected(null);
-                                }}
-                                className="px-4 py-2 border rounded"
-                            >
-                                Close
-                            </button>
-
-                            <div className="flex gap-2">
-                                {/* Edit */}
-                                <button
-                                    onClick={() => {
-                                        openEdit(selected);
-                                        setShowDetail(false);
-                                    }}
-                                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                >
-                                    Edit
-                                </button>
-
-                                {/* Delete */}
-                                <button
-                                    onClick={() => {
-                                        openDelete(selected);
-                                        setShowDetail(false);
-                                    }}
-                                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                                >
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
+                                {/* ============== RATINGS LIST ============== */}
+                                <div className="mt-6">
+                                    <h3 className="text-md font-semibold text-gray-700 mb-2">Ratings</h3>
+                                    {detailData.ratingDTOS?.length > 0 ? (
+                                        <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
+                                            {detailData.ratingDTOS.map((r, idx) => (
+                                                <div key={idx} className="p-3 border rounded-lg flex gap-3">
+                                                    <img
+                                                        src={
+                                                            r.avatarBase64
+                                                                ? r.avatarBase64.startsWith('data:image')
+                                                                    ? r.avatarBase64
+                                                                    : `data:image/jpeg;base64,${r.avatarBase64}`
+                                                                : avatarDefault
+                                                        }
+                                                        className="w-10 h-10 rounded-full border object-cover"
+                                                        alt="avatar"
+                                                    />
+                                                    <div className="flex-1">
+                                                        <div className="font-medium">{r.full_name}</div>
+                                                        <div className="text-yellow-500 text-sm">
+                                                            {'★'.repeat(r.stars)}
+                                                        </div>
+                                                        <div className="text-gray-700 text-sm">{r.comment}</div>
+                                                        <div className="text-xs text-gray-400 mt-1">
+                                                            {formatDateTime(r.created_at)}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">No ratings yet</p>
+                                    )}
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

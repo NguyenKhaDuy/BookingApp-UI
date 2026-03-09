@@ -5,8 +5,11 @@ import OtpForm from '../OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
+import getCookie from '../../../utils/getToken';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function ProfileEmail({ profile, onEmailUpdated }) {
+    const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const { setUser } = useContext(UserContext);
@@ -18,11 +21,12 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
 
     /* ================= SEND OTP ================= */
     const handleSendOtp = async () => {
+        setLoading(true);
         try {
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
 
             await axios.put(
-                'http://localhost:8081/api/customer/email',
+                'http://localhost:8081/api/email',
                 {
                     old_email: profile.email,
                     new_email: email,
@@ -31,7 +35,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
-                    withCredentials: true, // ⚠️ session
+                    withCredentials: true, //session
                 },
             );
 
@@ -39,12 +43,13 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
             setStep(2);
         } catch (err) {
             showToast('Không thể gửi OTP', 'error');
+        }finally {
+            setLoading(false);
         }
     };
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
         setUser(null);
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
@@ -52,6 +57,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
     /* ================= VERIFY OTP ================= */
     const verifyOtp = async (otp) => {
         try {
+            setLoading(true);
             const res = await fetch('http://localhost:8081/api/verify-otp/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -81,6 +87,8 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
             setStep(1);
         } catch {
             showToast('Lỗi xác thực OTP', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -144,6 +152,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
                 <ShieldCheck className="w-5 h-5" />
                 Lưu email mới
             </button>
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

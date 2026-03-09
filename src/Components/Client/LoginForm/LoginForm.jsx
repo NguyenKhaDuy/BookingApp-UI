@@ -4,11 +4,13 @@ import { Mail, Lock } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import { useToast } from '../../../Context/ToastContext';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 
 let stompClient = null;
 
 export default function LoginForm() {
+    const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
     const navigate = useNavigate();
     const { setUser } = useContext(UserContext); // Lấy setUser từ context
@@ -26,6 +28,7 @@ export default function LoginForm() {
         e.preventDefault();
 
         try {
+            setLoading(true);
             const res = await axios.post('http://localhost:8081/api/login/', form, { withCredentials: true });
 
             //LƯU USER INFO
@@ -44,9 +47,14 @@ export default function LoginForm() {
                 return;
             }
 
-            navigate('/');
+            if (roles.includes('CUSTOMER')) {
+                navigate('/');
+                return;
+            }
         } catch (error) {
             showToast('Sai email hoặc mật khẩu', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,6 +103,12 @@ export default function LoginForm() {
                 </div>
             </div>
 
+            <div className="flex justify-end">
+                <Link to="/forgot-password" className="text-sm text-orange-500 font-semibold hover:underline">
+                    Quên mật khẩu?
+                </Link>
+            </div>
+
             {/* Login thường */}
             <button
                 type="submit"
@@ -128,6 +142,7 @@ export default function LoginForm() {
                     Đăng ký ngay
                 </Link>
             </p>
+            <LoadingOverlay show={loading} />
         </form>
     );
 }

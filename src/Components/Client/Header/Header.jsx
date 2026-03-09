@@ -5,7 +5,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
-import default_avatar from '../../../assets/default-avatar.jpg'
+import default_avatar from '../../../assets/default-avatar.jpg';
+import getCookie from '../../../utils/getToken';
+import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { jwtDecode } from 'jwt-decode';
+import { useToast } from '../../../Context/ToastContext';
 
 const formatTimeFromArray = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -14,8 +18,8 @@ const formatTimeFromArray = (arr) => {
     return date.toLocaleString(); // hoặc dùng toLocaleDateString/toLocaleTimeString tuỳ ý
 };
 
-
 export default function HeaderBooking() {
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const [open, setOpen] = useState(false); // mobile menu
     const [notifOpen, setNotifOpen] = useState(false);
@@ -24,63 +28,60 @@ export default function HeaderBooking() {
     const [servicesMobileOpen, setServicesMobileOpen] = useState(false);
     const [services, setServices] = useState([]);
     const [notifications, setNotifications] = useState([]);
-
+    const [notification, setNotification] = useState(null);
     const { user, setUser } = useContext(UserContext);
     const isLoggedIn = !!user;
+    const fetchNotifications = async () => {
+        if (!user || !user.id_user) return;
 
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            if (!user || !user.id_user) return;
+        try {
+            const res = await axios.get(`http://localhost:8081/api/user/notification/id_user=${user.id_user}`, {
+                withCredentials: true,
+            });
 
-            try {
-                const res = await axios.get(`http://localhost:8081/api/user/notification/id_user=${user.id_user}`, {
-                    withCredentials: true,
-                });
+            if (res.data.data) {
+                const notifs = res.data.data
+                    .map((n) => ({
+                        id: n.id_notify,
+                        id_user_notify: n.id_user_notify,
+                        title: n.title,
+                        message: n.message,
+                        type: n.type,
+                        id_type: n.id_type,
+                        unread: n.status_id === 2,
+                        time: formatTimeFromArray(n.dateTime),
+                        createdAtArray: n.created_at, // giữ mảng để sort
+                    }))
+                    .sort((a, b) => {
+                        // Chuyển array → Date để so sánh
+                        const dateA = new Date(
+                            a.createdAtArray[0],
+                            a.createdAtArray[1] - 1,
+                            a.createdAtArray[2],
+                            a.createdAtArray[3],
+                            a.createdAtArray[4],
+                            a.createdAtArray[5],
+                        );
+                        const dateB = new Date(
+                            b.createdAtArray[0],
+                            b.createdAtArray[1] - 1,
+                            b.createdAtArray[2],
+                            b.createdAtArray[3],
+                            b.createdAtArray[4],
+                            b.createdAtArray[5],
+                        );
+                        return dateB - dateA; // mới → cũ
+                    });
 
-                if (res.data.data) {
-                    const notifs = res.data.data
-                        .map((n) => ({
-                            id: n.id_notify,
-                            title: n.title,
-                            message: n.message,
-                            type: n.type,
-                            id_type: n.id_type,
-                            unread: n.status_id === 2,
-                            time: formatTimeFromArray(n.created_at),
-                            createdAtArray: n.created_at, // giữ mảng để sort
-                        }))
-                        .sort((a, b) => {
-                            // Chuyển array → Date để so sánh
-                            const dateA = new Date(
-                                a.createdAtArray[0],
-                                a.createdAtArray[1] - 1,
-                                a.createdAtArray[2],
-                                a.createdAtArray[3],
-                                a.createdAtArray[4],
-                                a.createdAtArray[5],
-                            );
-                            const dateB = new Date(
-                                b.createdAtArray[0],
-                                b.createdAtArray[1] - 1,
-                                b.createdAtArray[2],
-                                b.createdAtArray[3],
-                                b.createdAtArray[4],
-                                b.createdAtArray[5],
-                            );
-                            return dateB - dateA; // mới → cũ
-                        });
-
-                    setNotifications(notifs);
-                }
-            } catch (err) {
-                console.error('Failed to fetch notifications:', err);
+                setNotifications(notifs);
             }
-        };
-
+        } catch (err) {
+            console.error('Failed to fetch notifications:', err);
+        }
+    };
+    useEffect(() => {
         fetchNotifications();
     }, [user]);
-
-
 
     // Fetch services
     useEffect(() => {
@@ -95,36 +96,72 @@ export default function HeaderBooking() {
         fetchServices();
     }, []);
 
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
+                if (typeof res.data === 'object') {
+                    setUser(res.data);
+                } else {
+                    setUser(null);
+                }
+                localStorage.setItem('user', JSON.stringify(res.data));
+            } catch (err) {
+                console.log('Chưa login');
+            }
+        };
+        fetchUser();
+    }, []);
 
-     useEffect(() => {
-         const fetchUser = async () => {
-             try {
-                 const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
-                 if (typeof res.data === 'object') {
-                     setUser(res.data);
-                 } else {
-                     setUser(null);
-                 }
-                 localStorage.setItem('user', JSON.stringify(res.data));
-             } catch (err) {
-                 console.log('Chưa login');
-             }
-         };
-         fetchUser();
-     }, []);
-
-     const markLocalAsRead = (id) => {
-         setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
-     };
-
+    const markLocalAsRead = (id) => {
+        setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+    };
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        localStorage.removeItem('token');
         setUser(null);
         setAvatarMenuOpen(false);
+        navigate('/');
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
+
+    useEffect(() => {
+        const token = getCookie('token');
+
+        if (!token) {
+            // navigate('/login');
+            return;
+        }
+
+        let decoded;
+        try {
+            decoded = jwtDecode(token);
+        } catch (err) {
+            // navigate('/login');
+            return;
+        }
+
+        const roles = decoded.roles || [];
+
+        if (!roles.includes('CUSTOMER')) {
+            // navigate('/login');
+            return;
+        }
+
+        const unsubscribe = addWebSocketListener((msg) => {
+            setNotification(msg);
+            console.log(msg);
+        });
+
+        return () => {
+            unsubscribe();
+        };
+    }, [navigate]);
+
+    useEffect(() => {
+        if (!notification) return;
+        showToast(`Bạn có thông báo mới \n ${notification.title}`, 'success');
+    }, [notification]);
 
     return (
         <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10">
@@ -139,7 +176,9 @@ export default function HeaderBooking() {
                         >
                             <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-2xl" />
                         </motion.div>
-                        <span className="text-2xl font-bold text-white tracking-tight drop-shadow-md">BookingApp</span>
+                        <span className="text-3xl font-extrabold tracking-wide text-white drop-shadow-[0_0_6px_rgba(255,255,255,0.6)]">
+                            KingTech
+                        </span>
                     </div>
                 </Link>
 
@@ -197,6 +236,7 @@ export default function HeaderBooking() {
                                     setNotifOpen(true);
                                     setOpen(false);
                                     setAvatarMenuOpen(false);
+                                    fetchNotifications();
                                 }}
                                 onMouseLeave={() => setNotifOpen(false)}
                             >
@@ -232,11 +272,13 @@ export default function HeaderBooking() {
 
                                                 {notifications.map((n) => (
                                                     <Link
-                                                        key={n.id}
-                                                        to={`/notification/${n.id}`}
+                                                        key={n.id_user_notify}
+                                                        to={`/notification/detail`}
+                                                        state={{ id_user_notify: n.id_user_notify, id_notify: n.id }}
                                                         onClick={() => {
                                                             markLocalAsRead(n.id); //cập nhật badge ngay
                                                             setNotifOpen(false);
+                                                            fetchNotifications();
                                                         }}
                                                         className={`px-4 py-3 flex justify-between items-center border-b border-white/5 transition
         hover:bg-white/5
@@ -278,9 +320,9 @@ export default function HeaderBooking() {
                                     <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
                                     <path d="M9 3h6v4H9z" />
                                 </svg>
-                                <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full shadow">
+                                {/* <span className="absolute top-0 right-0 bg-blue-500 text-white text-xs w-4 h-4 flex items-center justify-center rounded-full shadow">
                                     3
-                                </span>
+                                </span> */}
                             </Link>
                         )}
 

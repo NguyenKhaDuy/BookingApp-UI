@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import logo from '../../../assets/logo.png';
 import { User, Mail, Phone, Lock, MapPin, Calendar, Users } from 'lucide-react';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function RegisterForm({ onRegisterSuccess }) {
+    const [loadingOverLay, setLoadingOverLay] = useState(false);
     const [form, setForm] = useState({
         full_name: '',
         email: '',
@@ -40,11 +42,12 @@ export default function RegisterForm({ onRegisterSuccess }) {
         };
 
         try {
+            setLoadingOverLay(true);
             setLoading(true);
             const res = await fetch('http://localhost:8081/api/register/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                credentials: 'include', // ⭐⭐⭐ QUAN TRỌNG
+                credentials: 'include', //QUAN TRỌNG
                 body: JSON.stringify(payload),
             });
 
@@ -55,6 +58,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
             setError(err.message);
         } finally {
             setLoading(false);
+            setLoadingOverLay(false);
         }
     };
 
@@ -98,6 +102,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
                     {loading ? 'Đang xử lý...' : 'Đăng ký'}
                 </button>
             </div>
+            <LoadingOverlay show={loadingOverLay} />
         </div>
     );
 }

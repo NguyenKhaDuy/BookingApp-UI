@@ -7,16 +7,17 @@ import Notification from '../../../Components/Technician/Notifications/Notificat
 import Account from '../../../Components/Technician/Account/Account';
 import SkillManager from '../../../Components/Technician/SkillManager/SkillManager';
 import LocationManager from '../../../Components/Technician/LocationManager/LocationManager';
-import TechnicianInvoiceList from '../../../Components/Technician/TechnicianInvoiceList/TechnicianInvoiceList';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
-
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
-
+import getCookie from '../../../utils/getToken';
+import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
+import EmailManager from '../../../Components/Technician/EmailManager/EmailManager'
+import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
-     const { showToast } = useToast();
+    const { showToast } = useToast();
     const { user, setUser } = useContext(UserContext);
     const [open, setOpen] = useState(false);
 
@@ -39,52 +40,51 @@ export default function TechnicianHome({ active }) {
                }
            };
            fetchUser();
-       }, []);
+  }, []);
 
 
     // ===================== AUTH + WEBSOCKET =====================
     useEffect(() => {
-        const getCookie = (name) => {
-            const value = `; ${document.cookie}`;
-            const parts = value.split(`; ${name}=`);
-            if (parts.length === 2) return parts.pop().split(';').shift();
-        };
 
         const token = getCookie('token');
 
         if (!token) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
-
-        //LƯU TOKEN NGAY
-        localStorage.setItem('token', token);
 
         let decoded;
         try {
             decoded = jwtDecode(token);
         } catch (err) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
 
         const roles = decoded.roles || [];
 
         if (!roles.includes('TECHNICIAN')) {
-            navigate('/login');
+            // navigate('/login');
             return;
         }
 
         const unsubscribe = addWebSocketListener((msg) => {
             setNotification(msg);
-            setOpen(true);
-            setCountdown(60);
+            if (msg.type === "REQUEST_CANCEL") {
+                showToast(msg.body, 'success');
+                setOpen(false);
+                setNotification(null);
+            } else {
+                setOpen(true);
+                setCountdown(60);
+            }
         });
 
         return () => {
             unsubscribe();
         };
     }, [navigate]);
+   
 
 
     // ===================== COUNTDOWN 60s =====================
@@ -122,7 +122,7 @@ export default function TechnicianHome({ active }) {
         if (!notification) return;
         try {
             // Lấy id_technician từ token
-            const token = localStorage.getItem('token');;
+            const token = getCookie('token');;
             const id_technician = getTechnicianId(); 
 
             // Lấy id_request từ notification
@@ -163,7 +163,7 @@ export default function TechnicianHome({ active }) {
 
         try {
             // Lấy token và id_technician
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
             const id_technician = getTechnicianId(); // hàm của bạn lấy từ token
 
             // Lấy id_request từ notification
@@ -225,9 +225,11 @@ export default function TechnicianHome({ active }) {
                 {active === 'dashboard' && <TechnicianDashboard />}
                 {active === 'orders' && <RepairRequest />}
                 {active === 'notifications' && <Notification />}
-                {active === 'invoiceList' && <TechnicianInvoiceList />}
+                {active === 'schedules' && <TechnicianScheduleList />}
                 {active === 'location' && <LocationManager />}
                 {active === 'skills' && <SkillManager />}
+                {active === 'email' && <EmailManager />}
+                {active === 'password' && <PasswordManager />}
                 {active === 'account' && <Account />}
             </div>
         </>

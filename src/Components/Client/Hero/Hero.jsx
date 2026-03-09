@@ -14,7 +14,14 @@ export default function HomeHero() {
                     </p>
 
                     <div className="flex md:block justify-center">
-                        <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition">
+                        <button
+                            onClick={() => {
+                                document
+                                    .getElementById('quick-booking')
+                                    ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }}
+                            className="bg-gradient-to-r from-orange-500 to-orange-600 text-white px-8 py-3 rounded-2xl font-semibold shadow-lg hover:opacity-90 transition"
+                        >
                             Đặt lịch ngay
                         </button>
                     </div>
@@ -22,9 +29,7 @@ export default function HomeHero() {
 
                 {/* Hero Image Modern */}
                 <div className="flex justify-center md:justify-end w-full mt-3">
-                    <div
-                        className="relative w-[420px] sm:w-[520px] md:w-[720px] lg:w-[900px] xl:w-[1100px]"
-                    >
+                    <div className="relative w-[420px] sm:w-[520px] md:w-[720px] lg:w-[900px] xl:w-[1100px]">
                         {/* Orange Glow Behind */}
                         <div className="absolute inset-0 -z-10">
                             <div className="w-full h-full bg-orange-500/20 blur-3xl rounded-3xl"></div>

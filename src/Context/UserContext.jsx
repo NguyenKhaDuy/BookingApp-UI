@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
+import getCookie from '../utils/getToken';
 
 export const UserContext = createContext();
 
@@ -9,7 +10,7 @@ export function UserProvider({ children }) {
     useEffect(() => {
         try {
             const storedUser = localStorage.getItem('user');
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
 
             if (storedUser && token) {
                 const parsedUser = JSON.parse(storedUser);
@@ -19,7 +20,6 @@ export function UserProvider({ children }) {
                     setUser(parsedUser);
                 } else {
                     localStorage.removeItem('user');
-                    localStorage.removeItem('token');
                     setUser(null);
                 }
             } else {
@@ -27,7 +27,6 @@ export function UserProvider({ children }) {
             }
         } catch (err) {
             localStorage.removeItem('user');
-            localStorage.removeItem('token');
             setUser(null);
         }
 

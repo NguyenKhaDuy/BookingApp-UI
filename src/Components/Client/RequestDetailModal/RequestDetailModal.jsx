@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import getCookie from '../../../utils/getToken';
 
 export default function RequestDetailModal({ open, requestId, onClose }) {
     const [data, setData] = useState(null);
@@ -12,7 +13,7 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
         setLoading(true);
         setData(null);
 
-        const token = localStorage.getItem('token');
+        const token = getCookie('token');
 
         axios
             .get(`http://localhost:8081/api/request/id=${requestId}`, {

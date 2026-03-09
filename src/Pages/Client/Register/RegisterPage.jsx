@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import RegisterForm from '../../../Components/Client/RegisterForm/RegisterForm';
 import OtpForm from '../../../Components/Client/OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function Register() {
+    const [loading, setLoading] = useState(false);
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
      const { showToast } = useToast();
@@ -21,6 +23,7 @@ export default function Register() {
             return;
         }
 
+        setLoading(true);
         const res = await fetch('http://localhost:8081/api/verify-otp/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -33,9 +36,11 @@ export default function Register() {
         if (!res.ok) {
             showToast(data.message, 'error');
             setStep(1);
+            setLoading(false);
             navigate('/register')
             return;
         } else {
+            setLoading(false);
             showToast('Đăng ký thành công!', 'success');
             navigate('/login'); // ✅ CHUYỂN SANG TRANG LOGIN
         }
@@ -47,6 +52,7 @@ export default function Register() {
                 {step === 1 && <RegisterForm onRegisterSuccess={onRegisterSuccess} />}
                 {step === 2 && <OtpForm email={email} onVerify={verifyOtp} />}
             </div>
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

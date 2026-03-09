@@ -5,6 +5,7 @@ export default function TechnicianProfileHeader({ tech }) {
     const maxStars = 5;
     const isOnline = tech.status_technician === 'ONLINE';
     const navigate = useNavigate();
+    const numberRating = tech.ratingDTOS?.length ?? 0;
     return (
         <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col items-center text-center relative">
             {/* Status badge */}
@@ -38,7 +39,7 @@ export default function TechnicianProfileHeader({ tech }) {
                 ))}
 
                 <span className="ml-1 font-semibold">{(tech?.total_star ?? 0).toFixed(1)}</span>
-                <span className="text-gray-400 text-sm">({tech?.totalReviews ?? 0} đánh giá)</span>
+                <span className="text-gray-400 text-sm">({numberRating} đánh giá)</span>
             </div>
 
             {/* Action Buttons */}

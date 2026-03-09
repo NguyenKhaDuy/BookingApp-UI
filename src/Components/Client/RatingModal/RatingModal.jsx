@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { X, Star } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import axios from 'axios';
+import getCookie from '../../../utils/getToken';
 
 export default function RatingModal({ open, data, onClose }) {
     const [rating, setRating] = useState(0);
@@ -21,7 +22,7 @@ export default function RatingModal({ open, data, onClose }) {
         }
 
         try {
-              const token = localStorage.getItem('token');
+              const token = getCookie('token');
               if (!token) return;
 
             await axios.post(
