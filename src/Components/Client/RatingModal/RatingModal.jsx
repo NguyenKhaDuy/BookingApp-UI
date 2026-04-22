@@ -3,6 +3,7 @@ import { X, Star } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function RatingModal({ open, data, onClose }) {
     const [rating, setRating] = useState(0);
@@ -14,7 +15,7 @@ export default function RatingModal({ open, data, onClose }) {
 
     if (!open || !data) return null;
 
-    // 🔥 HÀM GỌI API
+    //HÀM GỌI API
     const handleSubmitRating = async () => {
         if (rating === 0) {
             showToast('Vui lòng chọn số sao đánh giá', 'error');
@@ -26,7 +27,7 @@ export default function RatingModal({ open, data, onClose }) {
               if (!token) return;
 
             await axios.post(
-                'http://localhost:8081/api/customer/rating/',
+                `http://localhost:8082/api/customer/rating/`,
                 {
                     stars: rating,
                     comment: comment,

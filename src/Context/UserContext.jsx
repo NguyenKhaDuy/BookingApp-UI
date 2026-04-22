@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import getCookie from '../utils/getToken';
+import axios from 'axios';
 
 export const UserContext = createContext();
 
@@ -11,6 +12,7 @@ export function UserProvider({ children }) {
         try {
             const storedUser = localStorage.getItem('user');
             const token = getCookie('token');
+
 
             if (storedUser && token) {
                 const parsedUser = JSON.parse(storedUser);

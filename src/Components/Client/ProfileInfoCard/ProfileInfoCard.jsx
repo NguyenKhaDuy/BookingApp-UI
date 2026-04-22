@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from "../../../utils/api.js";
 
 /* ================= FORMAT DOB ================= */
 const formatDobToInput = (dob) => {
@@ -79,7 +80,7 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                 dob: formData.date_of_birth,
             };
 
-            await axios.put('http://localhost:8081/api/customer/profile/', payload, {
+            await axios.put(`${API_BASE_URL}/customer/profile/`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

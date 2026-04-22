@@ -4,6 +4,7 @@ import getCookie from '../../../utils/getToken';
 import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function NotificationManager() {
     const [data, setData] = useState([]);
@@ -31,7 +32,7 @@ export default function NotificationManager() {
 
     const loadTypes = async () => {
         try {
-            const res = await fetch(`http://localhost:8081/api/admin/notification-type/select/`, {
+            const res = await fetch(`${API_BASE_URL}/admin/notification-type/select/`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
             const json = await res.json();
@@ -44,7 +45,7 @@ export default function NotificationManager() {
     const loadData = async (pageIndex = 0) => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/notifications/?pageNo=${pageIndex + 1}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/notifications/?pageNo=${pageIndex + 1}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
 
@@ -110,7 +111,7 @@ export default function NotificationManager() {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/notifications/id=${deleteId}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/notifications/id=${deleteId}`, {
                 method: 'DELETE',
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
@@ -137,7 +138,7 @@ export default function NotificationManager() {
 
     const handleSave = async () => {
         const method = editing ? 'PUT' : 'POST';
-        const url = `http://localhost:8081/api/admin/notification/`;
+        const url = `${API_BASE_URL}/admin/notification/`;
 
         const body = {
             id_notify: editing?.id_notify || null,
@@ -210,7 +211,7 @@ export default function NotificationManager() {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/notification/send/all/`, {
+            const res = await fetch(`${API_BASE_URL}/admin/notification/send/all/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -240,7 +241,7 @@ export default function NotificationManager() {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/notification/send/user/`, {
+            const res = await fetch(`${API_BASE_URL}/admin/notification/send/user/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

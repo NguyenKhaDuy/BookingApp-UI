@@ -6,7 +6,7 @@ export default function Testimonials() {
     const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:8081/api/ratings/outstanding/')
+        fetch('http://localhost:8082/api/ratings/outstanding/')
             .then((res) => res.json())
             .then((data) => {
                 if (data?.data) {

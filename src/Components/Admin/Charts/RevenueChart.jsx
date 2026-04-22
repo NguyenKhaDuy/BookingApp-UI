@@ -13,6 +13,7 @@ import {
     LabelList,
 } from 'recharts';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function RevenueChart() {
     const [mode, setMode] = useState('DAY');
@@ -48,17 +49,17 @@ export default function RevenueChart() {
             let res;
 
             if (mode === 'DAY') {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/revenueOfDay/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/revenueOfDay/`, {
                     params: { dateFrom, dateTo },
                     headers: { Authorization: `Bearer ${token}` },
                 });
             } else if (mode === 'MONTH') {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/revenueOfMonth/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/revenueOfMonth/`, {
                     params: { currentMonth: month },
                     headers: { Authorization: `Bearer ${token}` },
                 });
             } else {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/revenueOfYear/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/revenueOfYear/`, {
                     params: { currentYear: year },
                     headers: { Authorization: `Bearer ${token}` },
                 });

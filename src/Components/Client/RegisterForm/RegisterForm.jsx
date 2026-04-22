@@ -2,7 +2,7 @@ import { useState } from 'react';
 import logo from '../../../assets/logo.png';
 import { User, Mail, Phone, Lock, MapPin, Calendar, Users } from 'lucide-react';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-
+import {API_BASE_URL} from "../../../utils/api.js";
 export default function RegisterForm({ onRegisterSuccess }) {
     const [loadingOverLay, setLoadingOverLay] = useState(false);
     const [form, setForm] = useState({
@@ -44,7 +44,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
         try {
             setLoadingOverLay(true);
             setLoading(true);
-            const res = await fetch('http://localhost:8081/api/register/', {
+            const res = await fetch(`http://192.168.1.6:8082/api/register/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', //QUAN TRỌNG

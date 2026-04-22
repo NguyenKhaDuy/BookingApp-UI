@@ -8,7 +8,7 @@ export default function Services() {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get('http://localhost:8081/api/service/all/');
+                const res = await axios.get('http://localhost:8082/api/service/all/');
                 const allServices = res.data.data || [];
 
                 const shuffled = [...allServices].sort(() => 0.5 - Math.random());

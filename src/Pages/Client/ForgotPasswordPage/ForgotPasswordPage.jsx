@@ -21,7 +21,7 @@ export default function ForgotPassword() {
         }
         setLoading(true);
         try {
-            await axios.post(`http://localhost:8081/api/forgotpassword/send-otp/?email=${userEmail}`);
+            await axios.post(`http://192.168.1.6:8082/api/forgotpassword/send-otp/?email=${userEmail}`);
             setEmail(userEmail);
             showToast('Mã OTP đã gửi về email của bạn!', 'success');
             setStep(2);
@@ -41,7 +41,7 @@ export default function ForgotPassword() {
 
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:8081/api/verify-otp/', {
+            const res = await fetch('http://192.168.1.6:8082/api/verify-otp/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -64,7 +64,7 @@ export default function ForgotPassword() {
         }
         setLoading(true);
         try {
-            await axios.post('http://localhost:8081/api/forgotpassword/', {
+            await axios.post('http://192.168.1.6:8082/api/forgotpassword/', {
                 email: email,
                 password: newPassword,
             });

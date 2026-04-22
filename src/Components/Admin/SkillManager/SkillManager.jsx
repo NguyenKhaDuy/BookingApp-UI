@@ -5,7 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { formatDateTimeArray } from '../../../utils/formatDate';
-
+import {API_BASE_URL} from '../../../utils/api';
 export default function SkillManager() {
     const [skills, setSkills] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ export default function SkillManager() {
     const loadData = async (p = 0) => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/admin/skill/?pageNo=${p + 1}`, {
+            const res = await axios.get(`${API_BASE_URL}/admin/skill/?pageNo=${p + 1}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -72,7 +72,7 @@ export default function SkillManager() {
 
             await axios({
                 method: editData ? 'put' : 'post',
-                url: 'http://localhost:8081/api/admin/skill/',
+                url: '${API_BASE_URL}/admin/skill/',
                 data: payload,
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -97,7 +97,7 @@ export default function SkillManager() {
         if (!deleteId) return;
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:8081/api/admin/skill/id-skill=${deleteId}`, {
+            await axios.delete(`${API_BASE_URL}/admin/skill/id-skill=${deleteId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

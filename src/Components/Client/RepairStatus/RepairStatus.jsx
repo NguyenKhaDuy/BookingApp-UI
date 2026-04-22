@@ -7,6 +7,7 @@ import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { API_BASE_URL } from '../../../utils/api.js';
 
 /* ================= UTILS ================= */
 const formatDateTime = (dateArr, timeArr) => {
@@ -43,7 +44,7 @@ export default function RepairStatusPage() {
 
             if (!token || !user?.id_user) return;
 
-            const res = await fetch(`http://localhost:8081/api/customer/request/id_customer=${user.id_user}`, {
+            const res = await fetch(`${API_BASE_URL}/customer/request/id_customer=${user.id_user}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -90,7 +91,7 @@ export default function RepairStatusPage() {
 
                 setLoadingOverLay(true);
 
-                const res = await fetch('http://localhost:8081/api/customer/request/', {
+                const res = await fetch(`${API_BASE_URL}/customer/request/`, {
                     method: 'POST',
                     headers: { Authorization: `Bearer ${token}` },
                     body: fd,
@@ -178,7 +179,7 @@ export default function RepairStatusPage() {
 
             setLoadingOverLay(true);
 
-            const res = await fetch(`http://localhost:8081/api/customer/request/cancel/id=${id}`, {
+            const res = await fetch(`${API_BASE_URL}/customer/request/cancel/id=${id}`, {
                 method: 'PUT',
                 headers: { Authorization: `Bearer ${token}` },
             });

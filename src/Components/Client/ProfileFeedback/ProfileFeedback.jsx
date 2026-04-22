@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-
+import {API_BASE_URL} from "../../../utils/api.js";
 export default function ProfileFeedback({ profile }) {
     const [content, setContent] = useState('');
     const [requestId, setRequestId] = useState(null);
@@ -17,7 +17,7 @@ export default function ProfileFeedback({ profile }) {
             const token = localStorage.getItem('token');
             if (!token || !profile?.id_user) return;
 
-            const res = await fetch(`http://localhost:8081/api/customer/request/id_customer=${profile.id_user}`, {
+            const res = await fetch(`${API_BASE_URL}/customer/request/id_customer=${profile.id_user}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -56,7 +56,7 @@ export default function ProfileFeedback({ profile }) {
             const token = localStorage.getItem('token');
 
             await axios.post(
-                'http://localhost:8081/api/customer/feedback/',
+                `${API_BASE_URL}/customer/feedback/`,
                 {
                     content,
                     customer_id: profile.id_user,

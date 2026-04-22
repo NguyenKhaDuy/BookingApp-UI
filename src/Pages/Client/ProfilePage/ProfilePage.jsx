@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+
 import { ProfileSidebar } from '../../../Components/Client/SidebarProfile/SidebarProfile';
 import { ProfileMobileTabs } from '../../../Components/Client/ProfileMobileTabs/ProfileMobileTabs';
 import ProfileInfo from '../../../Components/Client/ProfileInfoCard/ProfileInfoCard';
@@ -23,33 +24,40 @@ export default function ProfilePage() {
 
     /* ================= FETCH PROFILE ================= */
     const fetchProfile = useCallback(async () => {
-        if (!user?.id_user) return;
+        const token = getCookie('token');
+
+        if (!token || !user?.id_user) return;
 
         try {
-            const token = getCookie('token');
-
-            const res = await axios.get(`http://localhost:8081/api/customer/profile/id=${user.id_user}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            const res = await axios.get(
+                `http://192.168.1.6:8082/api/customer/profile/id=${user.id_user}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
 
             setProfile(res.data.data);
         } catch (error) {
             console.error('Lỗi lấy profile:', error);
         }
-    }, [user]);
+    }, [user?.id_user]);
 
-    /* ================= CHECK LOGIN + INIT ================= */
+    /* ================= CHECK LOGIN ================= */
     useEffect(() => {
-        if (!initialized) return; // ⛔ chờ Context hydrate xong
+        if (!initialized) return;
 
         const token = getCookie('token');
 
-        if (!user || !token) {
+        // chưa có token => logout ngay
+        if (!token) {
             navigate('/login', { replace: true });
             return;
         }
+
+        // chờ user hydrate xong mới xử lý tiếp
+        if (!user) return;
 
         setLoading(false);
     }, [initialized, user, navigate]);
@@ -73,23 +81,44 @@ export default function ProfilePage() {
     /* ================= UI ================= */
     return (
         <div className="container mx-auto px-4 pt-24 pb-10 flex gap-6">
-            {/* Desktop Sidebar */}
-            <ProfileSidebar active={active} setActive={setActive} profile={profile} onAvatarUpdated={fetchProfile} />
+            {/* Sidebar */}
+            <ProfileSidebar
+                active={active}
+                setActive={setActive}
+                profile={profile}
+                onAvatarUpdated={fetchProfile}
+            />
 
             <div className="flex-1">
-                {/* Mobile Avatar + Name */}
+                {/* Mobile Header */}
                 <ProfileMobileHeader profile={profile} />
 
                 {/* Mobile Tabs */}
                 <ProfileMobileTabs active={active} setActive={setActive} />
 
                 {/* Content */}
-                {active === 'profile' && <ProfileInfo profile={profile} onProfileUpdated={fetchProfile} />}
+                {active === 'profile' && (
+                    <ProfileInfo
+                        profile={profile}
+                        onProfileUpdated={fetchProfile}
+                    />
+                )}
 
-                {active === 'email' && <ProfileEmail profile={profile} onEmailUpdated={fetchProfile} />}
+                {active === 'email' && (
+                    <ProfileEmail
+                        profile={profile}
+                        onEmailUpdated={fetchProfile}
+                    />
+                )}
 
-                {active === 'help' && <ProfileFeedback profile={profile} />}
-                {active === 'password' && <ProfilePassword profile={profile} />}
+                {active === 'help' && (
+                    <ProfileFeedback profile={profile} />
+                )}
+
+                {active === 'password' && (
+                    <ProfilePassword profile={profile} />
+                )}
+
                 {active === 'settings' && <ProfileSettings />}
             </div>
         </div>

@@ -4,6 +4,7 @@ import { EyeIcon, Plus, X } from 'lucide-react';
 import getCookie from '../../../../utils/getToken';
 import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
+import {API_BASE_URL} from '../../../../utils/api.js';
 
 const formatDateTime = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -43,7 +44,7 @@ export default function AdminTechnicians() {
     const fetchTechnicians = async (page = 1) => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/all/technician/?pageNo=${page}`);
+            const res = await axios.get(`${API_BASE_URL}/all/technician/?pageNo=${page}`);
             if (res.data?.data) {
                 setTechnicians(res.data.data);
                 setTotalPages(res.data.total_page || 1);
@@ -77,7 +78,7 @@ export default function AdminTechnicians() {
         setDetailData(null);
         setLoadingDetail(true);
         try {
-            const res = await axios.get(`http://localhost:8081/api/detail-technician/id=${item.id_user}`);
+            const res = await axios.get(`${API_BASE_URL}/detail-technician/id=${item.id_user}`);
             setDetailData(res.data.data);
         } catch (error) {
             console.error('Detail fetch error:', error);

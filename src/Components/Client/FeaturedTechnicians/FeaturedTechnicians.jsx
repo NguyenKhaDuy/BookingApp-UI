@@ -2,54 +2,17 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function FeaturedTechnicians() {
     const navigate = useNavigate();
-    const techs = [
-        {
-            name: 'Nguyễn Văn Tùng',
-            role: 'Kỹ thuật điện',
-            stars: 5,
-            img: 'https://i.pravatar.cc/300?img=12',
-        },
-        {
-            name: 'Lê Minh Sơn',
-            role: 'Điện lạnh - máy lạnh',
-            stars: 5,
-            img: 'https://i.pravatar.cc/300?img=32',
-        },
-        {
-            name: 'Trần Quốc Huy',
-            role: 'Sửa nước - đường ống',
-            stars: 4,
-            img: 'https://i.pravatar.cc/300?img=45',
-        },
-        {
-            name: 'Phan Đức Lợi',
-            role: 'Camera - Wifi',
-            stars: 5,
-            img: 'https://i.pravatar.cc/300?img=56',
-        },
-        {
-            name: 'Đặng Quốc Thắng',
-            role: 'Điện dân dụng',
-            stars: 5,
-            img: 'https://i.pravatar.cc/300?img=18',
-        },
-        {
-            name: 'Nguyễn Minh Đức',
-            role: 'Sửa máy bơm',
-            stars: 4,
-            img: 'https://i.pravatar.cc/300?img=22',
-        },
-    ];
 
     const [technicians, setTechnicians] = useState([]);
 
     useEffect(() => {
         const fetchTechnicians = async () => {
             try {
-                const res = await axios.get('http://localhost:8081/api/outstanding/technician/');
+                const res = await axios.get(`${API_BASE_URL}/outstanding/technician/`);
                 setTechnicians(res.data.data);
             } catch (error) {
                 console.error('Failed to fetch technicians:', error);
@@ -65,7 +28,7 @@ export default function FeaturedTechnicians() {
     const gap = 32; // gap-8
     const visibleCount = 4;
 
-    const maxIndex = Math.max(techs.length - visibleCount, 0);
+    const maxIndex = Math.max(technicians.length - visibleCount, 0);
 
     const next = () => setIndex((i) => Math.min(i + 1, maxIndex));
     const prev = () => setIndex((i) => Math.max(i - 1, 0));

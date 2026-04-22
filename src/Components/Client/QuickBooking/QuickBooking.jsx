@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import ServiceSelect from '../ServiceSelect/ServiceSelect';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from "../../../utils/api.js";
 export default function QuickBooking() {
     const navigate = useNavigate();
      const { showToast } = useToast();
@@ -19,7 +20,7 @@ export default function QuickBooking() {
     });
 
     useEffect(() => {
-        fetch('http://localhost:8081/api/service/all/')
+        fetch(`${API_BASE_URL}/service/all/`)
             .then((res) => res.json())
             .then((data) => {
                 if (data?.data) {
