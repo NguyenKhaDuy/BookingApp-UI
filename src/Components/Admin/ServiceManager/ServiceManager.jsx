@@ -5,6 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { formatDateTimeArray } from '../../../utils/formatDate';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function ServiceManager() {
     const [services, setServices] = useState([]);
@@ -27,7 +28,7 @@ export default function ServiceManager() {
     const loadData = async (p = 0) => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/service/?pageNo=${p + 1}`, {
+            const res = await axios.get(`${API_BASE_URL}/service/?pageNo=${p + 1}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -77,7 +78,7 @@ export default function ServiceManager() {
 
             await axios({
                 method: editData ? 'put' : 'post',
-                url: 'http://localhost:8081/api/admin/service/',
+                url: '${API_BASE_URL}/admin/service/',
                 data: payload,
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -107,7 +108,7 @@ export default function ServiceManager() {
 
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:8081/api/admin/service/id=${deleteId}`, {
+            await axios.delete(`${API_BASE_URL}/admin/service/id=${deleteId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

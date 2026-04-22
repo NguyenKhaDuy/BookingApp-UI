@@ -14,7 +14,7 @@ import {
     LabelList,
 } from 'recharts';
 import getCookie from '../../../utils/getToken';
-
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function MonthlyOrderStatistic() {
     const [tab, setTab] = useState('MONTH');
@@ -33,7 +33,7 @@ export default function MonthlyOrderStatistic() {
     const years = Array.from({ length: 6 }, (_, i) => new Date().getFullYear() - i);
 
     const fetchMonthly = async () => {
-        const res = await axios.get('http://localhost:8081/api/admin/statistic/monthlyOrder/', {
+        const res = await axios.get(`${API_BASE_URL}/admin/statistic/monthlyOrder/`, {
             params: { year, id_status: status },
             headers: { Authorization: `Bearer ${getCookie('token')}` },
         });
@@ -41,7 +41,7 @@ export default function MonthlyOrderStatistic() {
     };
 
     const fetchService = async () => {
-        const res = await axios.get('http://localhost:8081/api/admin/statistic/monthlyOrderOfService/', {
+        const res = await axios.get(`${API_BASE_URL}/admin/statistic/monthlyOrderOfService/`, {
             params: { year, id_status: status },
             headers: { Authorization: `Bearer ${getCookie('token')}` },
         });

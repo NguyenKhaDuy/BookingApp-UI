@@ -4,7 +4,7 @@ import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function PaymentMethodManager() {
     const [methods, setMethods] = useState([]);
@@ -31,7 +31,7 @@ export default function PaymentMethodManager() {
     const loadData = async (p = 0) => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/admin/paymentmethod/?pageNo=${p + 1}`, {
+            const res = await axios.get(`${API_BASE_URL}/admin/paymentmethod/?pageNo=${p + 1}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -99,7 +99,7 @@ export default function PaymentMethodManager() {
             setLoading(true);
             await axios({
                 method: editData ? 'put' : 'post',
-                url: 'http://localhost:8081/api/admin/payment/',
+                url: '${API_BASE_URL}/admin/payment/',
                 data: formData,
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -127,7 +127,7 @@ export default function PaymentMethodManager() {
         if (!deleteId) return;
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:8081/api/admin/payment/id-payment=${deleteId}`, {
+            await axios.delete(`${API_BASE_URL}/admin/payment/id-payment=${deleteId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

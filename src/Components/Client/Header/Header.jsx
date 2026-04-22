@@ -10,6 +10,7 @@ import getCookie from '../../../utils/getToken';
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from '../../../Context/ToastContext';
+import { API_BASE_URL } from '../../../utils/api.js';
 
 const formatTimeFromArray = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -35,7 +36,7 @@ export default function HeaderBooking() {
         if (!user || !user.id_user) return;
 
         try {
-            const res = await axios.get(`http://localhost:8081/api/user/notification/id_user=${user.id_user}`, {
+            const res = await axios.get(`http://localhost:8082/api/user/notification/id_user=${user.id_user}`, {
                 withCredentials: true,
             });
 
@@ -87,7 +88,7 @@ export default function HeaderBooking() {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get('http://localhost:8081/api/service/all/');
+                const res = await axios.get(`http://localhost:8082/api/service/all/`);
                 setServices(res.data.data);
             } catch (error) {
                 console.error('Failed to fetch services:', error);
@@ -99,7 +100,7 @@ export default function HeaderBooking() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
+                const res = await axios.get(`http://localhost:8082/api/me/`, { withCredentials: true });
                 if (typeof res.data === 'object') {
                     setUser(res.data);
                 } else {
@@ -128,35 +129,32 @@ export default function HeaderBooking() {
     useEffect(() => {
         const token = getCookie('token');
 
-        if (!token) {
-            // navigate('/login');
-            return;
-        }
+        if (!token) return;
 
         let decoded;
         try {
             decoded = jwtDecode(token);
         } catch (err) {
-            // navigate('/login');
             return;
         }
 
         const roles = decoded.roles || [];
 
-        if (!roles.includes('CUSTOMER')) {
-            // navigate('/login');
-            return;
-        }
+        if (!roles.includes('CUSTOMER')) return;
 
+        // 🔥 CONNECT
+        connectWebSocket(token);
+
+        // 🔥 LISTEN
         const unsubscribe = addWebSocketListener((msg) => {
+            console.log('📩 RECEIVED:', msg);
             setNotification(msg);
-            console.log(msg);
         });
 
         return () => {
             unsubscribe();
         };
-    }, [navigate]);
+    }, []);
 
     useEffect(() => {
         if (!notification) return;

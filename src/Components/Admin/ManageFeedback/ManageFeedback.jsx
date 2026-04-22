@@ -4,6 +4,7 @@ import getCookie from '../../../utils/getToken';
 import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
+import {API_BASE_URL} from '../../../utils/api.js';
 export default function ManageFeedback() {
     const [requests, setRequests] = useState([]);
     const [selected, setSelected] = useState(null);
@@ -18,7 +19,7 @@ export default function ManageFeedback() {
     const loadData = async (pageIndex) => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/feedback/?pageNo=${pageIndex + 1}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/feedback/?pageNo=${pageIndex + 1}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
             const json = await res.json();
@@ -42,7 +43,7 @@ export default function ManageFeedback() {
         try {
             setLoadingDetail(true);
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/feedback/id=${id_feedback}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/feedback/id=${id_feedback}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
             const json = await res.json();
@@ -60,7 +61,7 @@ export default function ManageFeedback() {
 
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/feedback/reply/`, {
+            const res = await fetch(`${API_BASE_URL}/admin/feedback/reply/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ export default function Register() {
         }
 
         setLoading(true);
-        const res = await fetch('http://localhost:8081/api/verify-otp/', {
+        const res = await fetch('http://192.168.1.6:8082/api/verify-otp/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -42,7 +42,7 @@ export default function Register() {
         } else {
             setLoading(false);
             showToast('Đăng ký thành công!', 'success');
-            navigate('/login'); // ✅ CHUYỂN SANG TRANG LOGIN
+            navigate('/login');
         }
     };
 

@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend, LabelList } from 'recharts';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function OrderChart() {
     const [mode, setMode] = useState('DAY');
@@ -40,17 +41,17 @@ export default function OrderChart() {
             let res;
 
             if (mode === 'DAY') {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/orderOfDay/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/orderOfDay/`, {
                     params: { dateFrom, dateTo, id_status: statusId },
                     headers: { Authorization: `Bearer ${token}` },
                 });
             } else if (mode === 'MONTH') {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/orderOfMonth/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/orderOfMonth/`, {
                     params: { currentMonth: month, id_status: statusId },
                     headers: { Authorization: `Bearer ${token}` },
                 });
             } else {
-                res = await axios.get(`http://localhost:8081/api/admin/statistic/orderOfYear/`, {
+                res = await axios.get(`${API_BASE_URL}/admin/statistic/orderOfYear/`, {
                     params: { currentYear: year, id_status: statusId },
                     headers: { Authorization: `Bearer ${token}` },
                 });

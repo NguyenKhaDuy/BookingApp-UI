@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-
+import { API_BASE_URL, API_URL_GG } from '../../../utils/api.js';
 
 let stompClient = null;
 
@@ -29,7 +29,9 @@ export default function LoginForm() {
 
         try {
             setLoading(true);
-            const res = await axios.post('http://localhost:8081/api/login/', form, { withCredentials: true });
+            const res = await axios.post(`${API_BASE_URL}/login/`, form, {
+                withCredentials: true,
+            });
 
             //LƯU USER INFO
             localStorage.setItem('user', JSON.stringify(res.data));
@@ -60,7 +62,7 @@ export default function LoginForm() {
 
     // 🔵 GOOGLE LOGIN
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8081/oauth2/authorization/google';
+        window.location.href = `${API_URL_GG}/oauth2/authorization/google`;
     };
 
     return (

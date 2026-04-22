@@ -3,6 +3,7 @@ import { Plus, Edit, Trash2, X, Search, MapPin, ChevronLeft, ChevronRight } from
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function LocationManager() {
     const [locations, setLocations] = useState([]);
@@ -28,7 +29,7 @@ export default function LocationManager() {
     const loadData = async (pageNo = 1) => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/location/?pageNo=${pageNo}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/location/?pageNo=${pageNo}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
 
@@ -169,7 +170,7 @@ export default function LocationManager() {
         try {
             setLoading(true);
             const method = editing ? 'PUT' : 'POST';
-            const res = await fetch(`http://localhost:8081/api/admin/location/`, {
+            const res = await fetch(`${API_BASE_URL}/admin/location/`, {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -204,7 +205,7 @@ export default function LocationManager() {
     const confirmDelete = async () => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/location/id-location=${deleteId}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/location/id-location=${deleteId}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',

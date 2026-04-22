@@ -11,7 +11,7 @@ import { Navigate } from 'react-router-dom';
 export default function HomePage() {
     const user = JSON.parse(localStorage.getItem('user'));
     const role = user?.roles?.[0];
-
+    console.log(user);
     //CHỈ redirect nếu đã đăng nhập
     if (user) {
         if (role === 'ADMIN') {

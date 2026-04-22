@@ -5,6 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { formatDateTimeArray } from '../../../utils/formatDate';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function NotificationTypeManager() {
     const [data, setData] = useState([]);
@@ -29,7 +30,7 @@ export default function NotificationTypeManager() {
     const loadData = async (pageIndex = 0) => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/admin/notification-type/`, {
+            const res = await axios.get(`${API_BASE_URL}/admin/notification-type/`, {
                 params: { pageNo: pageIndex + 1 },
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',
@@ -71,7 +72,7 @@ export default function NotificationTypeManager() {
     const createType = async () => {
         try {
             setLoading(true);
-            const res = await axios.post(`http://localhost:8081/api/admin/notification-type/`, form, {
+            const res = await axios.post(`${API_BASE_URL}/admin/notification-type/`, form, {
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',
                     'Content-Type': 'application/json',
@@ -97,7 +98,7 @@ export default function NotificationTypeManager() {
                 description: form.description,
             };
             setLoading(true);
-            const res = await axios.put(`http://localhost:8081/api/admin/notification-type/`, body, {
+            const res = await axios.put(`${API_BASE_URL}/admin/notification-type/`, body, {
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',
                     'Content-Type': 'application/json',
@@ -131,7 +132,7 @@ export default function NotificationTypeManager() {
         const id = confirmDelete.id;
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:8081/api/admin/notification-type/id-type=${id}`, {
+            await axios.delete(`${API_BASE_URL}/admin/notification-type/id-type=${id}`, {
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',
                 },

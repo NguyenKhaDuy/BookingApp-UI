@@ -5,7 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
-
+import {API_BASE_URL} from '../../../utils/api.js';
 export default function OtpManager() {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -26,7 +26,7 @@ export default function OtpManager() {
     const fetchRealOtp = async (pageIndex = 0) => {
         setLoading(true);
         try {
-            const res = await axios.get('http://localhost:8081/api/admin/otp-verification/', {
+            const res = await axios.get(`${API_BASE_URL}/admin/otp-verification/`, {
                 params: { pageNo: pageIndex + 1 },
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
                 withCredentials: true,
@@ -64,7 +64,7 @@ export default function OtpManager() {
     const confirmDeleteAction = async () => {
         try {
             setLoading(true);
-            await axios.delete('http://localhost:8081/api/admin/otp-verification/', {
+            await axios.delete(`${API_BASE_URL}/admin/otp-verification/`, {
                 data: { id: selectedIds }, // backend yêu cầu List<Long> id
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',

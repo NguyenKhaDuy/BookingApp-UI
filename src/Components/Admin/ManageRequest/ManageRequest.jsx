@@ -3,6 +3,7 @@ import { X, Search, SlidersHorizontal, Eye, ChevronLeft, ChevronRight, FileWarni
 import getCookie from '../../../utils/getToken';
 import { formatDateTimeArray, formatDateArray, formatTime } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import {API_BASE_URL} from '../../../utils/api.js';
 export default function ManageRequest() {
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function ManageRequest() {
     const loadData = async (p) => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/request/?pageNo=${p + 1}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/request/?pageNo=${p + 1}`, {
                 headers: { Authorization: token ? `Bearer ${token}` : '' },
             });
             const json = await res.json();

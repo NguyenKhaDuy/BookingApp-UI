@@ -5,6 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { formatDateTimeArray } from '../../../utils/formatDate';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function StatusManager() {
     const [statuses, setStatuses] = useState([]);
@@ -29,7 +30,7 @@ export default function StatusManager() {
         try {
             setLoading(true);
 
-            const res = await axios.get(`http://localhost:8081/api/admin/status/?pageNo=${p + 1}`, {
+            const res = await axios.get(`${API_BASE_URL}/admin/status/?pageNo=${p + 1}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -79,7 +80,7 @@ export default function StatusManager() {
 
             await axios({
                 method: editData ? 'put' : 'post',
-                url: 'http://localhost:8081/api/admin/status/',
+                url: '${API_BASE_URL}/admin/status/',
                 data: payload,
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -105,7 +106,7 @@ export default function StatusManager() {
 
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:8081/api/admin/status/id-status=${deleteId}`, {
+            await axios.delete(`${API_BASE_URL}/admin/status/id-status=${deleteId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

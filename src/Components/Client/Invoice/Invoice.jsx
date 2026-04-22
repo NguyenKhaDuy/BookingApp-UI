@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api.js';
 
 const formatDate = (date) => {
     if (!date) return 'Chưa thanh toán';
@@ -53,7 +54,7 @@ export default function Invoice() {
                 return;
             }
 
-            const res = await fetch(`http://localhost:8081/api/customer/invoices/id=${user.id_user}?pageNo=${pageNo}`, {
+            const res = await fetch(`${API_BASE_URL}/customer/invoices/id=${user.id_user}?pageNo=${pageNo}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -142,7 +143,7 @@ export default function Invoice() {
                 requestType: 'invoice',
             };
 
-            const res = await fetch('http://localhost:8081/api/customer/payment/', {
+            const res = await fetch(`${API_BASE_URL}/customer/payment/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

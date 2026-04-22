@@ -4,6 +4,7 @@ import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { formatDateTimeArray } from '../../../utils/formatDate';
 import { useToast } from '../../../Context/ToastContext';
+import {API_BASE_URL} from '../../../utils/api.js';
 export default function ManageLevel() {
     const [levels, setLevels] = useState([]);
     const [page, setPage] = useState(1);
@@ -29,7 +30,7 @@ export default function ManageLevel() {
     const loadData = async (pageNum = 1) => {
         try {
             setLoading(true);
-            const res = await fetch(`http://localhost:8081/api/admin/level/?pageNo=${pageNum}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/level/?pageNo=${pageNum}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -81,8 +82,8 @@ export default function ManageLevel() {
         try {
             setLoading(true);
             const url = isEdit
-                ? 'http://localhost:8081/api/admin/level/'
-                : 'http://localhost:8081/api/admin/level/';
+                ? '${API_BASE_URL}/admin/level/'
+                : '${API_BASE_URL}/admin/level/';
 
             const method = isEdit ? 'PUT' : 'POST';
 
@@ -111,7 +112,7 @@ export default function ManageLevel() {
     const handleDelete = async (id) => {
         try {
             setLoading(true);
-            await fetch(`http://localhost:8081/api/admin/level/id-level=${id}`, {
+            await fetch(`${API_BASE_URL}/admin/level/id-level=${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',

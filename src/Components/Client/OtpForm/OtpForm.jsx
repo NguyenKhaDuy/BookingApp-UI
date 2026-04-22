@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-
+import {API_BASE_URL} from "../../../utils/api.js";
 export default function OtpForm({ email, onVerify }) {
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const [timer, setTimer] = useState(300);
@@ -44,7 +44,7 @@ export default function OtpForm({ email, onVerify }) {
         try {
             setLoading(true);
             const res = await axios.post(
-                'http://localhost:8081/api/resend-otp/',
+                `${API_BASE_URL}/resend-otp/`,
                 {},
                 { withCredentials: true }, //gửi session
             );

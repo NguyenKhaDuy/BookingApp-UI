@@ -37,7 +37,7 @@ export default function NotificationDetail() {
                 const token = getCookie('token');
                 if (!token || !user) return;
 
-                const res = await axios.get(`http://localhost:8081/api/user/notification/`, {
+                const res = await axios.get(`http://192.168.1.10:8082/api/user/notification/`, {
                     params: {
                         id_user_notifi: idUserNotify,
                         id_notify: idNotify,

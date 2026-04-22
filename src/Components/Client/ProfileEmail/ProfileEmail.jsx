@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { API_BASE_URL } from '../../../utils/api.js';
 
 export default function ProfileEmail({ profile, onEmailUpdated }) {
     const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
             const token = getCookie('token');
 
             await axios.put(
-                'http://localhost:8081/api/email',
+                `${API_BASE_URL}/email`,
                 {
                     old_email: profile.email,
                     new_email: email,
@@ -58,7 +59,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:8081/api/verify-otp/', {
+            const res = await fetch(`${API_BASE_URL}/verify-otp/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
