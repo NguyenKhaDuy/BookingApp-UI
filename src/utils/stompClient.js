@@ -37,37 +37,37 @@ export function connectWebSocket(token) {
     debug: (msg) => console.log("[WS]", msg),
   });
 
-  // 🔥 FIX riêng cho React Native
+  //FIX riêng cho React Native
   if (isReactNative()) {
     stompClient.forceBinaryWSFrames = true;
   }
 
   stompClient.onConnect = () => {
     isConnected = true;
-    console.log("✅ WebSocket CONNECTED");
+    console.log("WebSocket CONNECTED");
 
-    // 🔥 SUBSCRIBE CHUNG
+    //SUBSCRIBE CHUNG
     stompClient.subscribe("/topic/notify", (msg) => {
       const data = JSON.parse(msg.body);
-      console.log("📩 TOPIC:", data);
+      console.log("TOPIC:", data);
       globalListeners.forEach((fn) => fn(data));
     });
 
     stompClient.subscribe("/user/queue/notify", (msg) => {
       const data = JSON.parse(msg.body);
-      console.log("📩 USER:", data);
+      console.log("USER:", data);
       globalListeners.forEach((fn) => fn(data));
     });
   };
 
   stompClient.onDisconnect = () => {
-    console.log("❌ WebSocket DISCONNECTED");
+    console.log("WebSocket DISCONNECTED");
     isConnected = false;
     stompClient = null;
   };
 
   stompClient.onStompError = (err) => {
-    console.log("❌ STOMP ERROR", err);
+    console.log("STOMP ERROR", err);
   };
 
   stompClient.activate();
