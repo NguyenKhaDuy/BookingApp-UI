@@ -27,7 +27,7 @@ export default function RatingModal({ open, data, onClose }) {
               if (!token) return;
 
             await axios.post(
-                `http://localhost:8082/api/customer/rating/`,
+                `${API_BASE_URL}/customer/rating/`,
                 {
                     stars: rating,
                     comment: comment,

@@ -15,6 +15,7 @@ import getCookie from '../../../utils/getToken';
 import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
 import EmailManager from '../../../Components/Technician/EmailManager/EmailManager'
 import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
+import { API_BASE_URL } from '../../../utils/api';
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -28,7 +29,7 @@ export default function TechnicianHome({ active }) {
   useEffect(() => {
            const fetchUser = async () => {
                try {
-                   const res = await axios.get('http://localhost:8081/api/me/', { withCredentials: true });
+                   const res = await axios.get(`${API_BASE_URL}/me/`, { withCredentials: true });
                    if (typeof res.data === 'object') {
                        setUser(res.data);
                    } else {
@@ -129,7 +130,7 @@ export default function TechnicianHome({ active }) {
             const id_request = notification.id_request;
 
             // Gọi API
-            const res = await fetch('http://localhost:8081/api/technician/accept-request/', {
+            const res = await fetch(`${API_BASE_URL}/technician/accept-request/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,7 +171,7 @@ export default function TechnicianHome({ active }) {
             const id_request = notification.id_request;
 
             // Gọi API refuse
-            const res = await fetch('http://localhost:8081/api/technician/refuse-request/', {
+            const res = await fetch(`${API_BASE_URL}/technician/refuse-request/`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

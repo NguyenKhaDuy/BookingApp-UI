@@ -4,6 +4,7 @@ import { useEffect, useContext, useState } from 'react';
 import { UserContext } from '../../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import avatarDefault from '../../../assets/default-avatar.jpg';
+import { API_BASE_URL } from '../../../utils/api';
 
 export default function TechnicianHeader() {
     const { user, setUser } = useContext(UserContext);
@@ -13,7 +14,7 @@ export default function TechnicianHeader() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get('http://localhost:8081/api/me/', {
+                const res = await axios.get(`${API_BASE_URL}/me/`, {
                     withCredentials: true,
                 });
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import {API_BASE_URL} from "../../../utils/api"
 
 export default function Services() {
     const [services, setServices] = useState([]);
@@ -7,7 +8,7 @@ export default function Services() {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get('http://localhost:8082/api/service/all/');
+                const res = await axios.get(`${API_BASE_URL}/service/all/`);
                 const allServices = res.data.data || [];
 
                 const shuffled = [...allServices].sort(() => 0.5 - Math.random());
@@ -20,7 +21,7 @@ export default function Services() {
         fetchServices();
     }, []);
 
-    // 🔥 FIX CHUẨN
+    //FIX CHUẨN
     const getImageSrc = (icon) => {
         if (!icon) return '';
 
@@ -38,8 +39,6 @@ export default function Services() {
 
         return `data:image/jpeg;base64,${icon}`;
     };
-
-    console.log(services)
 
     return (
         <section className="py-28 bg-gradient-to-b from-white via-gray-50 to-gray-100">

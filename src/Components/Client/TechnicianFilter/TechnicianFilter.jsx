@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Search, Wrench } from 'lucide-react';
+import {API_BASE_URL} from "../../../utils/api"
 
 export default function TechnicianFilter({
     selectedSkill,
@@ -20,7 +21,7 @@ export default function TechnicianFilter({
 
     const fetchSkills = async () => {
         try {
-            const res = await axios.get('http://localhost:8081/api/skill/');
+            const res = await axios.get(`${API_BASE_URL}/skill/`);
             const skillNames = res.data.data.map((s) => s.skill_name);
             setSkills(['Tất cả', ...skillNames]);
         } catch (error) {
@@ -30,7 +31,7 @@ export default function TechnicianFilter({
 
     const fetchServices = async () => {
         try {
-            const res = await axios.get('http://localhost:8081/api/service/all/');
+            const res = await axios.get(`${API_BASE_URL}/service/all/`);
             const serviceNames = res.data.data.map((s) => s.name_service);
             setServices(['Tất cả', ...serviceNames]);
         } catch (error) {

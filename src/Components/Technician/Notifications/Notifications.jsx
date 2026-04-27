@@ -36,7 +36,7 @@ export default function Notifications({ onAcceptOrder }) {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user?.id_user) return;
 
-            const res = await axios.get(`http://localhost:8081/api/notification/id_user=${user.id_user}`, {
+            const res = await axios.get(`http://localhost:8082/api/notification/id_user=${user.id_user}`, {
                 params: { pageNo },
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -57,7 +57,7 @@ export default function Notifications({ onAcceptOrder }) {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user?.id_user) return;
 
-            const res = await axios.get('http://localhost:8081/api/user/notification/', {
+            const res = await axios.get('http://localhost:8082/api/user/notification/', {
                 params: {
                     id_user: user.id_user,
                     id_notify: msg.id_notify,

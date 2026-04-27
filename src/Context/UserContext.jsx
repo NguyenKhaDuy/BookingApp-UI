@@ -17,7 +17,7 @@ export function UserProvider({ children }) {
             if (storedUser && token) {
                 const parsedUser = JSON.parse(storedUser);
 
-                // ✅ CHECK ĐÚNG KEY
+                //CHECK ĐÚNG KEY
                 if (parsedUser?.id_user) {
                     setUser(parsedUser);
                 } else {
@@ -32,7 +32,7 @@ export function UserProvider({ children }) {
             setUser(null);
         }
 
-        // 🔥 BẮT BUỘC
+        // BẮT BUỘC
         setInitialized(true);
     }, []);
 

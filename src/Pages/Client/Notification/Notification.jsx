@@ -4,6 +4,7 @@ import { ArrowLeft, Bell } from 'lucide-react';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api'
 
 const formatTime = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -37,7 +38,7 @@ export default function NotificationDetail() {
                 const token = getCookie('token');
                 if (!token || !user) return;
 
-                const res = await axios.get(`http://192.168.1.10:8082/api/user/notification/`, {
+                const res = await axios.get(`${API_BASE_URL}/user/notification/`, {
                     params: {
                         id_user_notifi: idUserNotify,
                         id_notify: idNotify,

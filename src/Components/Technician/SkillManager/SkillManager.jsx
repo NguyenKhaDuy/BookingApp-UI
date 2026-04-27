@@ -13,7 +13,7 @@ export default function SkillManager() {
 
     // Lấy skill tổng
     useEffect(() => {
-        fetch('http://localhost:8081/api/skill/')
+        fetch('http://localhost:8082/api/skill/')
             .then((res) => res.json())
             .then((res) => {
                 if (res.data) {
@@ -39,7 +39,7 @@ export default function SkillManager() {
 
     // Lấy skill của thợ
     const loadTechSkills = () => {
-        fetch(`http://localhost:8081/api/technician/profile/skill/id=${id_user}`, {
+        fetch(`http://localhost:8082/api/technician/profile/skill/id=${id_user}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function SkillManager() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8081/api/technician/profile/skill/', {
+            const res = await fetch('http://localhost:8082/api/technician/profile/skill/', {
                 method: 'PUT',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ export default function SkillManager() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8081/api/technician/profile/skill/', {
+            const res = await fetch('http://localhost:8082/api/technician/profile/skill/', {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,

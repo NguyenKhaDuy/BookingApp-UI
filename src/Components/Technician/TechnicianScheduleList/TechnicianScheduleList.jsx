@@ -4,6 +4,7 @@ import { Calendar, Clock, Edit3, Trash, Wifi, WifiOff, Plus, Moon, X, ChevronLef
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { API_BASE_URL } from '../../../utils/api';
 export default function TechnicianScheduleList() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -30,7 +31,7 @@ export default function TechnicianScheduleList() {
     const fetchSchedules = async (pageNo) => {
         try {
             const res = await axios.get(
-                `http://localhost:8081/api/technician/schedule/id-technician=${technicianId}?pageNo=${pageNo}`,
+                `${API_BASE_URL}/technician/schedule/id-technician=${technicianId}?pageNo=${pageNo}`,
                 { headers: { Authorization: `Bearer ${token}` } },
             );
 
@@ -87,7 +88,7 @@ export default function TechnicianScheduleList() {
         try {
             setLoading(true);
             if (editData) {
-                await axios.put(`http://localhost:8081/api/technician/schedule/`, payload, {
+                await axios.put(`${API_BASE_URL}/technician/schedule/`, payload, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -95,7 +96,7 @@ export default function TechnicianScheduleList() {
                 });
                 showToast('Cập nhật lịch thành công!', 'success');
             } else {
-                await axios.post(`http://localhost:8081/api/technician/schedule/`, payload, {
+                await axios.post(`${API_BASE_URL}/technician/schedule/`, payload, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ export default function TechnicianScheduleList() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`http://localhost:8081/api/technician/schedule/id-schedule=${id}`, {
+            await axios.delete(`${API_BASE_URL}/technician/schedule/id-schedule=${id}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 

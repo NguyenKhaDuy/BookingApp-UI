@@ -44,7 +44,7 @@ export default function RegisterForm({ onRegisterSuccess }) {
         try {
             setLoadingOverLay(true);
             setLoading(true);
-            const res = await fetch(`http://192.168.1.6:8082/api/register/`, {
+            const res = await fetch(`${API_BASE_URL}/register/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include', //QUAN TRỌNG

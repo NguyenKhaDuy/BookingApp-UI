@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { API_BASE_URL } from '../../../utils/api';
 
 export default function ProfilePassword({ profile }) {
     const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function ProfilePassword({ profile }) {
             const token = getCookie('token');
 
             await axios.post(
-                'http://localhost:8081/api/changepassword/',
+                `${API_BASE_URL}/changepassword/`,
                 {
                     old_password: oldPassword,
                     new_password: newPassword,
@@ -57,7 +58,7 @@ export default function ProfilePassword({ profile }) {
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:8081/api/verify-otp/', {
+            const res = await fetch(`${API_BASE_URL}/verify-otp/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

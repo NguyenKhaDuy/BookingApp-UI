@@ -13,7 +13,7 @@ export default function LocationManager() {
 
     // === Lấy full vị trí ===
     useEffect(() => {
-        fetch('http://localhost:8081/api/location/')
+        fetch('http://localhost:8082/api/location/')
             .then((res) => res.json())
             .then((res) => {
                 if (res.data) {
@@ -39,7 +39,7 @@ export default function LocationManager() {
 
     // === Lấy vị trí của thợ ===
     const loadTechLocations = () => {
-        fetch(`http://localhost:8081/api/technician/profile/location/id=${id_user}`, {
+        fetch(`http://localhost:8082/api/technician/profile/location/id=${id_user}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export default function LocationManager() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8081/api/technician/profile/location/', {
+            const res = await fetch('http://localhost:8082/api/technician/profile/location/', {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ export default function LocationManager() {
         setLoading(true);
 
         try {
-            const res = await fetch('http://localhost:8081/api/technician/profile/location/', {
+            const res = await fetch('http://localhost:8082/api/technician/profile/location/', {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`,
