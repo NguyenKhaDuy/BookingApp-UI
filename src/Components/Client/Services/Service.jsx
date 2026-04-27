@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import {API_BASE_URL} from "../../../utils/api"
 
-// src/components/Services.jsx
 export default function Services() {
     const [services, setServices] = useState([]);
 
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get('http://localhost:8082/api/service/all/');
+                const res = await axios.get(`${API_BASE_URL}/service/all/`);
                 const allServices = res.data.data || [];
 
                 const shuffled = [...allServices].sort(() => 0.5 - Math.random());
@@ -21,20 +21,39 @@ export default function Services() {
         fetchServices();
     }, []);
 
+    //FIX CHUẨN
+    const getImageSrc = (icon) => {
+        if (!icon) return '';
+
+        if (icon.startsWith('data:image')) {
+            return icon;
+        }
+
+        if (icon.startsWith('/9j/')) {
+            return `data:image/jpeg;base64,${icon}`;
+        }
+
+        if (icon.startsWith('iVBOR')) {
+            return `data:image/png;base64,${icon}`;
+        }
+
+        return `data:image/jpeg;base64,${icon}`;
+    };
+
     return (
         <section className="py-28 bg-gradient-to-b from-white via-gray-50 to-gray-100">
             <div className="max-w-7xl mx-auto px-6">
-                {/* Title */}
+
                 <div className="text-center mb-20">
-                    <h2 className="text-5xl font-extrabold text-gray-900 tracking-tight">Dịch Vụ Nổi Bật</h2>
-                    <p className="mt-5 text-gray-600 text-lg">Chuẩn kỹ thuật – Phục vụ tận tâm</p>
+                    <h2 className="text-5xl font-extrabold text-gray-900 tracking-tight">
+                        Dịch Vụ Nổi Bật
+                    </h2>
+                    <p className="mt-5 text-gray-600 text-lg">
+                        Chuẩn kỹ thuật – Phục vụ tận tâm
+                    </p>
                 </div>
 
-                {/* Grid – ALWAYS CENTER */}
-                <div
-                    className="grid gap-10 justify-center
-                               grid-cols-[repeat(auto-fit,minmax(260px,1fr))]"
-                >
+                <div className="grid gap-10 justify-center grid-cols-[repeat(auto-fit,minmax(260px,1fr))]">
                     {services.map((service, index) => (
                         <div
                             key={service.id_service ?? index}
@@ -44,38 +63,36 @@ export default function Services() {
                                        transition-all duration-500 hover:-translate-y-3
                                        w-[260px]"
                         >
-                            {/* Glow */}
-                            <div
-                                className="absolute inset-0 bg-gradient-to-br
+                            <div className="absolute inset-0 bg-gradient-to-br
                                             from-blue-500/10 to-indigo-600/10
                                             opacity-0 group-hover:opacity-100 transition"
                             />
 
-                            {/* Index */}
-                            <span
-                                className="absolute -top-6 -right-4 text-8xl font-extrabold
-                                             text-gray-200/40 select-none"
-                            >
+                            <span className="absolute -top-6 -right-4 text-8xl font-extrabold text-gray-200/40">
                                 {index + 1}
                             </span>
 
-                            {/* Content */}
-                            <div className="relative z-10 h-48 flex items-center justify-center">
-                                <h3
-                                    className="text-3xl font-extrabold text-gray-900
-                                               text-center group-hover:text-orange-700 transition"
-                                >
+                            <div className="relative z-10 h-48 flex flex-col items-center justify-center gap-4">
+
+                                {service.icon && (
+                                    <img
+                                        src={getImageSrc(service.icon)}
+                                        alt={service.name_service}
+                                        className="w-16 h-16 object-contain
+                                                   transition-transform duration-300
+                                                   group-hover:scale-110"
+                                    />
+                                )}
+
+                                <h3 className="text-2xl font-extrabold text-gray-900 text-center group-hover:text-orange-700 transition">
                                     {service.name_service}
                                 </h3>
                             </div>
 
-                            {/* Bottom line */}
                             <div className="relative h-1 overflow-hidden">
-                                <div
-                                    className="absolute inset-0 w-0 rounded-full
-                                               bg-gradient-to-r from-orange-500 via-orange-400 to-indigo-600
-                                               shadow-[0_0_12px_rgba(249,115,22,0.6)]
-                                               group-hover:w-full transition-all duration-500"
+                                <div className="absolute inset-0 w-0 rounded-full
+                                                bg-gradient-to-r from-orange-500 via-orange-400 to-indigo-600
+                                                group-hover:w-full transition-all duration-500"
                                 />
                             </div>
                         </div>

@@ -2,6 +2,7 @@ import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api'
 
 export default function RequestDetailModal({ open, requestId, onClose }) {
     const [data, setData] = useState(null);
@@ -16,7 +17,7 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
         const token = getCookie('token');
 
         axios
-            .get(`http://localhost:8081/api/request/id=${requestId}`, {
+            .get(`${API_BASE_URL}/request/id=${requestId}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },

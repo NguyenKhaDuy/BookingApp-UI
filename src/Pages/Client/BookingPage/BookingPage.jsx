@@ -5,6 +5,7 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from '../../../utils/api';
 
 export default function BookingTechnicianForm() {
     const { showToast } = useToast();
@@ -25,7 +26,7 @@ export default function BookingTechnicianForm() {
 
     // Fetch danh sách dịch vụ
     useEffect(() => {
-        fetch('http://localhost:8081/api/service/all/')
+        fetch(`${API_BASE_URL}/service/all/`)
             .then((res) => res.json())
             .then((data) => {
                 if (data?.data) setServices(data.data);

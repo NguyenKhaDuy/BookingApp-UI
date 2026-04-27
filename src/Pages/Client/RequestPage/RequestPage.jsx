@@ -6,6 +6,7 @@ import { UserContext } from '../../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
+import { API_BASE_URL } from '../../../utils/api';
 export default function RequestPage() {
     const [tab, setTab] = useState('request');
     const { showToast } = useToast();
@@ -36,7 +37,7 @@ export default function RequestPage() {
         if (code === '00') {
             setTab('invoice');
 
-            fetch(`http://localhost:8081/api/payment-info/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}`);
+            fetch(`${API_BASE_URL}/payment-info/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}`);
 
             showToast('Thanh toán thành công', 'success');
         } else {

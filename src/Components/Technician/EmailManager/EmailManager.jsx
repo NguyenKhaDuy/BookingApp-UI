@@ -34,7 +34,7 @@ export default function EmailManager() {
     const fetchProfile = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/technician/profile/id=${id_user}`, {
+            const res = await axios.get(`http://localhost:8082/api/technician/profile/id=${id_user}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -90,7 +90,7 @@ export default function EmailManager() {
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
-            const res = await fetch('http://localhost:8081/api/verify-otp/', {
+            const res = await fetch('http://localhost:8082/api/verify-otp/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',

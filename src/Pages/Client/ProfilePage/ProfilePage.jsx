@@ -13,7 +13,7 @@ import ProfileFeedback from '../../../Components/Client/ProfileFeedback/ProfileF
 
 import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
-
+import { API_BASE_URL } from '../../../utils/api';
 export default function ProfilePage() {
     const navigate = useNavigate();
     const { user, initialized } = useContext(UserContext);
@@ -30,7 +30,7 @@ export default function ProfilePage() {
 
         try {
             const res = await axios.get(
-                `http://192.168.1.6:8082/api/customer/profile/id=${user.id_user}`,
+                `${API_BASE_URL}/customer/profile/id=${user.id_user}`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,

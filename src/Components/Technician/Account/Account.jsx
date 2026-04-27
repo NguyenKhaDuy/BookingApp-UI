@@ -28,7 +28,7 @@ export default function AccountPage() {
     const fetchProfile = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/technician/profile/id=${id_user}`, {
+            const res = await axios.get(`http://localhost:8082/api/technician/profile/id=${id_user}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -63,7 +63,7 @@ export default function AccountPage() {
                 formData.append('id_user', id_user);
                 formData.append('avatar', file);
 
-                await axios.put('http://localhost:8081/api/technician/profile/avatar/', formData, {
+                await axios.put('http://localhost:8082/api/technician/profile/avatar/', formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -115,7 +115,7 @@ export default function AccountPage() {
                 experience_year: profile.experience_year,
             };
 
-            const res = await axios.put(`http://localhost:8081/api/technician/profile/`, payload, {
+            const res = await axios.put(`http://localhost:8082/api/technician/profile/`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',

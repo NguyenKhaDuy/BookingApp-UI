@@ -36,7 +36,7 @@ export default function RepairRequest() {
             const user = JSON.parse(localStorage.getItem('user'));
             if (!user?.id_user) return;
             setLoading(true);
-            const res = await axios.get(`http://localhost:8081/api/technician/request/id_tech=${user.id_user}`, {
+            const res = await axios.get(`http://localhost:8082/api/technician/request/id_tech=${user.id_user}`, {
                 params: { pageNo },
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -80,7 +80,7 @@ export default function RepairRequest() {
         try {
             setLoading(true);
             await axios.put(
-                'http://localhost:8081/api/technician/update-staus/request/',
+                'http://localhost:8082/api/technician/update-staus/request/',
                 {
                     id_request: selectedOrder.id_request,
                     id_status: newStatus,

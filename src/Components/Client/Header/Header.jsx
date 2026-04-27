@@ -36,7 +36,7 @@ export default function HeaderBooking() {
         if (!user || !user.id_user) return;
 
         try {
-            const res = await axios.get(`http://localhost:8082/api/user/notification/id_user=${user.id_user}`, {
+            const res = await axios.get(`${API_BASE_URL}/user/notification/id_user=${user.id_user}`, {
                 withCredentials: true,
             });
 
@@ -88,7 +88,7 @@ export default function HeaderBooking() {
     useEffect(() => {
         const fetchServices = async () => {
             try {
-                const res = await axios.get(`http://localhost:8082/api/service/all/`);
+                const res = await axios.get(`${API_BASE_URL}/service/all/`);
                 setServices(res.data.data);
             } catch (error) {
                 console.error('Failed to fetch services:', error);
@@ -100,7 +100,7 @@ export default function HeaderBooking() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const res = await axios.get(`http://localhost:8082/api/me/`, { withCredentials: true });
+                const res = await axios.get(`${API_BASE_URL}/me/`, { withCredentials: true });
                 if (typeof res.data === 'object') {
                     setUser(res.data);
                 } else {

@@ -6,6 +6,7 @@ import { useToast } from '../../../Context/ToastContext';
 import axios from 'axios';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../../../utils/api';
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
@@ -21,7 +22,7 @@ export default function ForgotPassword() {
         }
         setLoading(true);
         try {
-            await axios.post(`http://192.168.1.6:8082/api/forgotpassword/send-otp/?email=${userEmail}`);
+            await axios.post(`${API_BASE_URL}/forgotpassword/send-otp/?email=${userEmail}`);
             setEmail(userEmail);
             showToast('Mã OTP đã gửi về email của bạn!', 'success');
             setStep(2);
@@ -41,7 +42,7 @@ export default function ForgotPassword() {
 
         setLoading(true);
         try {
-            const res = await fetch('http://192.168.1.6:8082/api/verify-otp/', {
+            const res = await fetch(`${API_BASE_URL}/verify-otp/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -64,7 +65,7 @@ export default function ForgotPassword() {
         }
         setLoading(true);
         try {
-            await axios.post('http://192.168.1.6:8082/api/forgotpassword/', {
+            await axios.post(`${API_BASE_URL}/forgotpassword/`, {
                 email: email,
                 password: newPassword,
             });

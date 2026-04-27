@@ -4,6 +4,7 @@ import axios from 'axios';
 import avatarDefault from '../../../assets/default-avatar.jpg';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import {API_BASE_URL} from "../../../utils/api";
 
 export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) {
     const fileInputRef = useRef(null);
@@ -32,7 +33,7 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
         try {
             setUploading(true);
 
-            await axios.put('http://localhost:8081/api/customer/profile/avatar/', formData, {
+            await axios.put(`${API_BASE_URL}/customer/profile/avatar/`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',

@@ -10,6 +10,7 @@ import TechnicianCalendar from '../../../Components/Client/TechnicianCalendar/Te
 import TechnicianMap from '../../../Components/Client/TechnicianMap/TechnicianMap';
 import TechnicianActionBar from '../../../Components/Client/TechnicianActionBar/TechnicianActionBar';
 import TechnicianService from '../../../Components/Client/TechnicianService/TechnicianService';
+import {API_BASE_URL} from '../../../utils/api'
 
 export default function TechnicianDetailPage() {
     const { id_user } = useParams();
@@ -22,9 +23,9 @@ export default function TechnicianDetailPage() {
         if (!id_user) return;
 
         axios
-            .get(`http://localhost:8081/api/detail-technician/id=${id_user}`)
+            .get(`${API_BASE_URL}/detail-technician/id=${id_user}`)
             .then((res) => {
-                setTechData(res.data.data);// 👈 data backend trả về
+                setTechData(res.data.data);
                 setLoading(false);
             })
             .catch((err) => {

@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Star } from 'lucide-react';
+import {API_BASE_URL} from "../../../utils/api"
 
 export default function Testimonials() {
     const [reviews, setReviews] = useState([]);
 
     useEffect(() => {
-        fetch('http://localhost:8082/api/ratings/outstanding/')
+        fetch(`${API_BASE_URL}/ratings/outstanding/`)
             .then((res) => res.json())
             .then((data) => {
                 if (data?.data) {

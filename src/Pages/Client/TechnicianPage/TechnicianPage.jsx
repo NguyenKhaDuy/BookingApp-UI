@@ -4,14 +4,15 @@ import axios from 'axios';
 import TechnicianHero from '../../../Components/Client/TechnicianHero/TechnicianHero';
 import TechnicianFilter from '../../../Components/Client/TechnicianFilter/TechnicianFilter';
 import TechnicianGrid from '../../../Components/Client/TechnicianGrid/TechnicianGrid';
+import { API_BASE_URL } from '../../../utils/api';
 
 export default function TechnicianPage() {
-    // 🔎 Filter states
+    //Filter states
     const [selectedSkill, setSelectedSkill] = useState('Tất cả');
     const [selectedService, setSelectedService] = useState('Tất cả');
     const [keyword, setKeyword] = useState('');
 
-    // 📦 Data states
+    //Data states
     const [technicians, setTechnicians] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
@@ -22,9 +23,9 @@ export default function TechnicianPage() {
 
     const fetchTechnicians = async (page) => {
         try {
-            const res = await axios.get('http://localhost:8081/api/all/technician/', { params: { pageNo: page } });
+            const res = await axios.get(`${API_BASE_URL}/all/technician/`, { params: { pageNo: page } });
 
-            // 🔁 map backend → UI model
+            // map backend → UI model
             const mapped = res.data.data.map((t) => ({
                 id: t.id_user,
                 name: t.full_name,
@@ -42,7 +43,7 @@ export default function TechnicianPage() {
         }
     };
 
-    // 🔍 FILTER LOGIC: Skill + Service + Search
+    //FILTER LOGIC: Skill + Service + Search
     const filtered = technicians.filter((t) => {
         const matchSkill = selectedSkill === 'Tất cả' || t.skills.includes(selectedSkill);
 

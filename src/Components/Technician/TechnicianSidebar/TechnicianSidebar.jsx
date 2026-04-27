@@ -20,6 +20,7 @@ import { UserContext } from '../../../Context/UserContext';
 import { Link, useNavigate } from 'react-router-dom';
 import avatarDefault from '../../../assets/default-avatar.jpg'
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import  {API_BASE_URL} from "../../../utils/api"
 
 export default function TechnicianSidebar({ active, setActive }) {
     const [open, setOpen] = useState(true);
@@ -54,7 +55,7 @@ export default function TechnicianSidebar({ active, setActive }) {
             let totalUnread = 0;
 
             do {
-                const res = await axios.get(`http://localhost:8081/api/notification/id_user=${user.id_user}`, {
+                const res = await axios.get(`${API_BASE_URL}/notification/id_user=${user.id_user}`, {
                     params: { pageNo: page },
                     headers: { Authorization: `Bearer ${token}` },
                 });

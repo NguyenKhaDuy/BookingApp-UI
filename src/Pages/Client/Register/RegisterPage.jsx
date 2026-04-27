@@ -4,6 +4,7 @@ import RegisterForm from '../../../Components/Client/RegisterForm/RegisterForm';
 import OtpForm from '../../../Components/Client/OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { API_BASE_URL } from '../../../utils/api';
 
 export default function Register() {
     const [loading, setLoading] = useState(false);
@@ -24,7 +25,7 @@ export default function Register() {
         }
 
         setLoading(true);
-        const res = await fetch('http://192.168.1.6:8082/api/verify-otp/', {
+        const res = await fetch(`${API_BASE_URL}/verify-otp/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
