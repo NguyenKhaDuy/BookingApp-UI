@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Trash2, User, Mail, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
+import { User, Mail, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
 import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
-import {API_BASE_URL} from '../../../utils/api.js';
+import { API_BASE_URL } from '../../../utils/api.js';
+
 export default function OtpManager() {
     const [list, setList] = useState([]);
     const [loading, setLoading] = useState(false);
     const [page, setPage] = useState(0);
     const [totalPages, setTotalPages] = useState(0);
     const token = getCookie('token');
- const { showToast } = useToast();
-    // chọn nhiều
-    const [selectedIds, setSelectedIds] = useState([]);
+    const { showToast } = useToast();
 
-    // Popup confirm delete multiple
+    const [selectedIds, setSelectedIds] = useState([]);
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     useEffect(() => {
@@ -33,39 +32,42 @@ export default function OtpManager() {
             });
 
             const json = res.data;
+
+            console.log('CALL PAGE:', pageIndex + 1);
+            console.log('RESPONSE:', json);
+
             setList(json.data || []);
             setTotalPages(json.total_page || 0);
-            setPage((json.current_page || 1) - 1);
 
-            // reset selection khi đổi trang
+            // ❌ KHÔNG setPage ở đây nữa (tránh loop)
+
             setSelectedIds([]);
         } catch (err) {
             console.error('FETCH OTP ERROR:', err);
+            showToast('Lỗi tải dữ liệu', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    // toggle chọn 1 otp
     const toggleSelectOne = (id) => {
         setSelectedIds((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]));
     };
 
-    // chọn tất cả
     const toggleSelectAll = () => {
         if (selectedIds.length === list.length) {
-            setSelectedIds([]); // bỏ hết
+            setSelectedIds([]);
         } else {
             setSelectedIds(list.map((item) => item.id_otp));
         }
     };
 
-    // gửi API xóa nhiều
     const confirmDeleteAction = async () => {
         try {
             setLoading(true);
+
             await axios.delete(`${API_BASE_URL}/admin/otp-verification/`, {
-                data: { id: selectedIds }, // backend yêu cầu List<Long> id
+                data: { id: selectedIds },
                 headers: {
                     Authorization: token ? `Bearer ${token}` : '',
                     'Content-Type': 'application/json',
@@ -74,7 +76,10 @@ export default function OtpManager() {
             });
 
             setConfirmDelete(false);
+
+            // reload lại page hiện tại
             fetchRealOtp(page);
+
             showToast('Xóa thành công', 'success');
         } catch (err) {
             console.error('DELETE OTP ERROR:', err);
@@ -152,12 +157,16 @@ export default function OtpManager() {
                                             <User size={16} />
                                             <div>
                                                 <div className="font-medium text-gray-800">
-                                                    {item.userDTO.full_name}
+                                                    {item.userDTO?.full_name || 'Không có tên'}
                                                 </div>
+
                                                 <div className="flex items-center gap-1 text-xs text-gray-500">
-                                                    <Mail size={14} /> {item.userDTO.email}
+                                                    <Mail size={14} /> {item.userDTO?.email || 'Không có email'}
                                                 </div>
-                                                <div className="text-xs text-gray-400">{item.userDTO.phone_number}</div>
+
+                                                <div className="text-xs text-gray-400">
+                                                    {item.userDTO?.phone_number || 'Không có SĐT'}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
@@ -189,7 +198,11 @@ export default function OtpManager() {
 
             {/* Pagination */}
             <div className="flex items-center justify-center gap-2 p-3 bg-white">
-                <button disabled={page === 0} onClick={() => setPage(page - 1)} className="p-2 rounded-lg border">
+                <button
+                    disabled={page === 0}
+                    onClick={() => setPage((prev) => Math.max(prev - 1, 0))}
+                    className="p-2 rounded-lg border"
+                >
                     <ChevronLeft className="w-4 h-4" />
                 </button>
 
@@ -197,7 +210,9 @@ export default function OtpManager() {
                     <button
                         key={i}
                         onClick={() => setPage(i)}
-                        className={`px-3 py-1 rounded-lg text-sm border ${i === page ? 'bg-orange-600 text-white border-orange-600' : 'hover:bg-orange-50'}`}
+                        className={`px-3 py-1 rounded-lg text-sm border ${
+                            i === page ? 'bg-orange-600 text-white border-orange-600' : 'hover:bg-orange-50'
+                        }`}
                     >
                         {i + 1}
                     </button>
@@ -205,35 +220,27 @@ export default function OtpManager() {
 
                 <button
                     disabled={page === totalPages - 1}
-                    onClick={() => setPage(page + 1)}
+                    onClick={() => setPage((prev) => Math.min(prev + 1, totalPages - 1))}
                     className="p-2 rounded-lg border"
                 >
                     <ChevronRight className="w-4 h-4" />
                 </button>
             </div>
 
-            {/* POPUP DELETE CONFIRM */}
+            {/* Confirm Delete */}
             {confirmDelete && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white w-[350px] rounded-2xl shadow-xl p-6 space-y-5">
-                        <div className="text-center space-y-2">
-                            <p className="text-lg font-semibold text-gray-800">Xác nhận xóa</p>
-                            <p className="text-sm text-gray-500">
-                                Bạn có chắc muốn xóa {selectedIds.length} OTP này?
-                                <br />
-                                Hành động này không thể hoàn tác.
-                            </p>
-                        </div>
-                        <div className="flex justify-end gap-3 pt-2">
-                            <button
-                                onClick={() => setConfirmDelete(false)}
-                                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition"
-                            >
+                        <p className="text-lg font-semibold text-center">Xác nhận xóa</p>
+                        <p className="text-sm text-gray-500 text-center">Xóa {selectedIds.length} OTP?</p>
+
+                        <div className="flex justify-end gap-3">
+                            <button onClick={() => setConfirmDelete(false)} className="px-4 py-2 border rounded-lg">
                                 Hủy
                             </button>
                             <button
                                 onClick={confirmDeleteAction}
-                                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition"
+                                className="px-4 py-2 bg-red-600 text-white rounded-lg"
                             >
                                 Xóa
                             </button>
@@ -241,7 +248,8 @@ export default function OtpManager() {
                     </div>
                 </div>
             )}
-            <LoadingOverlay show={loading}/>
+
+            <LoadingOverlay show={loading} />
         </div>
     );
 }

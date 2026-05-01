@@ -7,6 +7,7 @@ import axios from 'axios';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useNavigate } from 'react-router-dom';
 import { API_BASE_URL } from '../../../utils/api';
+import { em } from 'framer-motion/client';
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
@@ -46,7 +47,7 @@ export default function ForgotPassword() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ otp }),
+                body: JSON.stringify({ otp, email: email, type: "FORGOT_PASSWORD"}),
             });
             showToast('Xác thực thành công!', 'success');
             setStep(3);

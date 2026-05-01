@@ -3,7 +3,7 @@ import { EyeIcon, Plus, User } from 'lucide-react';
 import getCookie from '../../../../utils/getToken';
 import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
-import {API_BASE_URL} from '../../../../utils/api.js';
+import {API_BASE_URL} from '../../../../utils/api';
 
 const formatDateTime = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -79,7 +79,7 @@ export default function AdminCustomer() {
         setLoadingDetail(true);
 
         try {
-            const res = await fetch(`${API_BASE_URL}/api/admin/customer/id=${c.id_user}`, {
+            const res = await fetch(`${API_BASE_URL}/admin/customer/id=${c.id_user}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             const json = await res.json();

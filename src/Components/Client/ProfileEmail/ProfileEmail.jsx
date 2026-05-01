@@ -63,7 +63,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ otp }),
+                body: JSON.stringify({ otp, email: profile.email, type: "UPDATE_EMAIL" }),
             });
 
             const data = await res.json();

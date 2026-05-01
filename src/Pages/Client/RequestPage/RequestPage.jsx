@@ -37,7 +37,7 @@ export default function RequestPage() {
         if (code === '00') {
             setTab('invoice');
 
-            fetch(`${API_BASE_URL}/payment-info/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}`);
+            fetch(`${API_BASE_URL}/payment-info/web/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}&appType=web`);
 
             showToast('Thanh toán thành công', 'success');
         } else {
