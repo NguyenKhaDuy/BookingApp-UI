@@ -17,6 +17,7 @@ import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
 import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
 import TechnicianHome from './Pages/Technician/TechnicianHome/TechnicianHome'
+import PaymentSuccess from './Pages/PaymentSuccess/PaymentSuccess'
 import { WebSocketProvider } from './Context/WebSocketProvider';
 function App() {
     return (
@@ -38,6 +39,7 @@ function App() {
                         <Route path="/booking" element={<BookingPage />} />
                         <Route path="/booking/:idTech" element={<BookingPage />} />
                         <Route path="/contact" element={<ContactPage />} />
+                        <Route path="/payment-success" element={<PaymentSuccess />} />
                     </Route>
 
                     {/* ================= ADMIN LAYOUT ================= */}

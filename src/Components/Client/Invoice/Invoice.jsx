@@ -106,7 +106,7 @@ export default function Invoice() {
                 const data = await res.json();
 
                 if (data.code === '00') {
-                    // 👉 Thêm NCB thủ công để test
+                    //Thêm NCB thủ công để test
                     const mockNCB = {
                         id: 999,
                         name: 'Ngân hàng Quốc Dân',

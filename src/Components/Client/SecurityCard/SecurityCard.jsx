@@ -8,6 +8,7 @@ import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { API_BASE_URL } from '../../../utils/api';
+import { type } from '@testing-library/user-event/dist/type';
 
 export default function ProfilePassword({ profile }) {
     const [loading, setLoading] = useState(false);
@@ -62,7 +63,7 @@ export default function ProfilePassword({ profile }) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ otp }),
+                body: JSON.stringify({ otp, email: profile.email, type: "CHANGE_PASSWORD" }),
             });
 
             const data = await res.json();

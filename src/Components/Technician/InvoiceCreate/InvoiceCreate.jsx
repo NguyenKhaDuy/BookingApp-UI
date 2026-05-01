@@ -4,6 +4,7 @@ import { Plus, Trash2, X } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import {API_BASE_URL} from "../../../utils/api"
 
 export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) {
     const [paid, setPaid] = useState(false);
@@ -25,7 +26,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
 
     const fetchPaymentMethods = async () => {
         try {
-            const res = await axios.get('http://localhost:8081/api/paymentmethod/', {
+            const res = await axios.get(`${API_BASE_URL}/paymentmethod/`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -95,7 +96,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
                 detailInvoiceDTOS, //CÔNG THỢ NẰM Ở ĐÂY
             };
 
-            await axios.post('http://localhost:8081/api/technician/invoices/', payload, {
+            await axios.post(`${API_BASE_URL}/technician/invoices/`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
