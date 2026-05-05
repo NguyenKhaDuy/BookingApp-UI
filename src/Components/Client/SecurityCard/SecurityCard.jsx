@@ -32,7 +32,7 @@ export default function ProfilePassword({ profile }) {
                 {
                     old_password: oldPassword,
                     new_password: newPassword,
-                    email: profile.email, // ✅ lấy từ UserContext
+                    email: profile.email, //lấy từ UserContext
                 },
                 {
                     headers: {

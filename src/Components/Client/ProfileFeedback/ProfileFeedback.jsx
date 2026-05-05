@@ -80,7 +80,6 @@ export default function ProfileFeedback({ profile }) {
             setLoading(false);
         }
     };
-    console.log(requests)
 
     /* ================= UI ================= */
     return (
