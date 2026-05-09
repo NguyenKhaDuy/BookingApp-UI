@@ -15,6 +15,7 @@ import getCookie from '../../../utils/getToken';
 import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
 import EmailManager from '../../../Components/Technician/EmailManager/EmailManager'
 import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
+import ServiceManager from '../../../Components/Technician/ServiceManager/ServiceManager';
 import { API_BASE_URL } from '../../../utils/api';
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
@@ -229,6 +230,7 @@ export default function TechnicianHome({ active }) {
                 {active === 'schedules' && <TechnicianScheduleList />}
                 {active === 'location' && <LocationManager />}
                 {active === 'skills' && <SkillManager />}
+                {active === 'services' && <ServiceManager />}
                 {active === 'email' && <EmailManager />}
                 {active === 'password' && <PasswordManager />}
                 {active === 'account' && <Account />}

@@ -12,6 +12,7 @@ import {
     Calendar,
     Mail,
     KeyRound,
+    Briefcase 
 } from 'lucide-react';
 import logo from '../../../assets/logo.png';
 import axios from 'axios';
@@ -35,6 +36,7 @@ export default function TechnicianSidebar({ active, setActive }) {
         { key: 'notifications', label: 'Thông báo', icon: Bell, badge: notificationCount },
         { key: 'schedules', label: 'Quản lí lịch làm việc', icon: Calendar },
         { key: 'skills', label: 'Quản lý kỹ năng', icon: Wrench },
+        { key: 'services', label: 'Quản lý dịch vụ', icon: Briefcase },
         { key: 'location', label: 'Quản lý vị trí', icon: MapPin },
         { key: 'email', label: 'Quản lý Email', icon: Mail },
         { key: 'password', label: 'Quản lý Mật khẩu', icon: KeyRound },
