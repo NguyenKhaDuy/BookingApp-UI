@@ -60,7 +60,7 @@ export default function LoginForm() {
         }
     };
 
-    // 🔵 GOOGLE LOGIN
+    //GOOGLE LOGIN
     const handleGoogleLogin = () => {
         window.location.href = `${API_URL_GG}/oauth2/authorization/google`;
     };

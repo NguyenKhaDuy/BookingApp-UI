@@ -13,7 +13,7 @@ import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClie
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
-import EmailManager from '../../../Components/Technician/EmailManager/EmailManager'
+import EmailManager from '../../../Components/Technician/EmailManager/EmailManager';
 import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
 import ServiceManager from '../../../Components/Technician/ServiceManager/ServiceManager';
 import { API_BASE_URL } from '../../../utils/api';
@@ -23,31 +23,28 @@ export default function TechnicianHome({ active }) {
     const { user, setUser } = useContext(UserContext);
     const [open, setOpen] = useState(false);
 
-
     const [notification, setNotification] = useState(null);
     const [countdown, setCountdown] = useState(60);
 
-  useEffect(() => {
-           const fetchUser = async () => {
-               try {
-                   const res = await axios.get(`${API_BASE_URL}/me/`, { withCredentials: true });
-                   if (typeof res.data === 'object') {
-                       setUser(res.data);
-                   } else {
-                       setUser(null);
-                   }
-                   localStorage.setItem('user', JSON.stringify(res.data));
-               } catch (err) {
-                   console.log('Chưa login');
-               }
-           };
-           fetchUser();
-  }, []);
-
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const res = await axios.get(`${API_BASE_URL}/me/`, { withCredentials: true });
+                if (typeof res.data === 'object') {
+                    setUser(res.data);
+                } else {
+                    setUser(null);
+                }
+                localStorage.setItem('user', JSON.stringify(res.data));
+            } catch (err) {
+                console.log('Chưa login');
+            }
+        };
+        fetchUser();
+    }, []);
 
     // ===================== AUTH + WEBSOCKET =====================
     useEffect(() => {
-
         const token = getCookie('token');
 
         if (!token) {
@@ -72,7 +69,7 @@ export default function TechnicianHome({ active }) {
 
         const unsubscribe = addWebSocketListener((msg) => {
             setNotification(msg);
-            if (msg.type === "REQUEST_CANCEL") {
+            if (msg.type === 'REQUEST_CANCEL') {
                 showToast(msg.body, 'success');
                 setOpen(false);
                 setNotification(null);
@@ -86,8 +83,6 @@ export default function TechnicianHome({ active }) {
             unsubscribe();
         };
     }, [navigate]);
-   
-
 
     // ===================== COUNTDOWN 60s =====================
     useEffect(() => {
@@ -110,9 +105,7 @@ export default function TechnicianHome({ active }) {
         return () => clearInterval(timer);
     }, [notification]);
 
-    
     const getTechnicianId = () => {
-
         // fallback localStorage
         const localUser = localStorage.getItem('user');
         if (!localUser) return null;
@@ -124,8 +117,8 @@ export default function TechnicianHome({ active }) {
         if (!notification) return;
         try {
             // Lấy id_technician từ token
-            const token = getCookie('token');;
-            const id_technician = getTechnicianId(); 
+            const token = getCookie('token');
+            const id_technician = getTechnicianId();
 
             // Lấy id_request từ notification
             const id_request = notification.id_request;
@@ -135,9 +128,9 @@ export default function TechnicianHome({ active }) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
+                    Authorization: `Bearer ${token}`,
                 },
-                body: JSON.stringify({ id_technician, id_request })
+                body: JSON.stringify({ id_technician, id_request }),
             });
 
             const data = await res.json();
@@ -152,10 +145,9 @@ export default function TechnicianHome({ active }) {
             showToast(`Có lỗi xảy ra, vui lòng thử lại`, 'error');
         } finally {
             setOpen(false);
-            setNotification(null);// đóng popup
+            setNotification(null); // đóng popup
         }
     };
-
 
     const handleReject = async () => {
         if (!notification) return;
@@ -194,6 +186,22 @@ export default function TechnicianHome({ active }) {
             showToast(`Có lỗi xảy ra, vui lòng thử lại`, 'error');
         }
     };
+
+    useEffect(() => {
+        const query = new URLSearchParams(window.location.search);
+
+        const payment = query.get('payment');
+
+        if (payment === 'success') {
+            showToast('Thanh toán công nợ thành công', 'success');
+        }
+
+        if (payment === 'failed') {
+            showToast('Thanh toán công nợ thất bại', 'error');
+        }
+
+        window.history.replaceState({}, '', '/technician/home');
+    }, []);
     return (
         <>
             {/* ===== POPUP NOTIFICATION ===== */}

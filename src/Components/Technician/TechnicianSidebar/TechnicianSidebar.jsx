@@ -121,7 +121,7 @@ export default function TechnicianSidebar({ active, setActive }) {
                                 if (m.key === 'logout') handleLogout();
                                 else setActive(m.key);
                             }}
-                            className={`flex items-center justify-between p-3 mb-1 rounded-lg transition-colors ${
+                            className={`w-full flex items-center justify-between p-3 mb-1 rounded-lg transition-colors ${
                                 active === m.key
                                     ? 'bg-orange-200 text-orange-700 font-medium'
                                     : 'text-gray-700 hover:bg-orange-100'

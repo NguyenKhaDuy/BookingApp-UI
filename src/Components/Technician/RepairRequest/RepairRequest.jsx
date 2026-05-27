@@ -22,8 +22,6 @@ export default function RepairRequest() {
     const [totalPage, setTotalPage] = useState(1);
 
     const token = getCookie('token');
-
-    // >>> ADDED: popup state
     const [openStatus, setOpenStatus] = useState(false);
     const [newStatus, setNewStatus] = useState(null);
 
@@ -148,7 +146,6 @@ export default function RepairRequest() {
                                                 Chi tiết
                                             </button>
 
-                                            {/* >>> ADDED: nút cập nhật trạng thái */}
                                             <button
                                                 disabled={
                                                     o.status_code !== STATUS.RECEIVED &&

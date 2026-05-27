@@ -141,6 +141,7 @@ export default function Invoice() {
                 amount: payInvoice.total_amount,
                 id_request: String(payInvoice.id_invoices),
                 requestType: 'invoice',
+                userAgent: "WEB"
             };
 
             const res = await fetch(`${API_BASE_URL}/customer/payment/`, {
