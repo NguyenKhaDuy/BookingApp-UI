@@ -7,6 +7,7 @@ import avatarDefault from '../../../assets/default-avatar.jpg';
 import axios from 'axios';
 import { useContext } from 'react';
 import { UserContext } from '../../../Context/UserContext';
+import { API_BASE_URL } from '../../../utils/api';
 
 export default function AccountPage() {
     const [loading, setLoading] = useState(false);
@@ -14,6 +15,13 @@ export default function AccountPage() {
     const [profile, setProfile] = useState(null);
     const [originalProfile, setOriginalProfile] = useState(null);
     const { user, setUser } = useContext(UserContext);
+
+    // payment states
+    const [showBankModal, setShowBankModal] = useState(false);
+    const [selectedBank, setSelectedBank] = useState('');
+    const [bankList, setBankList] = useState([]);
+    const [loadingBank, setLoadingBank] = useState(false);
+    const [payAmount, setPayAmount] = useState('');
 
     const token = getCookie('token');
 
@@ -28,7 +36,7 @@ export default function AccountPage() {
     const fetchProfile = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:8082/api/technician/profile/id=${id_user}`, {
+            const res = await axios.get(`${API_BASE_URL}/technician/profile/id=${id_user}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -45,6 +53,39 @@ export default function AccountPage() {
     useEffect(() => {
         if (id_user) fetchProfile();
     }, [fetchProfile, id_user]);
+
+    useEffect(() => {
+        if (!showBankModal) return;
+
+        const fetchBanks = async () => {
+            try {
+                setLoadingBank(true);
+                const res = await fetch('https://api.vietqr.io/v2/banks');
+                const data = await res.json();
+
+                if (data.code === '00') {
+                    //Thêm NCB thủ công để test
+                    const mockNCB = {
+                        id: 999,
+                        name: 'Ngân hàng Quốc Dân',
+                        shortName: 'NCB',
+                        code: 'NCB',
+                        logo: 'https://api.vietqr.io/img/NCB.png',
+                    };
+
+                    setBankList([mockNCB, ...data.data]);
+                } else {
+                    showToast('Không lấy được ngân hàng', 'error');
+                }
+            } catch {
+                showToast('Lỗi tải ngân hàng', 'error');
+            } finally {
+                setLoadingBank(false);
+            }
+        };
+
+        fetchBanks();
+    }, [showBankModal, showToast]);
 
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
@@ -63,7 +104,7 @@ export default function AccountPage() {
                 formData.append('id_user', id_user);
                 formData.append('avatar', file);
 
-                await axios.put('http://localhost:8082/api/technician/profile/avatar/', formData, {
+                await axios.put(`${API_BASE_URL}/technician/profile/avatar/`, formData, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -95,7 +136,7 @@ export default function AccountPage() {
         return JSON.stringify(profile) !== JSON.stringify(originalProfile);
     };
 
-    // HÀM UPDATE PROFILE — FULL CODE 
+    // HÀM UPDATE PROFILE
     const handleUpdateProfile = async () => {
         if (!profile) return;
 
@@ -108,14 +149,16 @@ export default function AccountPage() {
                 address: profile.address,
                 phone_number: profile.phone_number,
                 dob: profile.dob
-                    ? `${profile.dob[0].toString().padStart(2, '0')}-${profile.dob[1].toString().padStart(2, '0')}-${profile.dob[2]}`
+                    ? `${profile.dob[0]}-${profile.dob[1].toString().padStart(2, '0')}-${profile.dob[2]
+                          .toString()
+                          .padStart(2, '0')}`
                     : null,
                 gender: profile.gender,
                 working_area: profile.working_area,
                 experience_year: profile.experience_year,
             };
 
-            const res = await axios.put(`http://localhost:8082/api/technician/profile/`, payload, {
+            const res = await axios.put(`${API_BASE_URL}/technician/profile/`, payload, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'application/json',
@@ -128,6 +171,50 @@ export default function AccountPage() {
             showToast('Lỗi cập nhật: ' + (err.response?.data?.message || err.message), 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    //thanh toán công nợ
+    const openPaymentDebt = () => {
+        setSelectedBank('');
+        setPayAmount(profile.technician_debt);
+        setShowBankModal(true);
+    };
+
+    const handlePaymentDebt = async () => {
+        if (!selectedBank) {
+            return showToast('Vui lòng chọn ngân hàng', 'error');
+        }
+
+        if (!payAmount || Number(payAmount) <= 0) {
+            return showToast('Nhập số tiền hợp lệ', 'error');
+        }
+
+        if (Number(payAmount) > profile.technician_debt) {
+            return showToast('Số tiền vượt quá công nợ', 'error');
+        }
+
+        try {
+            const payload = {
+                bank: selectedBank,
+                amount: Number(payAmount),
+                id_technician: String(id_user),
+            };
+
+            const res = await fetch(`${API_BASE_URL}/technician/payment/debt/`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+
+            const paymentUrl = await res.text();
+
+            window.location.href = paymentUrl;
+        } catch {
+            showToast('Thanh toán thất bại', 'error');
         }
     };
 
@@ -219,18 +306,106 @@ export default function AccountPage() {
                         <Field label="Hiệu suất" value={profile.efficiency} />
                         <Field label="Trạng thái" value={profile.status_technician} />
                         <Field label="Level" value={profile.level} />
-                        <Field label="Công nợ" value={profile.technician_debt + ' VND'} />
+                        <div className="flex flex-col">
+                            <label className="text-sm text-gray-600 mb-1">Công nợ</label>
+
+                            <div
+                                className={`p-4 rounded-xl font-semibold
+        ${
+            profile.technician_debt > 0
+                ? 'bg-red-50 text-red-600 border border-red-200'
+                : 'bg-green-50 text-green-600 border border-green-200'
+        }`}
+                            >
+                                {new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND',
+                                }).format(profile.technician_debt || 0)}
+                            </div>
+                        </div>
                     </div>
 
-                    <div className="mt-8 flex justify-end">
+                    <div className="mt-8 flex justify-end gap-3">
+                        {profile.technician_debt > 0 && (
+                            <button
+                                onClick={openPaymentDebt}
+                                className="px-6 py-2 rounded-lg font-medium shadow-sm text-white bg-red-500 hover:bg-red-600"
+                            >
+                                Thanh toán công nợ
+                            </button>
+                        )}
+
                         <button
                             onClick={handleUpdateProfile}
-                            className={`px-6 py-2 rounded-lg font-medium shadow-sm text-white 
-                                ${hasChanged() ? 'bg-orange-500 hover:bg-orange-600 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'}`}
+                            className={`px-6 py-2 rounded-lg font-medium shadow-sm text-white
+        ${hasChanged() ? 'bg-orange-500 hover:bg-orange-600 cursor-pointer' : 'bg-gray-400 cursor-not-allowed'}`}
                             disabled={!hasChanged()}
                         >
                             Lưu thay đổi
                         </button>
+                    </div>
+                </div>
+            )}
+            {showBankModal && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                    <div className="bg-white max-w-md w-full rounded-xl p-6">
+                        <h2 className="text-xl font-bold mb-4">Thanh toán công nợ</h2>
+
+                        <div className="mb-4">
+                            <label className="text-sm text-gray-600">Số tiền thanh toán</label>
+
+                            <input
+                                type="number"
+                                value={payAmount}
+                                onChange={(e) => setPayAmount(e.target.value)}
+                                className="w-full p-3 border rounded-lg mt-2"
+                            />
+                        </div>
+
+                        <div className="space-y-3 max-h-72 overflow-y-auto">
+                            {loadingBank && <p className="text-center">Đang tải...</p>}
+
+                            {!loadingBank &&
+                                bankList.map((bank) => (
+                                    <div
+                                        key={bank.code}
+                                        onClick={() => setSelectedBank(bank.code)}
+                                        className={`flex items-center gap-4 p-4 border rounded-xl cursor-pointer
+                        ${selectedBank === bank.code ? 'border-orange-500 bg-orange-50' : 'hover:bg-gray-50'}`}
+                                    >
+                                        <img src={bank.logo} className="w-10 h-10 object-contain" />
+
+                                        <div className="flex-1">
+                                            <p className="font-semibold">{bank.shortName}</p>
+
+                                            <p className="text-sm text-gray-500">{bank.name}</p>
+                                        </div>
+
+                                        {selectedBank === bank.code && (
+                                            <div className="w-4 h-4 rounded-full bg-orange-500" />
+                                        )}
+                                    </div>
+                                ))}
+                        </div>
+
+                        <div className="flex gap-3 mt-5">
+                            <button
+                                onClick={() => {
+                                    setShowBankModal(false);
+                                }}
+                                className="flex-1 bg-gray-300 py-2 rounded-lg"
+                            >
+                                Hủy
+                            </button>
+
+                            <button
+                                disabled={!selectedBank}
+                                onClick={handlePaymentDebt}
+                                className="flex-1 bg-green-600 text-white py-2 rounded-lg disabled:opacity-50"
+                            >
+                                Thanh toán
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

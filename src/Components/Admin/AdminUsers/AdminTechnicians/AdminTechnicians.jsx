@@ -4,7 +4,8 @@ import { EyeIcon, Plus, X } from 'lucide-react';
 import getCookie from '../../../../utils/getToken';
 import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
-import {API_BASE_URL} from '../../../../utils/api.js';
+import { API_BASE_URL } from '../../../../utils/api.js';
+import AddTechnicianModal from '../../AddTechnicianModal/AddTechnicianModal.jsx';
 
 const formatDateTime = (arr) => {
     if (!arr || arr.length < 6) return '';
@@ -40,6 +41,8 @@ export default function AdminTechnicians() {
     const [showDetail, setShowDetail] = useState(false);
     const [detailData, setDetailData] = useState(null);
     const [loadingDetail, setLoadingDetail] = useState(false);
+
+    const [showAddModal, setShowAddModal] = useState(false);
 
     const fetchTechnicians = async (page = 1) => {
         try {
@@ -102,7 +105,7 @@ export default function AdminTechnicians() {
                 />
 
                 <button
-                    onClick={() => alert('TODO: Open add modal')}
+                    onClick={() => setShowAddModal(true)}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold bg-orange-500 text-white"
                 >
                     <Plus size={18} />
@@ -411,6 +414,11 @@ export default function AdminTechnicians() {
                     </div>
                 </div>
             )}
+            <AddTechnicianModal
+                show={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                onSuccess={() => fetchTechnicians(currentPage)}
+            />
         </div>
     );
 }

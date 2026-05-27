@@ -27,25 +27,20 @@ export default function RequestPage() {
     }, [navigate]);
 
     useEffect(() => {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get('vnp_ResponseCode');
-        const txnRef = params.get('vnp_TxnRef');
+        const query = new URLSearchParams(window.location.search);
 
-        //Không phải redirect từ VNPAY → bỏ qua
-        if (!code || !txnRef) return;
+        const payment = query.get('payment');
 
-        if (code === '00') {
-            setTab('invoice');
-
-            fetch(`${API_BASE_URL}/payment-info/web/?vnp_ResponseCode=${code}&vnp_TxnRef=${txnRef}&appType=web`);
-
+        if (payment === 'success') {
             showToast('Thanh toán thành công', 'success');
-        } else {
-            showToast('Thanh toán không thành công', 'error');
         }
 
-        //Clear URL
-        window.history.replaceState({}, document.title, '/request');
+        if (payment === 'failed') {
+            showToast('Thanh toán thất bại', 'error');
+        }
+
+        // xóa query payment khỏi URL
+        window.history.replaceState({}, '', '/request');
     }, [showToast]);
 
     return (
