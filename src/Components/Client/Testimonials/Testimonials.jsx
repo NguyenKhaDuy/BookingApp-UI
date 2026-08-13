@@ -18,13 +18,6 @@ export default function Testimonials() {
             .catch((err) => console.error('Fetch ratings error:', err));
     }, []);
 
-
-    const formatDate = (arr) => {
-        if (!arr || arr.length < 3) return '';
-        const [y, m, d] = arr;
-        return `${d}/${m}/${y}`;
-    };
-
     return (
         <section className="py-24 bg-gray-50" id="testimonials">
             <div className="max-w-7xl mx-auto px-6 text-center">
@@ -64,7 +57,7 @@ export default function Testimonials() {
                             <h4 className="font-semibold text-gray-900">{item.full_name}</h4>
 
                             {/* Date */}
-                            <span className="text-sm text-gray-500">{formatDate(item.created_at)}</span>
+                            <span className="text-sm text-gray-500">{item.created_at}</span>
                         </motion.div>
                     ))}
                 </div>

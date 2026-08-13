@@ -4,7 +4,6 @@ import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function StatusManager() {
@@ -168,7 +167,7 @@ export default function StatusManager() {
                                         <td className="p-3">{item.id_status}</td>
                                         <td className="p-3 font-medium">{item.nameStatus}</td>
                                         <td className="p-3">{item.description || '-'}</td>
-                                        <td className="p-3">{formatDateTimeArray(item.created_at) || '-'}</td>
+                                        <td className="p-3">{item.created_at || '-'}</td>
                                         <td className="p-3 flex gap-2">
                                             <button
                                                 onClick={() => openEdit(item)}

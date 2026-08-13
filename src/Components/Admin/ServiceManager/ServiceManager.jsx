@@ -4,7 +4,6 @@ import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function ServiceManager() {
@@ -23,6 +22,9 @@ export default function ServiceManager() {
     const [totalPages, setTotalPages] = useState(0);
 
     const token = getCookie('token');
+
+    const [icon, setIcon] = useState(null);
+    const [preview, setPreview] = useState('');
 
     // LOAD DATA
     const loadData = async (p = 0) => {
@@ -48,17 +50,38 @@ export default function ServiceManager() {
     }, []);
 
     // OPEN ADD
-    const openAdd = () => {
-        setEditData(null);
-        setServiceName('');
-        setModalOpen(true);
-    };
+   const openAdd = () => {
+       setEditData(null);
+       setServiceName('');
+       setIcon(null);
+       setPreview('');
+       setModalOpen(true);
+   };
 
     // OPEN EDIT
     const openEdit = (item) => {
         setEditData(item);
         setServiceName(item.name_service);
+
+        setIcon(null);
+
+        if (item.iconBase64) {
+            setPreview(`data:image/png;base64,${item.iconBase64}`);
+        } else {
+            setPreview('');
+        }
+
         setModalOpen(true);
+    };
+
+    const handleSelectImage = (e) => {
+        const file = e.target.files[0];
+
+        if (!file) return;
+
+        setIcon(file);
+
+        setPreview(URL.createObjectURL(file));
     };
 
     // SAVE
@@ -71,25 +94,35 @@ export default function ServiceManager() {
         try {
             setLoading(true);
 
-            const payload = {
-                id_service: editData?.id_service,
-                name_service: serviceName,
-            };
+            const formData = new FormData();
+
+            if (editData) {
+                formData.append('id_service', editData.id_service);
+            }
+
+            formData.append('name_service', serviceName);
+
+            // chỉ gửi khi người dùng chọn ảnh mới
+            if (icon) {
+                formData.append('icon', icon);
+            }
 
             await axios({
                 method: editData ? 'put' : 'post',
-                url: '${API_BASE_URL}/admin/service/',
-                data: payload,
+                url: `${API_BASE_URL}/admin/service/`,
+                data: formData,
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data',
                 },
             });
 
             showToast(editData ? 'Cập nhật thành công!' : 'Thêm mới thành công!', 'success');
+
             setModalOpen(false);
             loadData(page);
         } catch (err) {
-            console.error(err);
+            console.log(err);
             showToast('Lưu thất bại!', 'error');
         } finally {
             setLoading(false);
@@ -145,6 +178,7 @@ export default function ServiceManager() {
                         <thead className="bg-gray-50 text-gray-700">
                             <tr>
                                 <th className="p-3">#</th>
+                                <th className="p-3">Ảnh</th>
                                 <th className="p-3">Tên dịch vụ</th>
                                 <th className="p-3">Ngày tạo</th>
                                 <th className="p-3">Thao tác</th>
@@ -167,8 +201,19 @@ export default function ServiceManager() {
                                 services.map((item, index) => (
                                     <tr key={item.id_service} className="border-b hover:bg-gray-50">
                                         <td className="p-3">{page * 5 + index + 1}</td>
-                                        <td className="p-3 font-medium">{item.name_service}</td>
-                                        <td className="p-3">{formatDateTimeArray(item.created_at) || '-'}</td>
+                                        <td className="p-3">
+                                            {item.icon ? (
+                                                <img
+                                                    src={`data:image/png;base64,${item.icon}`}
+                                                    className="w-12 h-12 rounded object-cover border"
+                                                    alt=""
+                                                />
+                                            ) : (
+                                                '-'
+                                            )}
+                                        </td>
+                                        <td className="p-3 font-medium">{item.nameService}</td>
+                                        <td className="p-3">{item.created_at || '-'}</td>
                                         <td className="p-3 flex gap-2">
                                             <button
                                                 onClick={() => openEdit(item)}
@@ -234,6 +279,14 @@ export default function ServiceManager() {
                             value={serviceName}
                             onChange={(e) => setServiceName(e.target.value)}
                         />
+
+                        <div className="mt-4">
+                            {preview && (
+                                <img src={preview} alt="" className="w-28 h-28 object-cover rounded-lg border mb-3" />
+                            )}
+
+                            <input type="file" accept="image/*" onChange={handleSelectImage} />
+                        </div>
 
                         <div className="flex justify-end gap-2 mt-4">
                             <button onClick={() => setModalOpen(false)} className="px-4 py-2 border rounded-lg">

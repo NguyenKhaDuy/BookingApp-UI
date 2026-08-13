@@ -12,9 +12,6 @@ export default function ServiceManager() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
 
-    // =========================
-    // GET TECHNICIAN ID
-    // =========================
     const getTechnicianId = () => {
         const localUser = localStorage.getItem('user');
         if (!localUser) return null;
@@ -33,7 +30,7 @@ export default function ServiceManager() {
                 if (res.data) {
                     const list = res.data.map((s) => ({
                         id: s.id_service,
-                        name: s.name_service,
+                        name: s.nameService,
                     }));
 
                     setAllServices(list);
@@ -60,7 +57,7 @@ export default function ServiceManager() {
             if (json.data) {
                 const list = json.data.map((s) => ({
                     id: s.id_service,
-                    name: s.name_service,
+                    name: s.nameService,
                 }));
 
                 setTechServices(list);
@@ -159,6 +156,7 @@ export default function ServiceManager() {
             setLoading(false);
         }
     };
+
 
     return (
         <div className="max-w-4xl">

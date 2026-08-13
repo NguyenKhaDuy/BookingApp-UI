@@ -8,7 +8,6 @@ import { UserContext } from '../../../Context/UserContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { API_BASE_URL } from '../../../utils/api';
-import { type } from '@testing-library/user-event/dist/type';
 
 export default function ProfilePassword({ profile }) {
     const [loading, setLoading] = useState(false);
@@ -22,7 +21,7 @@ export default function ProfilePassword({ profile }) {
 
     const isValid = oldPassword && newPassword && confirmPassword && newPassword === confirmPassword;
 
-    /* ================= SEND OTP ================= */
+    /*  SEND OTP  */
     const handleSendOtp = async () => {
         try {
             const token = getCookie('token');
@@ -55,7 +54,7 @@ export default function ProfilePassword({ profile }) {
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
-    /* ================= VERIFY OTP ================= */
+    /*  VERIFY OTP  */
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
@@ -88,7 +87,7 @@ export default function ProfilePassword({ profile }) {
         }
     };
 
-    /* ================= RENDER ================= */
+    /*  RENDER  */
     if (step === 2) {
         return <OtpForm email={profile.email} onVerify={verifyOtp} />;
     }

@@ -12,11 +12,9 @@ import RequestPage from './Pages/Client/RequestPage/RequestPage';
 import ForgotPassword from './Pages/Client/ForgotPasswordPage/ForgotPasswordPage';
 import BookingPage from './Pages/Client/BookingPage/BookingPage';
 import ContactPage from './Pages/Client/ContactPage/ContactPage';
-import AdminHome from './Pages/Admin/AdminHome/AdminHome';
 import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
 import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
-import TechnicianHome from './Pages/Technician/TechnicianHome/TechnicianHome'
 import PaymentSuccess from './Pages/PaymentSuccess/PaymentSuccess'
 import { WebSocketProvider } from './Context/WebSocketProvider';
 function App() {
@@ -24,7 +22,7 @@ function App() {
         <WebSocketProvider>
             <BrowserRouter>
                 <Routes>
-                    {/* ================= CLIENT LAYOUT ================= */}
+                    {/*  CLIENT LAYOUT  */}
                     <Route element={<ClientLayout />}>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/notification/detail" element={<Notification />} />
@@ -42,13 +40,11 @@ function App() {
                         <Route path="/payment-success" element={<PaymentSuccess />} />
                     </Route>
 
-                    {/* ================= ADMIN LAYOUT ================= */}
+                    {/*  ADMIN LAYOUT  */}
                     <Route path="/admin/home" element={<DashboardLayout />} />
-                    {/* <Route path="/admin/home" element={<AdminHome />} /> */}
-                    {/* <Route path="/admin/users" element={<AdminCustomer />} /> */}
-                    {/* </Route> */}
+                    
 
-                    {/* ================= TECHNICIAN LAYOUT ================= */}
+                    {/*  TECHNICIAN LAYOUT  */}
                     <Route path="/technician/home" element={<TechnicianLayout />} />
                 </Routes>
             </BrowserRouter>

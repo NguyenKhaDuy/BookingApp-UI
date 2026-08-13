@@ -77,7 +77,7 @@ export default function Services() {
                                 {service.icon && (
                                     <img
                                         src={getImageSrc(service.icon)}
-                                        alt={service.name_service}
+                                        alt={service.nameService}
                                         className="w-16 h-16 object-contain
                                                    transition-transform duration-300
                                                    group-hover:scale-110"
@@ -85,7 +85,7 @@ export default function Services() {
                                 )}
 
                                 <h3 className="text-2xl font-extrabold text-gray-900 text-center group-hover:text-orange-700 transition">
-                                    {service.name_service}
+                                    {service.nameService}
                                 </h3>
                             </div>
 

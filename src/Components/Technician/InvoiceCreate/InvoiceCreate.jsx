@@ -12,14 +12,14 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
     const [laborCost, setLaborCost] = useState(0);
     const [loading, setLoading] = useState(false);
     
-    /* ===== PAYMENT ===== */
+    /*  PAYMENT  */
     const [paymentMethods, setPaymentMethods] = useState([]);
     const [paymentMethodId, setPaymentMethodId] = useState('');
 
     const { showToast } = useToast();
     const token = getCookie('token');
 
-    /* ================== LOAD PAYMENT METHOD ================== */
+    /*  LOAD PAYMENT METHOD  */
     useEffect(() => {
         fetchPaymentMethods();
     }, []);
@@ -42,7 +42,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
         }
     };
 
-    /* ================== MATERIAL ================== */
+    /*  MATERIAL  */
     const addItem = () => setItems([...items, { name: '', quantity: 1, price: 0 }]);
     const removeItem = (i) => setItems(items.filter((_, idx) => idx !== i));
 
@@ -52,11 +52,11 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
         setItems(updated);
     };
 
-    /* ================== TOTAL ================== */
+    /*  TOTAL  */
     const totalMaterial = items.reduce((s, it) => s + it.quantity * it.price, 0);
     const total = totalMaterial + Number(laborCost || 0);
 
-    /* ================== API CREATE ================== */
+    /*  API CREATE  */
     const createInvoice = async () => {
         try {
             if (!paymentMethodId) {
@@ -71,7 +71,6 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
 
             setLoading(true);
 
-            // ===== MATERIAL DETAILS =====
             const detailInvoiceDTOS = items.map((it) => ({
                 name: it.name,
                 quantity: it.quantity,
@@ -79,7 +78,6 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
                 total_price: it.quantity * it.price,
             }));
 
-            // ===== ADD LABOR COST AS DETAIL =====
             if (Number(laborCost) > 0) {
                 detailInvoiceDTOS.push({
                     name: 'Công thợ',
@@ -134,7 +132,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
                     <span className="text-orange-600 font-semibold"> #{orderId}</span>
                 </div>
 
-                {/* ======= BODY ======= */}
+                {/*  BODY  */}
                 <div className="overflow-y-auto max-h-[70vh] pr-2">
                     {/* Payment method */}
                     <div className="mb-6">
@@ -218,7 +216,7 @@ export default function InvoiceCreate({customer, orderId, onClose, onSuccess }) 
                     </div>
                 </div>
 
-                {/* ======= FOOTER ======= */}
+                {/*  FOOTER  */}
                 <button
                     disabled={loading || paid}
                     onClick={createInvoice}

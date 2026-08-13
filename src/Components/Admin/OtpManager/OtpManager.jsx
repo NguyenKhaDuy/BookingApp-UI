@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { User, Mail, ChevronLeft, ChevronRight, KeyRound } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
 import { API_BASE_URL } from '../../../utils/api.js';
@@ -38,9 +37,6 @@ export default function OtpManager() {
 
             setList(json.data || []);
             setTotalPages(json.total_page || 0);
-
-            // ❌ KHÔNG setPage ở đây nữa (tránh loop)
-
             setSelectedIds([]);
         } catch (err) {
             console.error('FETCH OTP ERROR:', err);
@@ -179,8 +175,8 @@ export default function OtpManager() {
                                         </span>
                                     </td>
 
-                                    <td className="px-4 py-3 text-gray-700">{formatDateTimeArray(item.expires_at)}</td>
-                                    <td className="px-4 py-3 text-gray-700">{formatDateTimeArray(item.created_at)}</td>
+                                    <td className="px-4 py-3 text-gray-700">{item.expires_at}</td>
+                                    <td className="px-4 py-3 text-gray-700">{item.created_at}</td>
                                 </tr>
                             ))}
 

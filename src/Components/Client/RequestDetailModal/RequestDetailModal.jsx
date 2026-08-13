@@ -2,7 +2,8 @@ import { X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
-import {API_BASE_URL} from '../../../utils/api'
+import { API_BASE_URL } from '../../../utils/api'
+import { formatScheduleDateTime } from '../../../utils/formatDate';
 
 export default function RequestDetailModal({ open, requestId, onClose }) {
     const [data, setData] = useState(null);
@@ -34,8 +35,8 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
     if (!open) return null;
 
     const customer = data?.customer;
-    const technician = data?.technicicanDTO; // ✅ đúng BE
-    const images = data?.image_request || []; // ✅ đúng BE
+    const technician = data?.technicicanDTO; 
+    const images = data?.image_request || []; 
 
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -115,7 +116,7 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
 
                                     <div>
                                         <p className="font-semibold">{technician.full_name}</p>
-                                        <p className="text-sm text-gray-600">📞 {technician.phone_number}</p>
+                                        <p className="text-sm text-gray-600"> {technician.phone_number}</p>
                                         <p className="text-sm text-gray-500">
                                             Kinh nghiệm: {technician.experience_year} năm
                                         </p>
@@ -128,8 +129,7 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
                         <div>
                             <p className="font-medium">Thời gian:</p>
                             <p className="text-gray-700">
-                                {data.scheduled_date?.join('/')} &nbsp;
-                                {data.scheduled_time?.join(':')}
+                                {formatScheduleDateTime(data.scheduled_date, data.scheduled_time)}
                             </p>
                         </div>
 

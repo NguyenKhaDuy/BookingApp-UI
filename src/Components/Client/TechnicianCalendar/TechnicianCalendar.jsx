@@ -1,9 +1,3 @@
-import { useState } from 'react';
-
-/* ===== HELPER FUNCTIONS ===== */
-const formatTime = ([h, m]) => `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-
-const formatDate = ([y, m, d]) => `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y}`;
 export default function TechnicianCalendar({ schedules }) {
     return (
         <div className="bg-white rounded-3xl p-6 shadow-md">
@@ -11,9 +5,6 @@ export default function TechnicianCalendar({ schedules }) {
 
             <div className="space-y-4">
                 {schedules.map((s) => {
-                    const date = formatDate(s.date);
-                    const start = formatTime(s.time_start);
-                    const end = formatTime(s.time_end);
 
                     const isOvernight =
                         s.time_start[0] > s.time_end[0] ||
@@ -27,14 +18,14 @@ export default function TechnicianCalendar({ schedules }) {
                             {/* Date */}
                             <div>
                                 <p className="text-sm text-gray-500">Ngày</p>
-                                <p className="font-semibold">{date}</p>
+                                <p className="font-semibold">{s.date}</p>
                             </div>
 
                             {/* Time */}
                             <div>
                                 <p className="text-sm text-gray-500">Thời gian</p>
                                 <p className="font-semibold">
-                                    {start} – {end}
+                                    {s.time_start} – {s.time_end}
                                     {isOvernight && <span className="ml-2 text-xs text-orange-500">(qua đêm)</span>}
                                 </p>
                             </div>

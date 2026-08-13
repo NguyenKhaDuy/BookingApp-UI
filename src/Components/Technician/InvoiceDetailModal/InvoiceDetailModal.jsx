@@ -1,7 +1,6 @@
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { Package } from 'lucide-react';
-import formatDate from '../../../utils/formatDate';
 
 export default function InvoiceDetailModal({ invoice, onClose }) {
     if (!invoice) return null;
@@ -31,7 +30,7 @@ export default function InvoiceDetailModal({ invoice, onClose }) {
                     <p className="flex items-center">
                         Ngày thanh toán:
                         {invoice.paid_at ? (
-                            <span className="ml-2 font-medium text-gray-800">{formatDate(invoice.paid_at)}</span>
+                            <span className="ml-2 font-medium text-gray-800">{invoice.paid_at}</span>
                         ) : (
                             <span
                                 className="ml-2 px-2 py-1 rounded-full text-sm font-semibold

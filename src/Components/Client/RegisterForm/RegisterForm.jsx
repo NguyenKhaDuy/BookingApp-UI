@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import logo from '../../../assets/logo.png';
-import { User, Mail, Phone, Lock, MapPin, Calendar, Users } from 'lucide-react';
+import { User, Mail, Phone, Lock, MapPin} from 'lucide-react';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import {API_BASE_URL} from "../../../utils/api.js";
 export default function RegisterForm({ onRegisterSuccess }) {

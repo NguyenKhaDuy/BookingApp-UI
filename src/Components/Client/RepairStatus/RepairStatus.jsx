@@ -7,15 +7,9 @@ import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
+import { formatScheduleDateTime } from '../../../utils/formatDate.js';
 import { API_BASE_URL } from '../../../utils/api.js';
-
-/* ================= UTILS ================= */
-const formatDateTime = (dateArr, timeArr) => {
-    if (!dateArr || !timeArr) return '';
-    const [y, m, d] = dateArr;
-    const [h, min] = timeArr;
-    return `${d}/${m}/${y} ${h}:${String(min).padStart(2, '0')}`;
-};
+import { Wrench, FileText, MapPin, CalendarDays, UserRound } from 'lucide-react';
 
 export default function RepairStatusPage() {
     const [active, setActive] = useState('WAITING_FOR_TECHNICIAN');
@@ -34,7 +28,7 @@ export default function RepairStatusPage() {
 
     const hasCreatedRef = useRef(false);
 
-    /* ================= FETCH REQUESTS ================= */
+    /* FETCH REQUESTS */
     const fetchRequests = useCallback(async () => {
         try {
             setLoading(true);
@@ -62,12 +56,12 @@ export default function RepairStatusPage() {
         }
     }, [showToast]);
 
-    /* ================= LOAD FIRST TIME ================= */
+    /* LOAD FIRST TIME */
     useEffect(() => {
         fetchRequests();
     }, [fetchRequests]);
 
-    /* ================= CREATE REQUEST (RUN ONCE) ================= */
+    /* CREATE REQUEST */
     useEffect(() => {
         if (!formData) return;
         if (hasCreatedRef.current) return;
@@ -118,10 +112,10 @@ export default function RepairStatusPage() {
         createRequest();
     }, [formData, images, fetchRequests, navigate, location.pathname, showToast]);
 
-    /* ================= WEBSOCKET ================= */
+    /* WEBSOCKET */
     useEffect(() => {
         const unsubscribe = addWebSocketListener((msg) => {
-            showToast(`🔔 ${msg.title}\n${msg.body}`, 'success');
+            showToast(`${msg.title}\n${msg.body}`, 'success');
             fetchRequests();
         });
 
@@ -136,7 +130,7 @@ export default function RepairStatusPage() {
         return acc;
     }, {});
 
-    /* ================= STATUS LIST ================= */
+    /* STATUS LIST */
     const statusList = [
         {
             key: 'WAITING_FOR_TECHNICIAN',
@@ -165,14 +159,14 @@ export default function RepairStatusPage() {
         },
     ];
 
-    /* ================= FILTER (FIX SEARCHING) ================= */
+    /* FILTER (FIX SEARCHING) */
     const filteredRequests = requests.filter((r) =>
         active === 'WAITING_FOR_TECHNICIAN'
             ? r.status_code === 'WAITING_FOR_TECHNICIAN' || r.status_code === 'SEARCHING'
             : r.status_code === active,
     );
 
-    /* ================= CANCEL ================= */
+    /* CANCEL */
     const handleCancelRequest = async (id) => {
         try {
             const token = getCookie('token');
@@ -198,7 +192,7 @@ export default function RepairStatusPage() {
         }
     };
 
-    /* ================= UI ================= */
+    /* UI */
     return (
         <div className="max-w-6xl mx-auto mt-10 px-4 flex flex-col md:flex-row gap-6">
             {/* LEFT */}
@@ -222,7 +216,7 @@ export default function RepairStatusPage() {
                                 </span>
                             </div>
 
-                            {/* 🔢 Số lượng */}
+                            {/* Số lượng */}
                             {statusCountMap[s.key] > 0 && (
                                 <span
                                     className={`min-w-[28px] text-center text-sm font-semibold px-2 py-0.5 rounded-full
@@ -252,16 +246,46 @@ export default function RepairStatusPage() {
                 <div className="space-y-4">
                     {filteredRequests.map((item) => (
                         <div key={item.id_request} className="border p-4 rounded-lg flex justify-between items-center">
-                            <div>
-                                <p className="font-semibold text-lg">{item.name_service}</p>
-                                <p className="text-sm text-gray-500">{item.description}</p>
-                                <p className="text-sm text-gray-400">📍 {item.location}</p>
-                                <p className="text-sm text-gray-400">
-                                    🕒 {formatDateTime(item.scheduled_date, item.scheduled_time)}
-                                </p>
+                            <div className="space-y-2">
+                                {/* Tên dịch vụ */}
+                                <div className="flex items-center gap-2">
+                                    <Wrench size={19} className="text-orange-500 shrink-0" />
 
+                                    <p className="font-semibold text-lg">{item.name_service}</p>
+                                </div>
+
+                                {/* Mô tả */}
+                                <div className="flex items-start gap-2">
+                                    <FileText size={16} className="text-gray-400 mt-0.5 shrink-0" />
+
+                                    <p className="text-sm text-gray-500">{item.description}</p>
+                                </div>
+
+                                {/* Địa điểm */}
+                                <div className="flex items-center gap-2">
+                                    <MapPin size={16} className="text-gray-400 shrink-0" />
+
+                                    <p className="text-sm text-gray-400">{item.location}</p>
+                                </div>
+
+                                {/* Ngày giờ */}
+                                <div className="flex items-center gap-2">
+                                    <CalendarDays size={16} className="text-gray-400 shrink-0" />
+
+                                    <p className="text-sm text-gray-400">
+                                        {formatScheduleDateTime(item.scheduled_date, item.scheduled_time)}
+                                    </p>
+                                </div>
+
+                                {/* Kỹ thuật viên */}
                                 {item.name_techinician && (
-                                    <p className="text-sm mt-1">👨‍🔧 Thợ: {item.name_techinician}</p>
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <UserRound size={16} className="text-gray-500 shrink-0" />
+
+                                        <p className="text-sm text-gray-600">
+                                            Thợ: <span className="font-medium">{item.name_techinician}</span>
+                                        </p>
+                                    </div>
                                 )}
                             </div>
 
@@ -288,7 +312,7 @@ export default function RepairStatusPage() {
                                 )}
 
                                 <button
-                                    className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                                    className="w-24 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 whitespace-nowrap"
                                     onClick={() => {
                                         setRequestId(item.id_request);
                                         setShowModal(true);
@@ -299,7 +323,7 @@ export default function RepairStatusPage() {
 
                                 {item.status_code === 'COMPLETED' && (
                                     <button
-                                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                        className="w-24 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 whitespace-nowrap"
                                         onClick={() => {
                                             setSelected(item);
                                             setShowRating(true);

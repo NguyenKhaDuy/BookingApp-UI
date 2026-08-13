@@ -11,8 +11,6 @@ export default function RatingModal({ open, data, onClose }) {
     const [comment, setComment] = useState('');
     const { showToast } = useToast();
 
-    // console.log(data)
-
     if (!open || !data) return null;
 
     //HÀM GỌI API

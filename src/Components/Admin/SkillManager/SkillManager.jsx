@@ -4,7 +4,6 @@ import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import {API_BASE_URL} from '../../../utils/api';
 export default function SkillManager() {
     const [skills, setSkills] = useState([]);
@@ -72,7 +71,7 @@ export default function SkillManager() {
 
             await axios({
                 method: editData ? 'put' : 'post',
-                url: '${API_BASE_URL}/admin/skill/',
+                url: `${API_BASE_URL}/admin/skill/`,
                 data: payload,
                 headers: { Authorization: `Bearer ${token}` },
             });
@@ -157,7 +156,7 @@ export default function SkillManager() {
                                     <tr key={item.id_skill} className="border-b hover:bg-gray-50">
                                         <td className="p-3">{item.id_skill}</td>
                                         <td className="p-3 font-medium">{item.skill_name}</td>
-                                        <td className="p-3">{formatDateTimeArray(item.created_at) || '-'}</td>
+                                        <td className="p-3">{item.created_at || '-'}</td>
                                         <td className="p-3 flex gap-2">
                                             <button
                                                 onClick={() => openEdit(item)}

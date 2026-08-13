@@ -9,7 +9,7 @@ import SkillManager from '../../../Components/Technician/SkillManager/SkillManag
 import LocationManager from '../../../Components/Technician/LocationManager/LocationManager';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
-import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import TechnicianScheduleList from '../../../Components/Technician/TechnicianScheduleList/TechnicianScheduleList';
@@ -43,7 +43,7 @@ export default function TechnicianHome({ active }) {
         fetchUser();
     }, []);
 
-    // ===================== AUTH + WEBSOCKET =====================
+    //  AUTH + WEBSOCKET 
     useEffect(() => {
         const token = getCookie('token');
 
@@ -69,7 +69,7 @@ export default function TechnicianHome({ active }) {
 
         const unsubscribe = addWebSocketListener((msg) => {
             setNotification(msg);
-            if (msg.type === 'REQUEST_CANCEL') {
+            if (msg.type != 'REQUEST_CREATED') {
                 showToast(msg.body, 'success');
                 setOpen(false);
                 setNotification(null);
@@ -84,7 +84,7 @@ export default function TechnicianHome({ active }) {
         };
     }, [navigate]);
 
-    // ===================== COUNTDOWN 60s =====================
+    //  COUNTDOWN 60s 
     useEffect(() => {
         if (!notification) return;
 
@@ -112,7 +112,7 @@ export default function TechnicianHome({ active }) {
         return JSON.parse(localUser).id_user;
     };
 
-    // ===================== ACTIONS =====================
+    //  ACTIONS 
     const handleAccept = async () => {
         if (!notification) return;
         try {
@@ -204,7 +204,7 @@ export default function TechnicianHome({ active }) {
     }, []);
     return (
         <>
-            {/* ===== POPUP NOTIFICATION ===== */}
+            {/*  POPUP NOTIFICATION  */}
             {open && notification && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white w-[90%] max-w-md rounded-xl p-5 shadow-xl animate-fadeIn">
@@ -230,7 +230,7 @@ export default function TechnicianHome({ active }) {
                 </div>
             )}
 
-            {/* ===== MAIN CONTENT ===== */}
+            {/*  MAIN CONTENT  */}
             <div className="space-y-6">
                 {active === 'dashboard' && <TechnicianDashboard />}
                 {active === 'orders' && <RepairRequest />}

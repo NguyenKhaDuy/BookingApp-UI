@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
+import { FileText, UserRound, CalendarDays, Banknote } from 'lucide-react';
 import {API_BASE_URL} from '../../../utils/api.js';
 
 const formatDate = (date) => {
@@ -25,7 +26,7 @@ const formatDate = (date) => {
 export default function Invoice() {
     const { showToast } = useToast();
 
-    /* ================= STATE ================= */
+    /* STATE */
     const [status, setStatus] = useState('unpaid');
     const [invoices, setInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -42,7 +43,7 @@ export default function Invoice() {
     const [bankList, setBankList] = useState([]);
     const [loadingBank, setLoadingBank] = useState(false);
 
-    /* ================= FETCH INVOICES ================= */
+    /* FETCH INVOICES */
     const fetchInvoices = async () => {
         try {
             setLoading(true);
@@ -77,25 +78,25 @@ export default function Invoice() {
         fetchInvoices();
     }, [pageNo]);
 
-    /* ================= FILTER ================= */
+    /* FILTER */
     const filteredInvoices = invoices.filter((inv) =>
         status === 'paid' ? inv.name_status === 'PAID' : inv.name_status === 'UNPAID',
     );
 
-    /* ================= DETAIL ================= */
+    /* DETAIL */
     const openDetail = (invoice) => {
         setSelectedInvoice(invoice);
         setShowDetailModal(true);
     };
 
-    /* ================= PAYMENT ================= */
+    /* PAYMENT */
     const openPayment = (invoice) => {
         setPayInvoice(invoice);
         setSelectedBank('');
         setShowBankModal(true);
     };
 
-    /* ================= FETCH BANK ================= */
+    /* FETCH BANK */
     useEffect(() => {
         if (!showBankModal) return;
 
@@ -130,7 +131,7 @@ export default function Invoice() {
     }, [showBankModal, showToast]);
 
 
-    /* ================= PAY ================= */
+    /*  PAY  */
     const handlePayment = async () => {
         if (!payInvoice || !selectedBank) return;
 
@@ -165,7 +166,7 @@ export default function Invoice() {
     const paidCount = invoices.filter((i) => i.name_status === 'PAID').length;
 
 
-    /* ================= UI ================= */
+    /*  UI  */
     return (
         <div className="max-w-5xl mx-auto px-4 bg-white shadow rounded-2xl p-6 border">
             {/* FILTER */}
@@ -213,14 +214,37 @@ export default function Invoice() {
                         <div key={bill.id_invoices} className="border p-4 rounded-xl shadow-sm">
                             <div className="flex justify-between items-center">
                                 <div>
-                                    <h3 className="font-bold text-lg">Hóa đơn #{bill.id_invoices}</h3>
-                                    <p className="text-sm text-gray-500">Thợ: {bill.name_tech}</p>
-                                    <p className="text-sm text-gray-500">
-                                        Ngày thanh toán: {formatDate(bill.paid_at) || 'Chưa thanh toán'}
-                                    </p>
-                                    <p className="font-semibold text-orange-600 mt-1">
-                                        {bill.total_amount.toLocaleString()} đ
-                                    </p>
+                                    {/* Hóa đơn */}
+                                    <div className="flex items-center gap-2">
+                                        <FileText size={18} className="text-orange-500" />
+
+                                        <h3 className="font-bold text-lg">Hóa đơn #{bill.id_invoices}</h3>
+                                    </div>
+
+                                    {/* Thợ */}
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <UserRound size={16} className="text-gray-500" />
+
+                                        <p className="text-sm text-gray-500">Thợ: {bill.name_tech}</p>
+                                    </div>
+
+                                    {/* Ngày thanh toán */}
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <CalendarDays size={16} className="text-gray-500" />
+
+                                        <p className="text-sm text-gray-500">
+                                            Ngày thanh toán: {bill.paid_at || 'Chưa thanh toán'}
+                                        </p>
+                                    </div>
+
+                                    {/* Tổng tiền */}
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <Banknote size={18} className="text-orange-600" />
+
+                                        <p className="font-semibold text-orange-600">
+                                            {bill.total_amount.toLocaleString()} đ
+                                        </p>
+                                    </div>
                                 </div>
 
                                 {bill.name_status === 'PAID' ? (
@@ -272,7 +296,7 @@ export default function Invoice() {
                 </button>
             </div>
 
-            {/* ================= DETAIL MODAL ================= */}
+            {/* DETAIL MODAL */}
             {showDetailModal && selectedInvoice && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white max-w-lg w-full rounded-2xl p-6 shadow-xl">
@@ -347,7 +371,7 @@ export default function Invoice() {
                 </div>
             )}
 
-            {/* ================= BANK MODAL ================= */}
+            {/* BANK MODAL */}
             {showBankModal && payInvoice && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
                     <div className="bg-white max-w-md w-full rounded-xl p-6">

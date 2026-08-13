@@ -5,7 +5,6 @@ import {
     ClipboardList,
     FileText,
     User,
-    Receipt,
     Wrench,
     MapPin,
     LogOut,
@@ -44,7 +43,7 @@ export default function TechnicianSidebar({ active, setActive }) {
         { key: 'logout', label: 'Đăng xuất', icon: LogOut },
     ];
 
-    // ===== FETCH TOTAL UNREAD =====
+    // FETCH TOTAL UNREAD 
     const fetchTotalUnread = async () => {
         try {
             const user = JSON.parse(localStorage.getItem('user'));

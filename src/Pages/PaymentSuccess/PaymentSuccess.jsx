@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { API_BASE_URL } from '../../utils/api';
 
 const PaymentSuccess = () => {
     const location = useLocation();
@@ -10,31 +9,25 @@ const PaymentSuccess = () => {
     const [status, setStatus] = useState(null);
 
     useEffect(() => {
-        const verifyPayment = async () => {
-            try {
-                const res = await fetch(`${API_BASE_URL}/payment-info${location.search}`);
+        const params = new URLSearchParams(location.search);
+        const payment = params.get('payment');
 
-                if (!res.ok) throw new Error('Verify failed');
-                setStatus('success');
+        if (payment === 'success') {
+            setStatus('success');
+        } else if (payment === 'failed') {
+            setStatus('failed');
+        } else {
+            setStatus('error');
+        }
 
-                setTimeout(() => {
-                    navigate('/request?payment=success', { replace: true });
-                }, 2000);
-            } catch (err) {
-                console.error(err);
+        setLoading(false);
 
-                setStatus('error');
+        const timer = setTimeout(() => {
+            navigate('/request', { replace: true });
+        }, 2000);
 
-                setTimeout(() => {
-                    navigate('/request?payment=error', { replace: true });
-                }, 2000);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        verifyPayment();
-    }, []);
+        return () => clearTimeout(timer);
+    }, [location.search, navigate]);
 
     if (loading) {
         return (
@@ -49,22 +42,24 @@ const PaymentSuccess = () => {
             <div style={styles.card}>
                 {status === 'success' && (
                     <>
-                        <h1 style={{ color: 'green' }}>✅ Thanh toán thành công</h1>
-                        <p>Đang chuyển về trang hóa đơn...</p>
+                        <h1 style={{ color: 'green' }}>Thanh toán thành công</h1>
+                        <p>Giao dịch đã được thanh toán thành công.</p>
+                        <p>Đang chuyển về trang yêu cầu...</p>
                     </>
                 )}
 
-                {status === 'fail' && (
+                {status === 'failed' && (
                     <>
-                        <h1 style={{ color: 'red' }}>❌ Thanh toán thất bại</h1>
+                        <h1 style={{ color: 'red' }}>Thanh toán thất bại</h1>
+                        <p>Giao dịch chưa được thanh toán thành công.</p>
                         <p>Đang quay lại...</p>
                     </>
                 )}
 
                 {status === 'error' && (
                     <>
-                        <h1 style={{ color: 'orange' }}>⚠️ Lỗi xác thực</h1>
-                        <p>Vui lòng thử lại...</p>
+                        <h1 style={{ color: 'orange' }}>Không xác định được trạng thái</h1>
+                        <p>Vui lòng kiểm tra lại giao dịch.</p>
                     </>
                 )}
             </div>
@@ -80,6 +75,7 @@ const styles = {
         alignItems: 'center',
         background: '#f5f5f5',
     },
+
     card: {
         background: '#fff',
         padding: '30px',

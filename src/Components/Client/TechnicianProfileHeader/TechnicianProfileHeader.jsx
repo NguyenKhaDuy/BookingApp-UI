@@ -25,7 +25,6 @@ export default function TechnicianProfileHeader({ tech }) {
             />
 
             <h1 className="text-2xl font-bold mt-4">{tech.full_name || '—'}</h1>
-            <p className="text-gray-500">{tech.specialty || '—'}</p>
 
             {/* Rating */}
             <div className="flex items-center gap-1 mt-2">

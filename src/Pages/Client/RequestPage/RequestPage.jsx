@@ -1,12 +1,10 @@
 import React, { Fragment, useState, useEffect, useContext } from 'react';
 import RepairStatus from '../../../Components/Client/RepairStatus/RepairStatus';
-import RequestHeader from '../../../Components/Client/RequestHeader/RequestHeader';
 import Invoice from '../../../Components/Client/Invoice/Invoice';
 import { UserContext } from '../../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
-import { API_BASE_URL } from '../../../utils/api';
 export default function RequestPage() {
     const [tab, setTab] = useState('request');
     const { showToast } = useToast();
@@ -45,7 +43,6 @@ export default function RequestPage() {
 
     return (
         <Fragment>
-            <RequestHeader />
 
             {/* TAB SELECTOR */}
             <div className="max-w-6xl mx-auto px-4 mt-6">

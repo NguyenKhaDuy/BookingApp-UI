@@ -35,7 +35,7 @@ export default function LoginForm() {
 
             //LƯU USER INFO
             localStorage.setItem('user', JSON.stringify(res.data));
-            setUser(res.data); // cập nhật ngay UI Header
+            setUser(res.data);
 
             const roles = res.data.roles || [];
 
@@ -127,7 +127,7 @@ export default function LoginForm() {
                 <div className="flex-1 h-px bg-gray-300" />
             </div>
 
-            {/* 🔴 GOOGLE LOGIN BUTTON */}
+            {/*GOOGLE LOGIN BUTTON */}
             <button
                 type="button"
                 onClick={handleGoogleLogin}

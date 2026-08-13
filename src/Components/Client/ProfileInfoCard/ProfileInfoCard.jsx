@@ -2,20 +2,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
-import {API_BASE_URL} from "../../../utils/api.js";
-
-/* ================= FORMAT DOB ================= */
-const formatDobToInput = (dob) => {
-    if (!dob || dob.length < 3) return '';
-    const [year, month, day] = dob;
-    return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-};
-
-const formatDobToApi = (dateStr) => {
-    if (!dateStr) return null;
-    const [year, month, day] = dateStr.split('-');
-    return `${day}-${month}-${year}`; // dd-MM-yyyy
-};
+import { API_BASE_URL } from "../../../utils/api.js";
+import { formatDateForInput } from '../../../utils/formatDate.js';
 
 export default function ProfileInfo({ profile, onProfileUpdated }) {
     const [formData, setFormData] = useState({});
@@ -23,7 +11,8 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
 
-    /* ================= INIT FORM ================= */
+    console.log(profile)
+
     useEffect(() => {
         if (profile) {
             setFormData({
@@ -32,13 +21,12 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                 email: profile.email || '',
                 gender: profile.gender || '',
                 address: profile.address || '',
-                date_of_birth: formatDobToInput(profile.dob),
+                date_of_birth: formatDateForInput(profile.dob),
             });
             setIsDirty(false);
         }
     }, [profile]);
 
-    /* ================= CHECK CHANGE ================= */
     useEffect(() => {
         if (!profile) return;
 
@@ -47,12 +35,11 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
             formData.phone_number !== profile.phone_number ||
             formData.gender !== profile.gender ||
             formData.address !== profile.address ||
-            formData.date_of_birth !== formatDobToInput(profile.dob);
+            formData.date_of_birth !== formatDateForInput(profile.dob);
 
         setIsDirty(changed);
     }, [formData, profile]);
 
-    /* ================= HANDLE CHANGE ================= */
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
@@ -61,7 +48,6 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
         }));
     };
 
-    /* ================= SUBMIT ================= */
     const handleSubmit = async () => {
         if (!isDirty) return;
 
@@ -134,13 +120,39 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
 
                 <div>
                     <label className="text-sm text-gray-500">Ngày sinh</label>
-                    <input
-                        type="date"
-                        name="date_of_birth"
-                        value={formData.date_of_birth}
-                        onChange={handleChange}
-                        className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500"
-                    />
+
+                    <div className="relative">
+                        {/* Ô hiển thị DD/MM/YYYY */}
+                        <input
+                            type="text"
+                            value={formData.date_of_birth ? formData.date_of_birth.split('-').reverse().join('/') : ''}
+                            readOnly
+                            onClick={(e) => {
+                                const dateInput = e.currentTarget.nextElementSibling;
+
+                                if (dateInput?.showPicker) {
+                                    dateInput.showPicker();
+                                } else {
+                                    dateInput?.click();
+                                }
+                            }}
+                            placeholder="DD/MM/YYYY"
+                            className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500 cursor-pointer"
+                        />
+
+                        {/* Input date dùng để mở lịch */}
+                        <input
+                            type="date"
+                            value={formData.date_of_birth || ''}
+                            onChange={(e) => {
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    date_of_birth: e.target.value,
+                                }));
+                            }}
+                            className="absolute right-3 top-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                        />
+                    </div>
                 </div>
 
                 <div>
