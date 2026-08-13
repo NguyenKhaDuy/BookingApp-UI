@@ -1,6 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
 import getCookie from '../utils/getToken';
-import axios from 'axios';
 
 export const UserContext = createContext();
 
@@ -32,7 +31,6 @@ export function UserProvider({ children }) {
             setUser(null);
         }
 
-        // BẮT BUỘC
         setInitialized(true);
     }, []);
 

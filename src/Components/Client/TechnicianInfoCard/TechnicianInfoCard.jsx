@@ -11,7 +11,7 @@ export default function TechnicianInfoCard({ tech }) {
                     <strong>Giới tính:</strong> {tech.gender}
                 </p>
                 <p>
-                    <strong>Năm sinh:</strong> {tech?.dob ? `${tech.dob[2]}/${tech.dob[1]}/${tech.dob[0]}` : '—'}
+                    <strong>Năm sinh:</strong> {tech?.dob || '—'}
                 </p>
                 <p>
                     <strong>Khu vực làm việc:</strong> {tech.working_area}

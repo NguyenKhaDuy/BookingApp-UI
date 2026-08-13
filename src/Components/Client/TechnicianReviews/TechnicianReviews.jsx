@@ -1,11 +1,4 @@
-const formatDateTime = (arr) => {
-    if (!Array.isArray(arr)) return '';
-
-    const [year, month, day, hour, minute] = arr;
-
-    return `${day}/${month}/${year} ${hour}:${minute.toString().padStart(2, '0')}`;
-};
-
+import { Star } from 'lucide-react';
 export default function TechnicianRatings({ ratings }) {
     const maxStars = 5;
 
@@ -36,17 +29,19 @@ export default function TechnicianRatings({ ratings }) {
 
                                 <div className="flex items-center gap-3">
                                     {/* Thời gian */}
-                                    <span className="text-xs text-gray-400">{formatDateTime(rating.created_at)}</span>
+                                    <span className="text-xs text-gray-400">{rating.created_at}</span>
 
                                     {/* Stars */}
                                     <div className="flex">
                                         {[...Array(maxStars)].map((_, index) => (
-                                            <span
+                                            <Star
                                                 key={index}
-                                                className={index < rating.stars ? 'text-yellow-500' : 'text-gray-300'}
-                                            >
-                                                ★
-                                            </span>
+                                                className={`w-5 h-5 ${
+                                                    index < rating.stars
+                                                        ? 'text-yellow-500 fill-yellow-500'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            />
                                         ))}
                                     </div>
                                 </div>

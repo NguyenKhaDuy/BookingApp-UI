@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import { ProfileSidebar } from '../../../Components/Client/SidebarProfile/SidebarProfile';
 import { ProfileMobileTabs } from '../../../Components/Client/ProfileMobileTabs/ProfileMobileTabs';
 import ProfileInfo from '../../../Components/Client/ProfileInfoCard/ProfileInfoCard';
@@ -22,7 +21,7 @@ export default function ProfilePage() {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    /* ================= FETCH PROFILE ================= */
+    /*  FETCH PROFILE  */
     const fetchProfile = useCallback(async () => {
         const token = getCookie('token');
 
@@ -44,7 +43,7 @@ export default function ProfilePage() {
         }
     }, [user?.id_user]);
 
-    /* ================= CHECK LOGIN ================= */
+    /*  CHECK LOGIN  */
     useEffect(() => {
         if (!initialized) return;
 
@@ -62,14 +61,14 @@ export default function ProfilePage() {
         setLoading(false);
     }, [initialized, user, navigate]);
 
-    /* ================= FETCH DATA ================= */
+    /*  FETCH DATA  */
     useEffect(() => {
         if (!loading) {
             fetchProfile();
         }
     }, [loading, fetchProfile]);
 
-    /* ================= LOADING ================= */
+    /*  LOADING  */
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center text-white">
@@ -78,7 +77,7 @@ export default function ProfilePage() {
         );
     }
 
-    /* ================= UI ================= */
+    /*  UI  */
     return (
         <div className="container mx-auto px-4 pt-24 pb-10 flex gap-6">
             {/* Sidebar */}

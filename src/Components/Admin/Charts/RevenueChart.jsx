@@ -112,18 +112,47 @@ export default function RevenueChart() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 items-center mb-8">
                     {mode === 'DAY' && (
                         <>
-                            <input
-                                type="date"
-                                value={dateFrom}
-                                onChange={(e) => setDateFrom(e.target.value)}
-                                className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 focus:border-orange-500"
-                            />
-                            <input
-                                type="date"
-                                value={dateTo}
-                                onChange={(e) => setDateTo(e.target.value)}
-                                className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 focus:border-orange-500"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={dateFrom ? dateFrom.split('-').reverse().join('/') : ''}
+                                    readOnly
+                                    placeholder="DD/MM/YYYY"
+                                    onClick={(e) => {
+                                        const dateInput = e.currentTarget.nextElementSibling;
+                                        dateInput?.showPicker?.();
+                                    }}
+                                    className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 focus:border-orange-500 cursor-pointer"
+                                />
+
+                                <input
+                                    type="date"
+                                    value={dateFrom}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={dateTo ? dateTo.split('-').reverse().join('/') : ''}
+                                    readOnly
+                                    placeholder="DD/MM/YYYY"
+                                    onClick={(e) => {
+                                        const dateInput = e.currentTarget.nextElementSibling;
+                                        dateInput?.showPicker?.();
+                                    }}
+                                    className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 focus:border-orange-500 cursor-pointer"
+                                />
+
+                                <input
+                                    type="date"
+                                    value={dateTo}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                                />
+                            </div>
                         </>
                     )}
 

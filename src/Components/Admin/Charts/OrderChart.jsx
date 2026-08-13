@@ -105,18 +105,45 @@ export default function OrderChart() {
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-4 items-center mb-8">
                     {mode === 'DAY' && (
                         <>
-                            <input
-                                type="date"
-                                value={dateFrom}
-                                onChange={(e) => setDateFrom(e.target.value)}
-                                className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100"
-                            />
-                            <input
-                                type="date"
-                                value={dateTo}
-                                onChange={(e) => setDateTo(e.target.value)}
-                                className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100"
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={dateFrom ? dateFrom.split('-').reverse().join('/') : ''}
+                                    placeholder="DD/MM/YYYY"
+                                    readOnly
+                                    onClick={(e) => {
+                                        e.currentTarget.nextElementSibling?.showPicker?.();
+                                    }}
+                                    className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 cursor-pointer"
+                                />
+
+                                <input
+                                    type="date"
+                                    value={dateFrom || ''}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                    className="absolute opacity-0 w-0 h-0"
+                                />
+                            </div>
+
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    value={dateTo ? dateTo.split('-').reverse().join('/') : ''}
+                                    placeholder="DD/MM/YYYY"
+                                    readOnly
+                                    onClick={(e) => {
+                                        e.currentTarget.nextElementSibling?.showPicker?.();
+                                    }}
+                                    className="px-3 py-2 bg-white/15 border border-orange-500/20 rounded-xl text-gray-100 cursor-pointer"
+                                />
+
+                                <input
+                                    type="date"
+                                    value={dateTo || ''}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                    className="absolute opacity-0 w-0 h-0"
+                                />
+                            </div>
                         </>
                     )}
 

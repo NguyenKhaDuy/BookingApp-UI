@@ -5,20 +5,6 @@ import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
 import {API_BASE_URL} from '../../../../utils/api';
 
-const formatDateTime = (arr) => {
-    if (!arr || arr.length < 6) return '';
-    const [year, month, day, hour, minute, second] = arr;
-    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year} ${hour
-        .toString()
-        .padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
-};
-
-const formatDate = (arr) => {
-    if (!arr || arr.length < 3) return '';
-    const [year, month, day] = arr;
-    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-};
-
 export default function AdminCustomer() {
     const [query, setQuery] = useState('');
     const [customers, setCustomers] = useState([]);
@@ -246,7 +232,7 @@ export default function AdminCustomer() {
 
                                     <div>
                                         <p className="text-gray-500">Ngày sinh</p>
-                                        <p className="font-medium">{formatDate(detail.dob) || '-'}</p>
+                                        <p className="font-medium">{detail.dob || '-'}</p>
                                     </div>
 
                                     <div className="col-span-2">
@@ -256,12 +242,12 @@ export default function AdminCustomer() {
 
                                     <div>
                                         <p className="text-gray-500">Ngày tạo</p>
-                                        <p className="font-medium">{formatDateTime(detail.created_at)}</p>
+                                        <p className="font-medium">{detail.created_at}</p>
                                     </div>
 
                                     <div>
                                         <p className="text-gray-500">Ngày cập nhật</p>
-                                        <p className="font-medium">{formatDateTime(detail.updated_at)}</p>
+                                        <p className="font-medium">{detail.updated_at}</p>
                                     </div>
 
                                     <div className="col-span-2">

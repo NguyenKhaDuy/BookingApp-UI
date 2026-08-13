@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import { useToast } from '../../../Context/ToastContext';
 import {API_BASE_URL} from '../../../utils/api.js';
 export default function ManageLevel() {
@@ -167,8 +166,8 @@ export default function ManageLevel() {
                                     <td className="px-6 py-3">{lv.id_level}</td>
                                     <td className="px-6 py-3 font-medium">{lv.level}</td>
                                     <td className="px-6 py-3">{lv.description}</td>
-                                    <td className="px-6 py-3">{formatDateTimeArray(lv.created_at)}</td>
-                                    <td className="px-6 py-3">{formatDateTimeArray(lv.updated_at)}</td>
+                                    <td className="px-6 py-3">{lv.created_at}</td>
+                                    <td className="px-6 py-3">{lv.updated_at}</td>
                                     <td className="px-6 py-3 flex items-center justify-center gap-3">
                                         <button
                                             onClick={() => handleEdit(lv)}

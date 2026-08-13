@@ -20,7 +20,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
 
     const isValid = email && confirmEmail && email === confirmEmail && email !== profile?.email;
 
-    /* ================= SEND OTP ================= */
+    /*  SEND OTP  */
     const handleSendOtp = async () => {
         setLoading(true);
         try {
@@ -55,7 +55,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
-    /* ================= VERIFY OTP ================= */
+    /*  VERIFY OTP  */
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
@@ -93,7 +93,7 @@ export default function ProfileEmail({ profile, onEmailUpdated }) {
         }
     };
 
-    /* ================= RENDER ================= */
+    /*  RENDER  */
     if (step === 2) {
         return <OtpForm email={profile.email} onVerify={verifyOtp} />;
     }

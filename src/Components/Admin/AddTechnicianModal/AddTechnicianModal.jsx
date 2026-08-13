@@ -144,14 +144,46 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
                             onChange={handleChange}
                         />
 
-                        <input
-                            type="date"
-                            name="dob"
-                            value={form.dob}
-                            onChange={handleChange}
-                            className="w-full p-3 border rounded-lg focus:border-orange-500 focus:ring-2 focus:ring-orange-300 outline-none transition
-                        required"
-                        />
+                        <div className="relative">
+                            {/* Ô hiển thị DD/MM/YYYY */}
+                            <input
+                                type="text"
+                                name="dob_display"
+                                value={form.dob ? form.dob.split('-').reverse().join('/') : ''}
+                                placeholder="DD/MM/YYYY"
+                                readOnly
+                                onClick={(e) => {
+                                    const dateInput = e.currentTarget.nextElementSibling;
+
+                                    if (dateInput?.showPicker) {
+                                        dateInput.showPicker();
+                                    } else {
+                                        dateInput?.click();
+                                    }
+                                }}
+                                className="w-full p-3 border rounded-lg 
+                   focus:border-orange-500 
+                   focus:ring-2 focus:ring-orange-300 
+                   outline-none transition cursor-pointer"
+                            />
+
+                            {/* Input thật để chọn ngày */}
+                            <input
+                                type="date"
+                                value={form.dob || ''}
+                                onChange={(e) => {
+                                    const selectedDate = e.target.value;
+
+                                    setForm((prev) => ({
+                                        ...prev,
+                                        dob: selectedDate,
+                                    }));
+                                }}
+                                className="absolute right-3 top-1/2 
+                   -translate-y-1/2 opacity-0 
+                   w-8 h-8 cursor-pointer"
+                            />
+                        </div>
 
                         <select
                             name="gender"

@@ -1,20 +1,18 @@
 import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import TechnicianProfileHeader from '../../../Components/Client/TechnicianProfileHeader/TechnicianProfileHeader';
 import TechnicianInfoCard from '../../../Components/Client/TechnicianInfoCard/TechnicianInfoCard';
 import TechnicianSkills from '../../../Components/Client/TechnicianSkills/TechnicianSkills';
 import TechnicianReviews from '../../../Components/Client/TechnicianReviews/TechnicianReviews';
 import TechnicianCalendar from '../../../Components/Client/TechnicianCalendar/TechnicianCalendar';
 import TechnicianMap from '../../../Components/Client/TechnicianMap/TechnicianMap';
-import TechnicianActionBar from '../../../Components/Client/TechnicianActionBar/TechnicianActionBar';
 import TechnicianService from '../../../Components/Client/TechnicianService/TechnicianService';
 import {API_BASE_URL} from '../../../utils/api'
 
 export default function TechnicianDetailPage() {
     const { id_user } = useParams();
-    console.log(id_user);
     const [techData, setTechData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -35,7 +33,9 @@ export default function TechnicianDetailPage() {
             });
     }, [id_user]);
 
-    if (loading) return <div>Đang tải dữ liệu...</div>;
+    console.log(techData)
+
+    if (loading) return <LoadingOverlay show={loading}/>;
     if (error) return <div className="text-red-500">{error}</div>;
 
     return (
@@ -43,11 +43,10 @@ export default function TechnicianDetailPage() {
             <TechnicianProfileHeader tech={techData} />
             <TechnicianInfoCard tech={techData} />
             <TechnicianSkills skills={techData.nameSkillTechnician || []} />
-            <TechnicianService services={techData.nameServiceTechnician || []} />
+            <TechnicianService services={techData.technicianServiceDTOS || []} />
             <TechnicianCalendar schedules={techData.technicianScheduleDTOS} />
-            <TechnicianMap />
+            <TechnicianMap locations={techData.locationTechnicianDTOS || []} />
             <TechnicianReviews ratings={techData.ratingDTOS || []} />
-            <TechnicianActionBar phone={techData.phone} />
         </div>
     );
 }

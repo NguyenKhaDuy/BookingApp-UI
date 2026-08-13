@@ -1,40 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { EyeIcon, Plus, X } from 'lucide-react';
+import { EyeIcon, Plus, X, Trash2 } from 'lucide-react';
 import getCookie from '../../../../utils/getToken';
 import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { API_BASE_URL } from '../../../../utils/api.js';
 import AddTechnicianModal from '../../AddTechnicianModal/AddTechnicianModal.jsx';
-
-const formatDateTime = (arr) => {
-    if (!arr || arr.length < 6) return '';
-    const [year, month, day, hour, minute, second] = arr;
-    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year} ${hour
-        .toString()
-        .padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`;
-};
-
-const formatDate = (arr) => {
-    if (!arr || arr.length < 3) return '';
-    const [year, month, day] = arr;
-    return `${day.toString().padStart(2, '0')}/${month.toString().padStart(2, '0')}/${year}`;
-};
-
-const formatTime = (arr) => {
-    if (!arr || !Array.isArray(arr) || arr.length < 2) return 'N/A';
-    const [h, m] = arr;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-};
+import { useToast } from '../../../../Context/ToastContext.jsx';
 
 export default function AdminTechnicians() {
     const [query, setQuery] = useState('');
     const [technicians, setTechnicians] = useState([]);
     const token = getCookie('token');
-
+    const { showToast } = useToast();
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [technicianDelete, setTechnicianDelete] = useState(null);
     const [loading, setLoading] = useState(false);
 
     // MODAL DETAIL
@@ -75,7 +57,7 @@ export default function AdminTechnicians() {
         );
     });
 
-    // ================= GET DETAIL API =================
+    // GET DETAIL API 
     const openDetail = async (item) => {
         setShowDetail(true);
         setDetailData(null);
@@ -87,6 +69,35 @@ export default function AdminTechnicians() {
             console.error('Detail fetch error:', error);
         } finally {
             setLoadingDetail(false);
+        }
+    };
+
+    const deleteTechnician = async () => {
+        if (!technicianDelete) return;
+
+        try {
+            setLoading(true);
+
+            const res = await axios.delete(`${API_BASE_URL}/admin/technician/id=${technicianDelete.id_user}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            showToast(res.data.message || 'Xóa thành công', 'success');
+
+            setTechnicians((prev) => prev.filter((t) => t.id_user !== technicianDelete.id_user));
+
+            setShowDeleteModal(false);
+            setTechnicianDelete(null);
+
+            // hoặc fetchTechnicians(currentPage);
+        } catch (err) {
+            console.log(err);
+
+            showToast(err.response?.data?.message || 'Không thể xóa kỹ thuật viên.', 'error');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -143,13 +154,26 @@ export default function AdminTechnicians() {
                                 <td className="p-3">{c.full_name}</td>
                                 <td className="p-3">{c.email}</td>
                                 <td className="p-3">
-                                    <button
-                                        onClick={() => openDetail(c)}
-                                        className="flex items-center gap-2 px-3 py-1 rounded-md bg-orange-500/15 text-orange-600 font-semibold hover:bg-orange-500 hover:text-white"
-                                    >
-                                        <EyeIcon size={16} />
-                                        View
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => openDetail(c)}
+                                            className="flex items-center gap-2 px-3 py-1 rounded-md bg-orange-500/15 text-orange-600 font-semibold hover:bg-orange-500 hover:text-white"
+                                        >
+                                            <EyeIcon size={16} />
+                                            View
+                                        </button>
+
+                                        <button
+                                            onClick={() => {
+                                                setTechnicianDelete(c);
+                                                setShowDeleteModal(true);
+                                            }}
+                                            className="flex items-center gap-2 px-3 py-1 rounded-md bg-red-100 text-red-600 font-semibold hover:bg-red-500 hover:text-white"
+                                        >
+                                            <Trash2 size={16} />
+                                            Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -192,7 +216,7 @@ export default function AdminTechnicians() {
 
             <LoadingOverlay show={loading} />
 
-            {/* ===================== DETAIL MODAL ===================== */}
+            {/*  DETAIL MODAL  */}
             {showDetail && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white rounded-xl w-full max-w-3xl p-6 shadow-xl relative max-h-[90vh] overflow-y-auto">
@@ -240,7 +264,7 @@ export default function AdminTechnicians() {
                                         <b>Gender:</b> {detailData.gender}
                                     </p>
                                     <p>
-                                        <b>DOB:</b> {formatDate(detailData.dob)}
+                                        <b>DOB:</b> {detailData.dob}
                                     </p>
                                     <p>
                                         <b>Experience:</b> {detailData.experience_year} years
@@ -310,10 +334,10 @@ export default function AdminTechnicians() {
                                                 >
                                                     <div>
                                                         <div className="text-gray-800 font-medium">
-                                                            {formatDate(s.date)}
+                                                            {s.date}
                                                         </div>
                                                         <div className="text-gray-600 text-sm">
-                                                            {formatTime(s.time_start)} → {formatTime(s.time_end)}
+                                                            {s.time_start} → {s.time_end}
                                                         </div>
                                                     </div>
                                                     <span
@@ -333,7 +357,7 @@ export default function AdminTechnicians() {
                                     )}
                                 </div>
 
-                                {/* ============== WALLET INFO ============== */}
+                                {/*  WALLET INFO  */}
                                 <div className="mt-6">
                                     <h3 className="text-md font-semibold text-gray-700 mb-2">Technician Wallet</h3>
                                     {detailData.technicianWalletDTO ? (
@@ -374,7 +398,7 @@ export default function AdminTechnicians() {
                                     )}
                                 </div>
 
-                                {/* ============== RATINGS LIST ============== */}
+                                {/*  RATINGS LIST  */}
                                 <div className="mt-6">
                                     <h3 className="text-md font-semibold text-gray-700 mb-2">Ratings</h3>
                                     {detailData.ratingDTOS?.length > 0 ? (
@@ -399,7 +423,7 @@ export default function AdminTechnicians() {
                                                         </div>
                                                         <div className="text-gray-700 text-sm">{r.comment}</div>
                                                         <div className="text-xs text-gray-400 mt-1">
-                                                            {formatDateTime(r.created_at)}
+                                                            {(r.created_at)}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -419,6 +443,38 @@ export default function AdminTechnicians() {
                 onClose={() => setShowAddModal(false)}
                 onSuccess={() => fetchTechnicians(currentPage)}
             />
+            {showDeleteModal && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50">
+                    <div className="w-[420px] rounded-xl bg-white p-6 shadow-2xl">
+                        <h2 className="text-xl font-bold text-gray-800">Xác nhận xóa</h2>
+
+                        <p className="mt-3 text-gray-600">Bạn có chắc muốn xóa kỹ thuật viên</p>
+
+                        <p className="mt-2 font-semibold text-red-600">{technicianDelete?.full_name}</p>
+
+                        <p className="text-gray-500 text-sm">({technicianDelete?.email})</p>
+
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setTechnicianDelete(null);
+                                }}
+                                className="rounded-lg border px-5 py-2 hover:bg-gray-100"
+                            >
+                                Hủy
+                            </button>
+
+                            <button
+                                onClick={deleteTechnician}
+                                className="rounded-lg bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700"
+                            >
+                                Xóa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

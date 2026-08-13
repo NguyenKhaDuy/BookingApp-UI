@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { Bell, LogOut, User } from 'lucide-react';
 import { useEffect, useContext, useState } from 'react';
 import { UserContext } from '../../../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,6 @@ import { API_BASE_URL } from '../../../utils/api';
 
 export default function TechnicianHeader() {
     const { user, setUser } = useContext(UserContext);
-    const [openMenu, setOpenMenu] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,13 +28,6 @@ export default function TechnicianHeader() {
         };
         fetchUser();
     }, []);
-
-    const handleLogout = async () => {
-        localStorage.removeItem('user');
-        setUser(null);
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-        navigate('/login');
-    };
 
     const avatarSrc = user?.avatarBase64 ? `data:image/jpeg;base64,${user.avatarBase64}` : avatarDefault;
 

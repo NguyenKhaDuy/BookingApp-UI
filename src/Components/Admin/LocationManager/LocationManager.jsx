@@ -49,7 +49,7 @@ export default function LocationManager() {
         loadProvinces();
     }, []);
 
-    // ================== API PROVINCE MỚI ===================
+    // API PROVINCE MỚI 
     const loadProvinces = async () => {
         try {
             const res = await fetch(`https://provinces.open-api.vn/api/p/`);
@@ -59,8 +59,6 @@ export default function LocationManager() {
             console.error('Failed to load provinces:', err);
         }
     };
-
-    console.log(provinces)
 
     const loadDistricts = async (provinceCode) => {
         try {
@@ -82,7 +80,7 @@ export default function LocationManager() {
         }
     };
 
-    // ================== FILTER FRONTEND ===================
+    // FILTER FRONTEND 
     const filtered = locations.filter(
         (x) =>
             x.district.toLowerCase().includes(search.toLowerCase()) ||
@@ -90,7 +88,7 @@ export default function LocationManager() {
             x.conscious.toLowerCase().includes(search.toLowerCase()),
     );
 
-    // ================== HANDLERS ===================
+    // HANDLERS 
     const openModal = async (item = null) => {
         setEditing(item);
         setModalOpen(true);

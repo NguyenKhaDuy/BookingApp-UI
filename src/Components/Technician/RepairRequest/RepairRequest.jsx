@@ -17,7 +17,6 @@ export default function RepairRequest() {
     const [openDetail, setOpenDetail] = useState(false);
     const [openInvoiceDetail, setOpenInvoiceDetail] = useState(false);
     const { showToast } = useToast();
-    // ===== PAGINATION =====
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(1);
 
@@ -39,6 +38,8 @@ export default function RepairRequest() {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
+            console.log(res.data.data)
+
             setOrders(res.data?.data || []);
             setPage(res.data?.current_page || 1);
             setTotalPage(res.data?.total_page || 1);
@@ -49,7 +50,6 @@ export default function RepairRequest() {
         }
     };
 
-    /* ===== STATUS ===== */
     const STATUS = {
         COMPLETED: 'COMPLETED',
         RECEIVING: 'RECEIVING',
@@ -103,7 +103,7 @@ export default function RepairRequest() {
             <h1 className="text-2xl font-semibold mb-4">Đơn hàng</h1>
 
             <div className="bg-white p-4 rounded-xl shadow">
-                {/* DESKTOP */}
+
                 <div className="hidden md:block">
                     <table className="w-full">
                         <thead>
@@ -206,7 +206,6 @@ export default function RepairRequest() {
                     </table>
                 </div>
 
-                {/* PAGINATION */}
                 {totalPage > 0 && (
                     <div className="flex justify-center gap-2 mt-6">
                         <button
@@ -244,7 +243,6 @@ export default function RepairRequest() {
                 )}
             </div>
 
-            {/* MODALS */}
             {openDetail && selectedOrder && (
                 <RepairRequestDetail data={selectedOrder} onClose={() => setOpenDetail(false)} />
             )}
@@ -265,7 +263,6 @@ export default function RepairRequest() {
                 <InvoiceDetailModal invoice={selectedOrder.invoices} onClose={() => setOpenInvoiceDetail(false)} />
             )}
 
-            {/* >>> ADDED: MODAL UPDATE STATUS */}
             {openStatus && selectedOrder && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center">
                     <div className="bg-white p-5 rounded-xl w-80 shadow-md">

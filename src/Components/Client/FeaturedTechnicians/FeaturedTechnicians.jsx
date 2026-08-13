@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {API_BASE_URL} from '../../../utils/api.js';
-
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 export default function FeaturedTechnicians() {
     const navigate = useNavigate();
 
@@ -49,12 +48,12 @@ export default function FeaturedTechnicians() {
                     onClick={prev}
                     disabled={index === 0}
                     className="absolute -left-4 top-1/2 -translate-y-1/2
-                               w-12 h-12 rounded-full bg-white border shadow-xl
-                               flex items-center justify-center
-                               disabled:opacity-30 disabled:cursor-not-allowed
-                               hover:bg-gray-100 transition z-10"
+               w-12 h-12 rounded-full bg-white border shadow-xl
+               flex items-center justify-center
+               disabled:opacity-30 disabled:cursor-not-allowed
+               hover:bg-gray-100 transition z-10"
                 >
-                    ◀
+                    <ChevronLeft className="w-6 h-6 text-gray-700" />
                 </button>
 
                 {/* Arrow Right */}
@@ -62,12 +61,12 @@ export default function FeaturedTechnicians() {
                     onClick={next}
                     disabled={index === maxIndex}
                     className="absolute -right-4 top-1/2 -translate-y-1/2
-                               w-12 h-12 rounded-full bg-white border shadow-xl
-                               flex items-center justify-center
-                               disabled:opacity-30 disabled:cursor-not-allowed
-                               hover:bg-gray-100 transition z-10"
+               w-12 h-12 rounded-full bg-white border shadow-xl
+               flex items-center justify-center
+               disabled:opacity-30 disabled:cursor-not-allowed
+               hover:bg-gray-100 transition z-10"
                 >
-                    ▶
+                    <ChevronRight className="w-6 h-6 text-gray-700" />
                 </button>
 
                 {/* Carousel */}

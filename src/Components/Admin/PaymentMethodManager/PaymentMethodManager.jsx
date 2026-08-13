@@ -99,7 +99,7 @@ export default function PaymentMethodManager() {
             setLoading(true);
             await axios({
                 method: editData ? 'put' : 'post',
-                url: '${API_BASE_URL}/admin/payment/',
+                url: `${API_BASE_URL}/admin/payment/`,
                 data: formData,
                 headers: {
                     Authorization: `Bearer ${token}`,

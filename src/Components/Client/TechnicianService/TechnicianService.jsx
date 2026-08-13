@@ -6,7 +6,7 @@ export default function TechnicianService({ services }) {
             <div className="flex flex-wrap gap-3">
                 {services.map((s, i) => (
                     <span key={i} className="px-4 py-2 rounded-full bg-indigo-50 text-indigo-600 font-medium shadow-sm">
-                        {s}
+                        {s.name_service}
                     </span>
                 ))}
             </div>

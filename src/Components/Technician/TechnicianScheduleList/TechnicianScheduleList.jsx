@@ -5,6 +5,7 @@ import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { API_BASE_URL } from '../../../utils/api';
+import { formatTime, formatDateForInput } from '../../../utils/formatDate';
 export default function TechnicianScheduleList() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
@@ -38,17 +39,24 @@ export default function TechnicianScheduleList() {
             const { data, current_page, total_page } = res.data;
 
             const mapped = data.map((item) => {
-                const [year, month, day] = item.date;
-                const [startHour, startMin] = item.time_start;
-                const [endHour, endMin] = item.time_end;
+                const start = formatTime(item.time_start);
+                const end = formatTime(item.time_end);
+
+                const startMinutes = Number(start.split(':')[0]) * 60 + Number(start.split(':')[1]);
+
+                const endMinutes = Number(end.split(':')[0]) * 60 + Number(end.split(':')[1]);
 
                 return {
                     id: item.idSchedule,
-                    date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
-                    start: `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`,
-                    end: `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`,
+
+                    date: item.date,
+
+                    start,
+                    end,
+
                     status: item.status_code,
-                    overnight: endHour < startHour,
+
+                    overnight: endMinutes < startMinutes,
                 };
             });
 
@@ -70,11 +78,18 @@ export default function TechnicianScheduleList() {
         setModalOpen(true);
     };
 
-    const openEditModal = (item) => {
-        setEditData(item);
-        setForm({ date: item.date, start: item.start, end: item.end, status: item.status });
-        setModalOpen(true);
-    };
+   const openEditModal = (item) => {
+       setEditData(item);
+
+       setForm({
+           date: formatDateForInput(item.date),
+           start: item.start,
+           end: item.end,
+           status: item.status,
+       });
+
+       setModalOpen(true);
+   };
 
     const handleSave = async () => {
         const payload = {
@@ -153,7 +168,7 @@ export default function TechnicianScheduleList() {
                     >
                         <div className="space-y-1">
                             <div className="flex items-center gap-2 text-gray-800 font-medium">
-                                <Calendar size={18} /> {new Date(item.date).toLocaleDateString('vi-VN')}
+                                <Calendar size={18} /> {item.date}
                             </div>
 
                             <div className="flex items-center gap-2 text-gray-900">
@@ -245,12 +260,39 @@ export default function TechnicianScheduleList() {
                         <div className="space-y-3">
                             <div>
                                 <label className="text-sm">Ngày làm</label>
-                                <input
-                                    type="date"
-                                    className="w-full border rounded-lg px-3 py-2"
-                                    value={form.date}
-                                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                                />
+
+                                <div className="relative">
+                                    {/* Hiển thị DD/MM/YYYY */}
+                                    <input
+                                        type="text"
+                                        value={form.date ? form.date.split('-').reverse().join('/') : ''}
+                                        readOnly
+                                        placeholder="DD/MM/YYYY"
+                                        onClick={(e) => {
+                                            const dateInput = e.currentTarget.nextElementSibling;
+
+                                            if (dateInput?.showPicker) {
+                                                dateInput.showPicker();
+                                            } else {
+                                                dateInput?.click();
+                                            }
+                                        }}
+                                        className="w-full border rounded-lg px-3 py-2 cursor-pointer"
+                                    />
+
+                                    {/* Input date thật để chọn ngày */}
+                                    <input
+                                        type="date"
+                                        value={form.date || ''}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                date: e.target.value,
+                                            })
+                                        }
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                                    />
+                                </div>
                             </div>
 
                             <div className="flex gap-2">

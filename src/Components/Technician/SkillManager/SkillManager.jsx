@@ -64,7 +64,6 @@ export default function SkillManager() {
         }
     }, [id_user]);
 
-    // === THÊM SKILL (CALL API) ===
     const addSkill = async () => {
         if (selected === null) {
             showToast('Vui lòng chọn kĩ năng trước!', 'error');

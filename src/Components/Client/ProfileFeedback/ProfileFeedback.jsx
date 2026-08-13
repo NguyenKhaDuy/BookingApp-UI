@@ -9,7 +9,7 @@ export default function ProfileFeedback({ profile }) {
     const [loadingRequests, setLoadingRequests] = useState(false);
     const [success, setSuccess] = useState(null);
 
-    /* ================= FETCH REQUESTS ================= */
+    /*  FETCH REQUESTS  */
     const fetchRequests = useCallback(async () => {
         try {
             setLoadingRequests(true);
@@ -37,14 +37,14 @@ export default function ProfileFeedback({ profile }) {
         }
     }, [profile]);
 
-    /* ================= INIT ================= */
+    /*  INIT  */
     useEffect(() => {
         if (profile?.id_user) {
             fetchRequests();
         }
     }, [profile, fetchRequests]);
 
-    /* ================= SUBMIT FEEDBACK ================= */
+    /*  SUBMIT FEEDBACK  */
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!content.trim()) return;
@@ -80,8 +80,6 @@ export default function ProfileFeedback({ profile }) {
             setLoading(false);
         }
     };
-
-    /* ================= UI ================= */
     return (
         <div className="bg-white p-6 rounded-2xl shadow border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-800 mb-1">Góp ý & Phản hồi</h2>

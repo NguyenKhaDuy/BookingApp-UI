@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, Bell } from 'lucide-react';
 import axios from 'axios';
 import { UserContext } from '../../../Context/UserContext';
@@ -98,7 +98,7 @@ export default function NotificationDetail() {
                     {notification.type === 'ACCEPTED_REQUEST' && (
                         <div className="mt-6 text-right">
                             <button
-                                onClick={() => navigate(`/request/${notification.idType}`)}
+                                onClick={() => navigate(`/request`)}
                                 className="px-5 py-2 bg-orange-500 text-white rounded-xl hover:bg-orange-600"
                             >
                                 Xem đơn sửa chữa

@@ -32,7 +32,7 @@ export default function TechnicianFilter({
     const fetchServices = async () => {
         try {
             const res = await axios.get(`${API_BASE_URL}/service/all/`);
-            const serviceNames = res.data.data.map((s) => s.name_service);
+            const serviceNames = res.data.data.map((s) => s.nameService);
             setServices(['Tất cả', ...serviceNames]);
         } catch (error) {
             console.error('Lỗi lấy service:', error);
@@ -41,7 +41,7 @@ export default function TechnicianFilter({
 
     return (
         <div className="max-w-6xl mx-auto px-6 mt-10 space-y-6">
-            {/* 🔍 SEARCH */}
+            {/*  SEARCH */}
             <div className="relative">
                 <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <input
@@ -58,7 +58,7 @@ export default function TechnicianFilter({
                 />
             </div>
 
-            {/* 🧰 SKILL */}
+            {/* SKILL */}
             <div>
                 <p className="text-sm font-semibold text-gray-600 mb-2">Kỹ năng</p>
                 <div className="flex gap-3 overflow-x-auto no-scrollbar pb-1">
@@ -79,7 +79,7 @@ export default function TechnicianFilter({
                 </div>
             </div>
 
-            {/* 🛠 SERVICE */}
+            {/* SERVICE */}
             <div>
                 <p className="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-1">
                     <Wrench className="w-4 h-4" /> Dịch vụ

@@ -30,7 +30,7 @@ export default function EmailManager() {
 
     const id_user = getTechnicianId();
 
-    // ====== FETCH CURRENT EMAIL ======
+    //  FETCH CURRENT EMAIL 
     const fetchProfile = useCallback(async () => {
         try {
             setLoading(true);
@@ -54,7 +54,7 @@ export default function EmailManager() {
 
     const isValid = email && confirmEmail && email === confirmEmail && email !== currentEmail;
 
-    // ====== SEND OTP ======
+    // SEND OTP 
     const handleSendOtp = async () => {
         setLoading(true);
         try {
@@ -79,14 +79,14 @@ export default function EmailManager() {
         }
     };
 
-    // ====== LOGOUT ======
+    //  LOGOUT 
     const handleLogout = () => {
         localStorage.removeItem('user');
         setUser(null);
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
-    // ====== VERIFY OTP ======
+    //  VERIFY OTP 
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);

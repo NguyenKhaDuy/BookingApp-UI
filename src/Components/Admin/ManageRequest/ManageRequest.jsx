@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, Search, SlidersHorizontal, Eye, ChevronLeft, ChevronRight, FileWarning, Receipt } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
-import { formatDateTimeArray, formatDateArray, formatTime } from '../../../utils/formatDate';
+import { formatDateArray, formatTime } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import {API_BASE_URL} from '../../../utils/api.js';
 export default function ManageRequest() {
@@ -10,7 +10,6 @@ export default function ManageRequest() {
     const [preview, setPreview] = useState(null);
 
     const [page, setPage] = useState(0);
-    const size = 5;
     const [totalPages, setTotalPages] = useState(0);
 
     const [search, setSearch] = useState('');
@@ -140,7 +139,7 @@ export default function ManageRequest() {
                                     <td className="px-4 py-3">{r.customer?.full_name}</td>
                                     <td className="px-4 py-3">{r.name_service}</td>
                                     <td className="px-4 py-3">
-                                        {formatDateArray(r.scheduled_date)} {formatTime(r.scheduled_time)}
+                                        {r.scheduled_date} {r.scheduled_time}
                                     </td>
                                     <td className="px-4 py-3">{r.technicicanDTO?.full_name || 'Chưa gán'}</td>
                                     <td className="px-4 py-3">

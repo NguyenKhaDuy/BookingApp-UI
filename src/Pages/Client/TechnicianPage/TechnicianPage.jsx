@@ -1,55 +1,94 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
+import { useSearchParams } from 'react-router-dom';
 
+import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import TechnicianHero from '../../../Components/Client/TechnicianHero/TechnicianHero';
 import TechnicianFilter from '../../../Components/Client/TechnicianFilter/TechnicianFilter';
 import TechnicianGrid from '../../../Components/Client/TechnicianGrid/TechnicianGrid';
+
 import { API_BASE_URL } from '../../../utils/api';
 
 export default function TechnicianPage() {
-    //Filter states
-    const [selectedSkill, setSelectedSkill] = useState('Tất cả');
-    const [selectedService, setSelectedService] = useState('Tất cả');
-    const [keyword, setKeyword] = useState('');
+    // Đọc service từ URL
+    const [searchParams] = useSearchParams();
 
-    //Data states
+    const serviceIdFromUrl = searchParams.get('service');
+    const serviceNameFromUrl = searchParams.get('serviceName');
+
+    // Filter states
+    const [selectedSkill, setSelectedSkill] = useState('Tất cả');
+
+    const [selectedService, setSelectedService] = useState(serviceNameFromUrl || 'Tất cả');
+
+    const [keyword, setKeyword] = useState('');
+    // Data states
+    const [loading, setLoading] = useState(false);
     const [technicians, setTechnicians] = useState([]);
+
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPage, setTotalPage] = useState(0);
 
+    // Khi URL thay đổi service
+    useEffect(() => {
+        if (serviceNameFromUrl) {
+            setSelectedService(serviceNameFromUrl);
+        } else {
+            setSelectedService('Tất cả');
+        }
+
+        // Khi chọn service mới thì quay về page 1
+        setCurrentPage(1);
+    }, [serviceIdFromUrl, serviceNameFromUrl]);
+
+    // Fetch technicians
     useEffect(() => {
         fetchTechnicians(currentPage);
     }, [currentPage]);
 
     const fetchTechnicians = async (page) => {
         try {
-            const res = await axios.get(`${API_BASE_URL}/all/technician/`, { params: { pageNo: page } });
+            setLoading(true);
 
-            // map backend → UI model
+            const res = await axios.get(`${API_BASE_URL}/all/technician/`, {
+                params: {
+                    pageNo: page,
+                },
+            });
+
+            // Map backend → UI model
             const mapped = res.data.data.map((t) => ({
                 id: t.id_user,
                 name: t.full_name,
                 avatar: t.avatarBase64 ? `data:image/png;base64,${t.avatarBase64}` : null,
                 skills: t.nameSkillTechnician || [],
-                services: t.nameServiceTechnician || [],
+                services: (t.technicianServiceDTOS || []).map((item) => item.name_service),
                 rating: t.total_star ?? 0,
                 location: t.working_area,
             }));
 
             setTechnicians(mapped);
+
             setTotalPage(res.data.total_page);
         } catch (error) {
             console.error('Lỗi lấy danh sách thợ:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
-    //FILTER LOGIC: Skill + Service + Search
+    // FILTER
+    // Skill + Service + Search
     const filtered = technicians.filter((t) => {
+        // Filter skill
         const matchSkill = selectedSkill === 'Tất cả' || t.skills.includes(selectedSkill);
 
-        const matchService = selectedService === 'Tất cả' || t.services.includes(selectedService);
+        // Filter service
+        const matchService =
+            selectedService === 'Tất cả' || t.services.some((s) => s?.toLowerCase() === selectedService?.toLowerCase());
 
-        const matchKeyword = t.name.toLowerCase().includes(keyword.toLowerCase());
+        // Filter keyword
+        const matchKeyword = t.name?.toLowerCase().includes(keyword.toLowerCase());
 
         return matchSkill && matchService && matchKeyword;
     });
@@ -69,18 +108,30 @@ export default function TechnicianPage() {
 
             <TechnicianGrid list={filtered} />
 
-            {/* Pagination */}
+            {/*
+                Pagination*/}
             {totalPage > 1 && (
                 <div className="flex justify-center gap-2 mb-12">
-                    {Array.from({ length: totalPage }).map((_, index) => {
+                    {Array.from({
+                        length: totalPage,
+                    }).map((_, index) => {
                         const page = index + 1;
+
                         return (
                             <button
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
-                                className={`px-4 py-2 rounded-lg transition ${
-                                    page === currentPage ? 'bg-orange-500 text-white' : 'bg-gray-200 hover:bg-gray-300'
-                                }`}
+                                className={`
+                                    px-4 py-2
+                                    rounded-lg
+                                    transition
+
+                                    ${
+                                        page === currentPage
+                                            ? 'bg-orange-500 text-white'
+                                            : 'bg-gray-200 hover:bg-gray-300'
+                                    }
+                                `}
                             >
                                 {page}
                             </button>
@@ -88,6 +139,8 @@ export default function TechnicianPage() {
                     })}
                 </div>
             )}
+
+            <LoadingOverlay show={loading} />
         </Fragment>
     );
 }

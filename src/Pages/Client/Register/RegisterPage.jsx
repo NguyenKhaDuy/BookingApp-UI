@@ -5,7 +5,6 @@ import OtpForm from '../../../Components/Client/OtpForm/OtpForm';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { API_BASE_URL } from '../../../utils/api';
-import { type } from '@testing-library/user-event/dist/type';
 
 export default function Register() {
     const [loading, setLoading] = useState(false);

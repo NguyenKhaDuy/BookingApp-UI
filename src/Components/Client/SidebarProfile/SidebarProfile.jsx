@@ -13,12 +13,12 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
 
     const avatarSrc = profile?.avatarBase64 ? `data:image/jpeg;base64,${profile.avatarBase64}` : avatarDefault;
 
-    /* ================= CLICK AVATAR ================= */
+    /*  CLICK AVATAR  */
     const handleAvatarClick = () => {
         fileInputRef.current.click();
     };
 
-    /* ================= UPLOAD AVATAR ================= */
+    /*  UPLOAD AVATAR  */
     const handleAvatarChange = async (e) => {
         const file = e.target.files[0];
         if (!file) return;
@@ -51,7 +51,7 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
 
     return (
         <aside className="hidden md:flex flex-col w-64 bg-white border rounded-xl shadow p-6 h-fit sticky top-24">
-            {/* ================= AVATAR + INFO ================= */}
+            {/*  AVATAR + INFO  */}
             <div className="flex flex-col items-center text-center mb-10 relative">
                 <div onClick={handleAvatarClick} className="relative cursor-pointer group">
                     <img
@@ -79,7 +79,7 @@ export function ProfileSidebar({ active, setActive, profile, onAvatarUpdated }) 
                 <p className="text-sm text-gray-500">{profile?.email || ''}</p>
             </div>
 
-            {/* ================= MENU ================= */}
+            {/*  MENU  */}
             <nav className="flex flex-col text-gray-700 font-medium">
                 {/* PROFILE */}
                 <button

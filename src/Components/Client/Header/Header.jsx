@@ -7,17 +7,11 @@ import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
 import default_avatar from '../../../assets/default-avatar.jpg';
 import getCookie from '../../../utils/getToken';
+import { formatDateTimeArray } from '../../../utils/formatDate';
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from '../../../Context/ToastContext';
 import { API_BASE_URL } from '../../../utils/api.js';
-
-const formatTimeFromArray = (arr) => {
-    if (!arr || arr.length < 6) return '';
-    // JS month bắt đầu từ 0 → arr[1]-1
-    const date = new Date(arr[0], arr[1] - 1, arr[2], arr[3], arr[4], arr[5]);
-    return date.toLocaleString(); // hoặc dùng toLocaleDateString/toLocaleTimeString tuỳ ý
-};
 
 export default function HeaderBooking() {
     const { showToast } = useToast();
@@ -49,29 +43,34 @@ export default function HeaderBooking() {
                         message: n.message,
                         type: n.type,
                         id_type: n.id_type,
+
                         unread: n.status_id === 2,
-                        time: formatTimeFromArray(n.dateTime),
-                        createdAtArray: n.created_at, // giữ mảng để sort
+
+                        // hiển thị ngày giờ
+                        time: formatDateTimeArray(n.dateTime || n.created_at),
+
+                        // giữ để sort
+                        createdAt: n.dateTime || n.created_at,
                     }))
                     .sort((a, b) => {
-                        // Chuyển array → Date để so sánh
-                        const dateA = new Date(
-                            a.createdAtArray[0],
-                            a.createdAtArray[1] - 1,
-                            a.createdAtArray[2],
-                            a.createdAtArray[3],
-                            a.createdAtArray[4],
-                            a.createdAtArray[5],
-                        );
-                        const dateB = new Date(
-                            b.createdAtArray[0],
-                            b.createdAtArray[1] - 1,
-                            b.createdAtArray[2],
-                            b.createdAtArray[3],
-                            b.createdAtArray[4],
-                            b.createdAtArray[5],
-                        );
-                        return dateB - dateA; // mới → cũ
+                        const parseDate = (value) => {
+                            // Backend trả array
+                            if (Array.isArray(value)) {
+                                return new Date(
+                                    value[0],
+                                    value[1] - 1,
+                                    value[2],
+                                    value[3] || 0,
+                                    value[4] || 0,
+                                    value[5] || 0,
+                                );
+                            }
+
+                            // Backend trả string ISO
+                            return new Date(value);
+                        };
+
+                        return parseDate(b.createdAt) - parseDate(a.createdAt);
                     });
 
                 setNotifications(notifs);
@@ -142,10 +141,10 @@ export default function HeaderBooking() {
 
         if (!roles.includes('CUSTOMER')) return;
 
-        // 🔥 CONNECT
+        // CONNECT
         connectWebSocket(token);
 
-        // 🔥 LISTEN
+        // LISTEN
         const unsubscribe = addWebSocketListener((msg) => {
             console.log('📩 RECEIVED:', msg);
             setNotification(msg);
@@ -200,10 +199,11 @@ export default function HeaderBooking() {
                                     {services.map((service) => (
                                         <Link
                                             key={service.id_service}
-                                            to={`/services/${service.id_service}`}
+                                            to={`/technicians?service=${service.id_service}&serviceName=${encodeURIComponent(service.nameService)}`}
                                             className="block px-4 py-3 text-white hover:text-orange-500 hover:bg-white/10 transition"
+                                            onClick={() => setServicesDesktopOpen(false)}
                                         >
-                                            {service.name_service}
+                                            {service.nameService}
                                         </Link>
                                     ))}
                                 </motion.div>

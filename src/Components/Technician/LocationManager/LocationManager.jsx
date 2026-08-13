@@ -11,7 +11,7 @@ export default function LocationManager() {
     const { showToast } = useToast();
     const [loading, setLoading] = useState(false);
 
-    // === Lấy full vị trí ===
+    //  Lấy full vị trí 
     useEffect(() => {
         fetch('http://localhost:8082/api/location/')
             .then((res) => res.json())
@@ -27,7 +27,7 @@ export default function LocationManager() {
             .catch((err) => console.error('Lỗi load vị trí tổng:', err));
     }, []);
 
-    // === Lấy id_user ===
+    //  Lấy id_user 
     const getTechnicianId = () => {
         const localUser = localStorage.getItem('user');
         if (!localUser) return null;
@@ -37,7 +37,7 @@ export default function LocationManager() {
     const token = getCookie('token');
     const id_user = getTechnicianId();
 
-    // === Lấy vị trí của thợ ===
+    //  Lấy vị trí của thợ 
     const loadTechLocations = () => {
         fetch(`http://localhost:8082/api/technician/profile/location/id=${id_user}`, {
             headers: {
@@ -64,7 +64,7 @@ export default function LocationManager() {
         }
     }, [id_user]);
 
-    // === Thêm vị trí (POST) ===
+    //  Thêm vị trí (POST) 
     const addLocation = async () => {
         if (selected === null) {
             showToast('Vui lòng chọn vị trí trước!', 'error');
@@ -98,7 +98,7 @@ export default function LocationManager() {
         }
     };
 
-    // === Xóa vị trí (DELETE) ===
+    //  Xóa vị trí (DELETE) 
     const deleteLocation = async () => {
         if (selected === null) {
             showToast('Vui lòng chọn vị trí để xóa!', 'error');

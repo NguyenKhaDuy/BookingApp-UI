@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { X, Plus, Edit3, Trash2, ChevronLeft, ChevronRight, Send, Bell } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
 import {API_BASE_URL} from '../../../utils/api.js';
@@ -199,7 +198,7 @@ export default function NotificationManager() {
         );
     };
 
-    // ====== GỬI THÔNG BÁO ======
+    // GỬI THÔNG BÁO 
 
     const sendToAll = async () => {
         const body = {
@@ -372,7 +371,7 @@ export default function NotificationManager() {
                                         {item.message}
                                     </td>
                                     <td className="p-3">{renderType(item.type)}</td>
-                                    <td className="p-3">{formatDateTimeArray(item.created_at)}</td>
+                                    <td className="p-3">{item.created_at}</td>
 
                                     <td className="p-3 flex justify-center gap-2">
                                         <button

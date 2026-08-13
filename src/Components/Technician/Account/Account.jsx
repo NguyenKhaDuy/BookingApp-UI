@@ -136,6 +136,31 @@ export default function AccountPage() {
         return JSON.stringify(profile) !== JSON.stringify(originalProfile);
     };
 
+    const formatDobForPayload = (dob) => {
+        if (!dob) return null;
+
+        // Nếu backend trả về [year, month, day]
+        if (Array.isArray(dob)) {
+            const [year, month, day] = dob;
+
+            return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        // Nếu đang là dd-MM-yyyy
+        if (/^\d{2}-\d{2}-\d{4}$/.test(dob)) {
+            const [day, month, year] = dob.split('-');
+
+            return `${year}-${month}-${day}`;
+        }
+
+        // Nếu đã là yyyy-MM-dd
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dob)) {
+            return dob;
+        }
+
+        return null;
+    };
+
     // HÀM UPDATE PROFILE
     const handleUpdateProfile = async () => {
         if (!profile) return;
@@ -148,15 +173,15 @@ export default function AccountPage() {
                 full_name: profile.full_name,
                 address: profile.address,
                 phone_number: profile.phone_number,
-                dob: profile.dob
-                    ? `${profile.dob[0]}-${profile.dob[1].toString().padStart(2, '0')}-${profile.dob[2]
-                          .toString()
-                          .padStart(2, '0')}`
-                    : null,
+                dob: formatDobForPayload(profile.dob),
                 gender: profile.gender,
                 working_area: profile.working_area,
                 experience_year: profile.experience_year,
             };
+
+            console.log('PAYLOAD UPDATE:', payload);
+            console.log('DOB:', payload.dob);
+            console.log('DOB TYPE:', typeof payload.dob);
 
             const res = await axios.put(`${API_BASE_URL}/technician/profile/`, payload, {
                 headers: {
@@ -166,8 +191,11 @@ export default function AccountPage() {
             });
 
             showToast('Cập nhật thông tin thành công!', 'success');
+
             await fetchProfile();
         } catch (err) {
+            console.error('UPDATE PROFILE ERROR:', err);
+
             showToast('Lỗi cập nhật: ' + (err.response?.data?.message || err.message), 'error');
         } finally {
             setLoading(false);
@@ -431,20 +459,70 @@ function Field({ label, value, editable, onChange, name }) {
 }
 
 function DateField({ label, value, editable, onChange, name }) {
-    const formatted = toDateInputValue(value);
+    let formatted = '';
+
+    // Backend: [yyyy, MM, dd]
+    if (Array.isArray(value) && value.length >= 3) {
+        const [year, month, day] = value;
+
+        formatted = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    }
+
+    // Backend: dd-MM-yyyy
+    else if (typeof value === 'string' && /^\d{2}-\d{2}-\d{4}$/.test(value)) {
+        const [day, month, year] = value.split('-');
+
+        formatted = `${year}-${month}-${day}`;
+    }
+
+    // Backend: yyyy-MM-dd
+    else if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        formatted = value;
+    }
+
+    // Backend: yyyyMMdd
+    else if (typeof value === 'string' && /^\d{8}$/.test(value)) {
+        formatted = `${value.substring(0, 4)}-${value.substring(4, 6)}-${value.substring(6, 8)}`;
+    }
+
+    // Hiển thị DD/MM/YYYY
+    const displayDate = formatted ? formatted.split('-').reverse().join('/') : '';
+
     return (
         <div className="flex flex-col">
             <label className="text-sm text-gray-600 mb-1">{label}</label>
-            <input
-                type="date"
-                className="p-4 rounded-xl border border-gray-300 outline-orange-500 mb-4 text-gray-800"
-                value={formatted}
-                onChange={(e) => {
-                    const parts = e.target.value.split('-');
-                    onChange && onChange(name, [Number(parts[0]), Number(parts[1]), Number(parts[2])]);
-                }}
-                disabled={!editable}
-            />
+
+            <div className="relative">
+                {/* Ô hiển thị DD/MM/YYYY */}
+                <input
+                    type="text"
+                    value={displayDate}
+                    readOnly
+                    onClick={(e) => {
+                        const dateInput = e.currentTarget.nextElementSibling;
+
+                        if (dateInput?.showPicker) {
+                            dateInput.showPicker();
+                        } else {
+                            dateInput?.click();
+                        }
+                    }}
+                    placeholder="DD/MM/YYYY"
+                    disabled={!editable}
+                    className="p-4 rounded-xl border border-gray-300 outline-orange-500 mb-4 text-gray-800 w-full cursor-pointer"
+                />
+
+                {/* Input date thật để mở calendar */}
+                <input
+                    type="date"
+                    value={formatted}
+                    onChange={(e) => {
+                        onChange && onChange(name, e.target.value);
+                    }}
+                    disabled={!editable}
+                    className="absolute right-3 top-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                />
+            </div>
         </div>
     );
 }

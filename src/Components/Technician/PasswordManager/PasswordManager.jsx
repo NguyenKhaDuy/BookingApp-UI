@@ -29,7 +29,6 @@ export default function PasswordManager() {
     
         const id_user = getTechnicianId();
     
-        // ====== FETCH CURRENT EMAIL ======
         const fetchProfile = useCallback(async () => {
             try {
                 setLoading(true);
@@ -53,7 +52,6 @@ export default function PasswordManager() {
 
     const isValid = oldPassword && newPassword && confirmPassword && newPassword === confirmPassword;
 
-    /* ================= SEND OTP ================= */
     const handleSendOtp = async () => {
         try {
             setLoading(true);
@@ -83,22 +81,27 @@ export default function PasswordManager() {
         }
     };
 
-    /* ================= LOGOUT ================= */
     const handleLogout = () => {
         localStorage.removeItem('user');
         setUser(null);
         document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
-    /* ================= VERIFY OTP ================= */
     const verifyOtp = async (otp) => {
         try {
             setLoading(true);
+
             const res = await fetch('http://localhost:8082/api/verify-otp/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 credentials: 'include',
-                body: JSON.stringify({ otp }),
+                body: JSON.stringify({
+                    email: currentEmail,
+                    otp: otp,
+                    type: 'CHANGE_PASSWORD',
+                }),
             });
 
             const data = await res.json();
@@ -109,20 +112,22 @@ export default function PasswordManager() {
             }
 
             showToast('Đổi mật khẩu thành công', 'success');
+
             handleLogout();
             navigate('/login', { replace: true });
+
             setStep(1);
             setOldPassword('');
             setNewPassword('');
             setConfirmPassword('');
-        } catch {
+        } catch (error) {
+            console.error(error);
             showToast('Lỗi xác thực OTP', 'error');
         } finally {
             setLoading(false);
         }
     };
 
-    /* ================= RENDER ================= */
     if (step === 2) {
         return <OtpForm email={user.email} onVerify={verifyOtp} />;
     }

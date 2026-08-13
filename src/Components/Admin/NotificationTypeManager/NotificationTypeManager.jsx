@@ -4,7 +4,6 @@ import { Plus, Edit3, Trash2, ChevronLeft, ChevronRight, X, Bell } from 'lucide-
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import {API_BASE_URL} from '../../../utils/api.js';
 
 export default function NotificationTypeManager() {
@@ -186,7 +185,7 @@ export default function NotificationTypeManager() {
                                     <td className="p-3 max-w-[260px] whitespace-nowrap overflow-hidden text-ellipsis">
                                         {item.description}
                                     </td>
-                                    <td className="p-3">{formatDateTimeArray(item.created_at) || '---'}</td>
+                                    <td className="p-3">{item.created_at || '---'}</td>
                                     <td className="p-3 flex justify-center gap-2">
                                         <button
                                             onClick={() => openEdit(item)}

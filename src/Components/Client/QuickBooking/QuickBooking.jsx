@@ -98,12 +98,47 @@ export default function QuickBooking() {
                         />
 
                         {/* Ngày */}
+                        {/* Input hiển thị */}
+                        <input
+                            type="text"
+                            readOnly
+                            value={
+                                form.scheduled_date
+                                    ? new Date(form.scheduled_date + 'T00:00:00').toLocaleDateString('vi-VN')
+                                    : ''
+                            }
+                            placeholder="Chọn ngày sửa chữa"
+                            onClick={(e) => {
+                                const dateInput = e.currentTarget.nextElementSibling;
+
+                                if (dateInput?.showPicker) {
+                                    dateInput.showPicker();
+                                } else {
+                                    dateInput?.click();
+                                }
+                            }}
+                            className="w-full p-4 rounded-xl 
+               border border-gray-300 
+               focus:border-orange-500 
+               focus:ring-2 focus:ring-orange-300 
+               outline-none transition cursor-pointer"
+                        />
+
+                        {/* Input date thật */}
                         <input
                             type="date"
                             name="scheduled_date"
-                            value={form.scheduled_date}
-                            onChange={handleChange}
-                            className="p-4 rounded-xl border border-gray-300 outline-orange-500"
+                            value={form.scheduled_date || ''}
+                            onChange={(e) => {
+                                const selectedDate = e.target.value;
+
+                                setForm((prev) => ({
+                                    ...prev,
+                                    scheduled_date: selectedDate,
+                                }));
+                            }}
+                            className="absolute opacity-0 
+               w-0 h-0 pointer-events-none"
                         />
 
                         {/* Giờ */}
