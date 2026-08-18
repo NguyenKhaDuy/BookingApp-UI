@@ -14,13 +14,13 @@ import BookingPage from './Pages/Client/BookingPage/BookingPage';
 import ContactPage from './Pages/Client/ContactPage/ContactPage';
 import ClientLayout from './Layouts/ClientLayout/ClientLayout';
 import DashboardLayout from './Layouts/AdminLayout/DashboardLayout';
-import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout'
-import PaymentSuccess from './Pages/PaymentSuccess/PaymentSuccess'
+import TechnicianLayout from './Layouts/TechnicianLayout/TechnicianLayout';
+import PaymentSuccess from './Pages/PaymentSuccess/PaymentSuccess';
 import { WebSocketProvider } from './Context/WebSocketProvider';
 function App() {
     return (
-        <WebSocketProvider>
-            <BrowserRouter>
+        <BrowserRouter>
+            <WebSocketProvider>
                 <Routes>
                     {/*  CLIENT LAYOUT  */}
                     <Route element={<ClientLayout />}>
@@ -42,13 +42,12 @@ function App() {
 
                     {/*  ADMIN LAYOUT  */}
                     <Route path="/admin/home" element={<DashboardLayout />} />
-                    
 
                     {/*  TECHNICIAN LAYOUT  */}
                     <Route path="/technician/home" element={<TechnicianLayout />} />
                 </Routes>
-            </BrowserRouter>
-        </WebSocketProvider>
+            </WebSocketProvider>
+        </BrowserRouter>
     );
 }
 

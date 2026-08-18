@@ -7,7 +7,7 @@ import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
 import default_avatar from '../../../assets/default-avatar.jpg';
 import getCookie from '../../../utils/getToken';
-import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
+import { connectWebSocket, addWebSocketListener, disconnectWebSocket } from '../../../utils/stompClient';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from '../../../Context/ToastContext';
 import { API_BASE_URL } from '../../../utils/api.js';
@@ -116,12 +116,28 @@ export default function HeaderBooking() {
         setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
     };
 
+    // const handleLogout = () => {
+    //     localStorage.removeItem('user');
+    //     setUser(null);
+    //     setAvatarMenuOpen(false);
+    //     navigate('/');
+    //     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    // };
+
     const handleLogout = () => {
+        // Ngắt WebSocket trước khi logout
+        disconnectWebSocket();
+
+        // Xóa thông tin đăng nhập
         localStorage.removeItem('user');
+
+        // Xóa token cookie
+        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
         setUser(null);
         setAvatarMenuOpen(false);
+
         navigate('/');
-        document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
     };
 
     useEffect(() => {
