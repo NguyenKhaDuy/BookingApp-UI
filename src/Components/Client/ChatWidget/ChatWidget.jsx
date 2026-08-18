@@ -84,12 +84,18 @@ export default function ChatWidget() {
         const formatText = (text) => {
             return (
                 text
-                    // bỏ markdown bold **text**
+                    // Bỏ markdown bold **text**
                     .replace(/\*\*(.*?)\*\*/g, '$1')
-                    // bỏ markdown heading ###
+
+                    // Bỏ markdown heading ###, ##, #
                     .replace(/^#+\s*/gm, '')
-                    // bỏ emoji cảnh báo nếu muốn
-                    .replace('Lưu ý:')
+
+                    // Bỏ "Lưu ý:"
+                    .replace(/Lưu ý:/g, '')
+
+                    // Chuẩn hóa bullet
+                    .replace(/•\s*/g, '• ')
+
                     .trim()
             );
         };
@@ -105,56 +111,66 @@ export default function ChatWidget() {
                         return <div key={index} className="h-2" />;
                     }
 
-                    // đường phân cách
+                    // Đường phân cách
                     if (text.includes('---')) {
                         return <div key={index} className="my-3 border-t border-gray-200" />;
                     }
 
-                    // tiêu đề
+                    // Tiêu đề
                     if (
                         text.startsWith('Thiết bị') ||
                         text.startsWith('Nguyên nhân') ||
                         text.startsWith('Chi phí') ||
                         text.startsWith('Cách kiểm tra') ||
-                        text.startsWith('Khi nào nên gọi')
+                        text.startsWith('Khi nào nên gọi') ||
+                        text.startsWith('Có nên gọi thợ') ||
+                        text.startsWith('Vì sao') ||
+                        text.startsWith('Trước khi gọi thợ') ||
+                        text.startsWith('Khi nào cần gọi thợ')
                     ) {
                         return (
-                            <p
-                                key={index}
-                                className="
-                                mt-3
-                                font-bold
-                                text-orange-600
-                            "
-                            >
+                            <p key={index} className="mt-3 font-bold text-orange-600">
                                 {text}
                             </p>
                         );
                     }
 
-                    // list -
-                    if (text.startsWith('-')) {
+                    // List dạng •
+                    if (text.startsWith('•')) {
                         return (
                             <div key={index} className="flex gap-2 text-gray-700">
-                                <span>•</span>
+                                <span className="text-orange-500">•</span>
 
-                                <span>{text.replace('-', '').trim()}</span>
+                                <span>{text.replace(/^•\s*/, '')}</span>
                             </div>
                         );
                     }
 
-                    // số thứ tự 1. 2. 3.
-                    if (/^\d+\./.test(text)) {
+                    // List dạng -
+                    if (text.startsWith('-')) {
                         return (
                             <div key={index} className="flex gap-2 text-gray-700">
-                                <span className="font-medium">{text.match(/^\d+\./)[0]}</span>
+                                <span className="text-orange-500">•</span>
+
+                                <span>{text.replace(/^-\s*/, '')}</span>
+                            </div>
+                        );
+                    }
+
+                    // Số thứ tự: 1. 2. 3.
+                    if (/^\d+\./.test(text)) {
+                        const number = text.match(/^\d+\./)[0];
+
+                        return (
+                            <div key={index} className="flex gap-2 text-gray-700">
+                                <span className="font-medium text-orange-500">{number}</span>
 
                                 <span>{text.replace(/^\d+\.\s*/, '')}</span>
                             </div>
                         );
                     }
 
-                    // dòng key:value
+                    // Dòng key:value
                     if (text.includes(':')) {
                         const [key, ...rest] = text.split(':');
 
@@ -349,8 +365,6 @@ export default function ChatWidget() {
             console.error('Xóa cuộc trò chuyện thất bại:', error.response?.data || error);
         }
     };
-
-    console.log(messages)
 
     return (
         <>

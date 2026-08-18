@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import {API_BASE_URL} from '../../../utils/api.js';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 export default function FeaturedTechnicians() {
     const navigate = useNavigate();
 
@@ -97,17 +97,22 @@ export default function FeaturedTechnicians() {
                                 <h3 className="text-xl font-bold text-gray-900">{tech.full_name}</h3>
 
                                 {/* Stars */}
+                                {/* Stars */}
                                 <div className="flex justify-center mt-3">
-                                    {[...Array(tech.total_star)].map((_, j) => (
-                                        <span key={j} className="text-yellow-400 text-xl">
-                                            ★
-                                        </span>
-                                    ))}
-                                    {[...Array(5 - tech.total_star)].map((_, j) => (
-                                        <span key={j} className="text-gray-300 text-xl">
-                                            ★
-                                        </span>
-                                    ))}
+                                    {[...Array(5)].map((_, j) => {
+                                        const rating = tech.total_star ?? 0;
+
+                                        return (
+                                            <Star
+                                                key={j}
+                                                className={`w-5 h-5 ${
+                                                    j < Math.round(rating)
+                                                        ? 'text-yellow-400 fill-yellow-400'
+                                                        : 'text-gray-300'
+                                                }`}
+                                            />
+                                        );
+                                    })}
                                 </div>
 
                                 {/* Button */}

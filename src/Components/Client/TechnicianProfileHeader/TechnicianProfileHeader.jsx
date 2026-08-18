@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import avatar from '../../../assets/default-avatar.jpg';
 import getCookie from '../../../utils/getToken';
+import { Star } from 'lucide-react';
 
 export default function TechnicianProfileHeader({ tech }) {
     const maxStars = 5;
@@ -47,15 +48,18 @@ export default function TechnicianProfileHeader({ tech }) {
             {/* Rating */}
             <div className="flex items-center gap-1 mt-2">
                 {[...Array(maxStars)].map((_, index) => (
-                    <span
+                    <Star
                         key={index}
-                        className={index < Math.round(tech?.total_star ?? 0) ? 'text-yellow-500' : 'text-gray-300'}
-                    >
-                        ★
-                    </span>
+                        className={`w-5 h-5 ${
+                            index < Math.round(tech?.total_star ?? 0)
+                                ? 'text-yellow-500 fill-yellow-500'
+                                : 'text-gray-300'
+                        }`}
+                    />
                 ))}
 
                 <span className="ml-1 font-semibold">{(tech?.total_star ?? 0).toFixed(1)}</span>
+
                 <span className="text-gray-400 text-sm">({numberRating} đánh giá)</span>
             </div>
 

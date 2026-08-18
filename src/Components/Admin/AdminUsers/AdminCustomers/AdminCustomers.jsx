@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { EyeIcon, Plus, User } from 'lucide-react';
+import { EyeIcon, User } from 'lucide-react';
 import getCookie from '../../../../utils/getToken';
 import avatarDefault from '../../../../assets/default-avatar.jpg';
 import LoadingOverlay from '../../../../Layouts/LoadingOverLay/LoadingOverlay';

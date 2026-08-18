@@ -159,7 +159,6 @@ export default function HeaderBooking() {
         showToast(`Bạn có thông báo mới \n ${notification.title}`, 'success');
     }, [notification]);
 
-
     return (
         <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10">
             <div className="max-w-7xl mx-auto flex items-center justify-between py-4 px-6">

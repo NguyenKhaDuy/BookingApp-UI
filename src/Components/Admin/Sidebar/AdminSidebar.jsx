@@ -22,7 +22,7 @@ import {
 import logo from '../../../assets/logo.png';
 import { useContext, useState } from 'react';
 import { UserContext } from '../../../Context/UserContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 
 export default function AdminSidebar({ active, setActive, open, setOpen }) {

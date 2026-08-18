@@ -89,7 +89,7 @@ export default function Footer() {
                     <h3 className="text-lg font-semibold text-white mb-4">Liên hệ</h3>
                     <ul className="space-y-4 text-gray-400">
                         <li className="flex items-start gap-3">
-                            <MapPin className="w-5 h-5 text-orange-500 mt-1" />
+                            <MapPin className="w-10 h-10 text-orange-500 mt-1" />
                             <span>19 Đường Quảng Trọng Hoàng, Phường Ninh Kiều, TP. Cần Thơ</span>
                         </li>
                         <li className="flex items-start gap-3">
