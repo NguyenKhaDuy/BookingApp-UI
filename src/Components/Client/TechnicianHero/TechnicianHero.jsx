@@ -18,7 +18,7 @@ export default function TechnicianHero() {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="text-gray-300 max-w-2xl mx-auto text-lg"
                 >
-                    Tất cả KTV đều được đào tạo bài bản – minh bạch hồ sơ – chấm điểm chất lượng rõ ràng.
+                    Tất cả kỹ thuật viên đều được đào tạo bài bản – minh bạch hồ sơ – chấm điểm chất lượng rõ ràng.
                 </motion.p>
             </div>
         </section>

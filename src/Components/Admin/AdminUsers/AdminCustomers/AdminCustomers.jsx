@@ -108,10 +108,10 @@ export default function AdminCustomer() {
                 <table className="min-w-full text-sm">
                     <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
                         <tr>
-                            <th className="p-3 text-left">Avatar</th>
-                            <th className="p-3 text-left">Full Name</th>
+                            <th className="p-3 text-left">Ảnh đại diện</th>
+                            <th className="p-3 text-left">Họ tên</th>
                             <th className="p-3 text-left">Email</th>
-                            <th className="p-3 text-left">Actions</th>
+                            <th className="p-3 text-left">Hành động</th>
                         </tr>
                     </thead>
 

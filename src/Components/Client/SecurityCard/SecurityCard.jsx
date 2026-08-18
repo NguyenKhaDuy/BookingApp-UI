@@ -1,4 +1,4 @@
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import { useState, useContext } from 'react';
 import axios from 'axios';
 import OtpForm from '../OtpForm/OtpForm';
@@ -18,6 +18,10 @@ export default function ProfilePassword({ profile }) {
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+
+    const [showOldPassword, setShowOldPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const isValid = oldPassword && newPassword && confirmPassword && newPassword === confirmPassword;
 
@@ -62,7 +66,7 @@ export default function ProfilePassword({ profile }) {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ otp, email: profile.email, type: "CHANGE_PASSWORD" }),
+                body: JSON.stringify({ otp, email: profile.email, type: 'CHANGE_PASSWORD' }),
             });
 
             const data = await res.json();
@@ -99,40 +103,106 @@ export default function ProfilePassword({ profile }) {
                 Đổi mật khẩu
             </h2>
 
-            <div className="space-y-4">
-                <div>
-                    <label className="text-sm text-gray-500">Mật khẩu hiện tại</label>
+            <div>
+                <label className="text-sm text-gray-500">Mật khẩu hiện tại</label>
+
+                <div className="relative mt-1">
                     <input
-                        type="password"
+                        type={showOldPassword ? 'text' : 'password'}
                         value={oldPassword}
                         onChange={(e) => setOldPassword(e.target.value)}
-                        className="mt-1 w-full p-3 border rounded-xl"
+                        className="
+                w-full p-3 pr-12
+                border border-gray-300
+                rounded-xl
+                outline-none
+                focus:border-orange-500
+                focus:ring-2
+                focus:ring-orange-200
+            "
                     />
-                </div>
 
-                <div>
-                    <label className="text-sm text-gray-500">Mật khẩu mới</label>
+                    <button
+                        type="button"
+                        onClick={() => setShowOldPassword((prev) => !prev)}
+                        className="
+                absolute right-3 top-1/2
+                -translate-y-1/2
+                text-gray-400
+                hover:text-orange-500
+            "
+                    >
+                        {showOldPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label className="text-sm text-gray-500">Mật khẩu mới</label>
+
+                <div className="relative mt-1">
                     <input
-                        type="password"
+                        type={showNewPassword ? 'text' : 'password'}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="mt-1 w-full p-3 border rounded-xl"
+                        className="
+                w-full p-3 pr-12
+                border border-gray-300
+                rounded-xl
+                outline-none
+                focus:border-orange-500
+                focus:ring-2
+                focus:ring-orange-200
+            "
                     />
-                </div>
 
-                <div>
-                    <label className="text-sm text-gray-500">Nhập lại mật khẩu</label>
+                    <button
+                        type="button"
+                        onClick={() => setShowNewPassword((prev) => !prev)}
+                        className="
+                absolute right-3 top-1/2
+                -translate-y-1/2
+                text-gray-400
+                hover:text-orange-500
+            "
+                    >
+                        {showNewPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label className="text-sm text-gray-500">Nhập lại mật khẩu</label>
+
+                <div className="relative mt-1">
                     <input
-                        type="password"
+                        type={showConfirmPassword ? 'text' : 'password'}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="mt-1 w-full p-3 border rounded-xl"
+                        className="
+                w-full p-3 pr-12
+                border border-gray-300
+                rounded-xl
+                outline-none
+                focus:border-orange-500
+                focus:ring-2
+                focus:ring-orange-200
+            "
                     />
-                </div>
 
-                {newPassword && confirmPassword && newPassword !== confirmPassword && (
-                    <p className="text-sm text-red-500">Mật khẩu không khớp</p>
-                )}
+                    <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((prev) => !prev)}
+                        className="
+                absolute right-3 top-1/2
+                -translate-y-1/2
+                text-gray-400
+                hover:text-orange-500
+            "
+                    >
+                        {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                    </button>
+                </div>
             </div>
 
             <button

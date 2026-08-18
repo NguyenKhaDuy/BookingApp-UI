@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, Wrench, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
@@ -135,7 +135,7 @@ export default function SkillManager() {
                                 <th className="p-3">ID</th>
                                 <th className="p-3">Tên kỹ năng</th>
                                 <th className="p-3">Ngày tạo</th>
-                                <th className="p-3">Thao tác</th>
+                                <th className="p-3 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -157,17 +157,17 @@ export default function SkillManager() {
                                         <td className="p-3">{item.id_skill}</td>
                                         <td className="p-3 font-medium">{item.skill_name}</td>
                                         <td className="p-3">{item.created_at || '-'}</td>
-                                        <td className="p-3 flex gap-2">
+                                        <td className="px-4 py-2 flex justify-center gap-3">
                                             <button
                                                 onClick={() => openEdit(item)}
-                                                className="p-2 rounded bg-blue-50 hover:bg-blue-100 text-blue-600"
+                                                className="p-2 rounded-md hover:bg-orange-50"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit3 className="w-4 h-4" />
                                             </button>
 
                                             <button
                                                 onClick={() => openDeleteConfirm(item.id_skill)}
-                                                className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                                                className="p-2 rounded-md hover:bg-red-50 text-red-500"
                                             >
                                                 <Trash2 className="w-4 h-4" />
                                             </button>

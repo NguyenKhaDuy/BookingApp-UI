@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
+import { Plus, Edit3, Trash2, ChevronLeft, ChevronRight, Layers } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import { useToast } from '../../../Context/ToastContext';
@@ -171,9 +171,9 @@ export default function ManageLevel() {
                                     <td className="px-6 py-3 flex items-center justify-center gap-3">
                                         <button
                                             onClick={() => handleEdit(lv)}
-                                            className="p-1.5 hover:bg-blue-50 text-blue-600 rounded-full transition"
+                                            className="p-1.5 hover:bg-blue-50 text-black-600 rounded-full transition"
                                         >
-                                            <Pencil className="w-4 h-4" />
+                                            <Edit3 className="w-4 h-4" />
                                         </button>
                                         <button
                                             onClick={() => setConfirmDeleteId(lv.id_level)}

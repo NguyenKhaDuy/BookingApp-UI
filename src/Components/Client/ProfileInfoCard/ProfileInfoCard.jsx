@@ -11,8 +11,6 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
     const [loading, setLoading] = useState(false);
     const { showToast } = useToast();
 
-    console.log(profile)
-
     useEffect(() => {
         if (profile) {
             setFormData({
@@ -93,7 +91,7 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                     <label className="text-sm text-gray-500">Họ và tên</label>
                     <input
                         name="full_name"
-                        value={formData.full_name}
+                        value={formData.full_name ?? ''}
                         onChange={handleChange}
                         className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500"
                     />
@@ -103,20 +101,11 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                     <label className="text-sm text-gray-500">Số điện thoại</label>
                     <input
                         name="phone_number"
-                        value={formData.phone_number}
+                        value={formData.phone_number ?? ''}
                         onChange={handleChange}
                         className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500"
                     />
                 </div>
-
-                {/* <div>
-                    <label className="text-sm text-gray-500">Email</label>
-                    <input
-                        value={formData.email}
-                        readOnly
-                        className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500 bg-gray-100"
-                    />
-                </div> */}
 
                 <div>
                     <label className="text-sm text-gray-500">Ngày sinh</label>
@@ -159,7 +148,7 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                     <label className="text-sm text-gray-500">Giới tính</label>
                     <input
                         name="gender"
-                        value={formData.gender}
+                        value={formData.gender ?? ''}
                         onChange={handleChange}
                         className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500"
                     />
@@ -169,14 +158,14 @@ export default function ProfileInfo({ profile, onProfileUpdated }) {
                     <label className="text-sm text-gray-500">Địa chỉ</label>
                     <input
                         name="address"
-                        value={formData.address}
+                        value={formData.address ?? ''}
                         onChange={handleChange}
                         className="mt-1 w-full p-4 rounded-xl border border-gray-300 outline-orange-500"
                     />
                 </div>
             </div>
 
-            {/* ================= SAVE BUTTON ================= */}
+            {/*  SAVE BUTTON  */}
             <button
                 onClick={handleSubmit}
                 disabled={!isDirty || loading}

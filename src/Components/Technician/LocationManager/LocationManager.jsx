@@ -16,11 +16,21 @@ export default function LocationManager() {
         fetch('http://localhost:8082/api/location/')
             .then((res) => res.json())
             .then((res) => {
+                console.log('LOCATION API:', res.data);
+
                 if (res.data) {
                     const list = res.data.map((l) => ({
-                        id: l.id_location,
+                        id: Number(l.id_location),
                         name: `${l.ward} - ${l.district} - ${l.conscious}`,
+                        ward: l.ward,
+                        district: l.district,
+                        conscious: l.conscious,
                     }));
+
+                    setAllLocations(list);
+
+                    console.log('LOCATION MAPPED:', list);
+
                     setAllLocations(list);
                 }
             })
@@ -143,6 +153,8 @@ export default function LocationManager() {
         }
     };
 
+    const selectedLocation = allLocations.find((l) => Number(l.id) === Number(selected));
+
     return (
         <div className="max-w-4xl">
             <div className="flex justify-between items-center mb-4">
@@ -218,8 +230,23 @@ export default function LocationManager() {
                         </button>
                     </div>
 
-                    <div className="w-full h-40 bg-gray-200 flex items-center justify-center rounded-lg">
-                        <span className="text-gray-600">[ Location Preview ]</span>
+                    <div className="w-full h-64 rounded-lg overflow-hidden border">
+                        {selectedLocation ? (
+                            <iframe
+                                key={selectedLocation.id}
+                                title="Location Map"
+                                className="w-full h-full border-0"
+                                loading="lazy"
+                                src={`https://www.google.com/maps?q=${encodeURIComponent(
+                                    selectedLocation.name,
+                                )}&z=15&output=embed`}
+                                allowFullScreen
+                            />
+                        ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                <span className="text-gray-500">Chọn vị trí để xem bản đồ</span>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

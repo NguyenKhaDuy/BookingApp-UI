@@ -247,7 +247,7 @@ export default function ManageRequest() {
 
                                 <InfoItem
                                     label="Thời gian hẹn"
-                                    value={`${formatDateArray(detail.scheduled_date)} ${formatTime(detail.scheduled_time)}`}
+                                    value={`${(detail.scheduled_date)} ${formatTime(detail.scheduled_time)}`}
                                 />
                             </div>
 

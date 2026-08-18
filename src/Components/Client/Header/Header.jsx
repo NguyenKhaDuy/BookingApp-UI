@@ -7,7 +7,6 @@ import logo from '../../../assets/logo.png';
 import { UserContext } from '../../../Context/UserContext';
 import default_avatar from '../../../assets/default-avatar.jpg';
 import getCookie from '../../../utils/getToken';
-import { formatDateTimeArray } from '../../../utils/formatDate';
 import { connectWebSocket, addWebSocketListener } from '../../../utils/stompClient';
 import { jwtDecode } from 'jwt-decode';
 import { useToast } from '../../../Context/ToastContext';
@@ -47,7 +46,7 @@ export default function HeaderBooking() {
                         unread: n.status_id === 2,
 
                         // hiển thị ngày giờ
-                        time: formatDateTimeArray(n.dateTime || n.created_at),
+                        time: n.dateTime,
 
                         // giữ để sort
                         createdAt: n.dateTime || n.created_at,
@@ -146,7 +145,7 @@ export default function HeaderBooking() {
 
         // LISTEN
         const unsubscribe = addWebSocketListener((msg) => {
-            console.log('📩 RECEIVED:', msg);
+            console.log('RECEIVED:', msg);
             setNotification(msg);
         });
 
@@ -159,6 +158,7 @@ export default function HeaderBooking() {
         if (!notification) return;
         showToast(`Bạn có thông báo mới \n ${notification.title}`, 'success');
     }, [notification]);
+
 
     return (
         <header className="w-full bg-[#0a1a2f]/80 backdrop-blur-xl shadow-lg sticky top-0 z-50 border-b border-white/10">
@@ -215,7 +215,7 @@ export default function HeaderBooking() {
                     <Link to="/technicians" className="hover:text-orange-500 transition">
                         Kỹ thuật viên
                     </Link>
-                    <Link to="/Booking" className="hover:text-orange-500 transition">
+                    <Link to={isLoggedIn ? '/Booking' : '/login'} className="hover:text-orange-500 transition">
                         Đặt lịch
                     </Link>
                     <Link to="/contact" className="hover:text-orange-500 transition">
@@ -481,7 +481,7 @@ export default function HeaderBooking() {
                             <Link to="/technicians" className="hover:text-orange-500 transition">
                                 Kỹ thuật viên
                             </Link>
-                            <Link to="/Booking" className="hover:text-orange-500 transition">
+                            <Link to={isLoggedIn ? '/Booking' : '/login'} className="hover:text-orange-500 transition">
                                 Đặt lịch
                             </Link>
                             <Link to="/contact" className="hover:text-orange-500 transition">

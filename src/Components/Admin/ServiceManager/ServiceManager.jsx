@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, Grid2X2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, Grid2X2, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
@@ -61,12 +61,11 @@ export default function ServiceManager() {
     // OPEN EDIT
     const openEdit = (item) => {
         setEditData(item);
-        setServiceName(item.name_service);
-
+        setServiceName(item.nameService);
         setIcon(null);
 
-        if (item.iconBase64) {
-            setPreview(`data:image/png;base64,${item.iconBase64}`);
+        if (item.icon) {
+            setPreview(`data:image/png;base64,${item.icon}`);
         } else {
             setPreview('');
         }
@@ -181,7 +180,7 @@ export default function ServiceManager() {
                                 <th className="p-3">Ảnh</th>
                                 <th className="p-3">Tên dịch vụ</th>
                                 <th className="p-3">Ngày tạo</th>
-                                <th className="p-3">Thao tác</th>
+                                <th className="p-3 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -214,18 +213,19 @@ export default function ServiceManager() {
                                         </td>
                                         <td className="p-3 font-medium">{item.nameService}</td>
                                         <td className="p-3">{item.created_at || '-'}</td>
-                                        <td className="p-3 flex gap-2">
+                                        <td className="px-4 py-2 flex justify-center gap-3">
                                             <button
                                                 onClick={() => openEdit(item)}
-                                                className="p-2 rounded bg-blue-50 hover:bg-blue-100 text-blue-600"
+                                                className="p-2 rounded-md hover:bg-orange-50"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit3 size={18} />
                                             </button>
+
                                             <button
                                                 onClick={() => openDeleteConfirm(item.id_service)}
-                                                className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                                                className="p-2 rounded-md hover:bg-red-50 text-red-500"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 size={18} />
                                             </button>
                                         </td>
                                     </tr>

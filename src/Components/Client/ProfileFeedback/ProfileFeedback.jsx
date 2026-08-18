@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
-import {API_BASE_URL} from "../../../utils/api.js";
+import { API_BASE_URL } from "../../../utils/api.js";
+import getCookie from '../../../utils/getToken.js';
 export default function ProfileFeedback({ profile }) {
     const [content, setContent] = useState('');
     const [requestId, setRequestId] = useState(null);
@@ -14,28 +15,31 @@ export default function ProfileFeedback({ profile }) {
         try {
             setLoadingRequests(true);
 
-            const token = localStorage.getItem('token');
-            if (!token || !profile?.id_user) return;
+            const token = getCookie('token');
 
-            const res = await fetch(`${API_BASE_URL}/customer/request/id_customer=${profile.id_user}`, {
+            if (!token || !profile?.id_user) {
+                return;
+            }
+
+            const res = await axios.get(`${API_BASE_URL}/customer/request/id_customer=${profile.id_user}`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
 
-            const json = await res.json();
-
-            if (json.message === 'Success') {
-                setRequests(json.data || []);
+            if (res.data.message === 'Success') {
+                setRequests(res.data.data || []);
             } else {
-                console.error(json.message);
+                setRequests([]);
+                console.error(res.data.message);
             }
         } catch (err) {
-            console.error('Lỗi lấy danh sách request', err);
+            console.error('Lỗi lấy danh sách request:', err.response?.data || err);
+            setRequests([]);
         } finally {
             setLoadingRequests(false);
         }
-    }, [profile]);
+    }, [profile?.id_user]);
 
     /*  INIT  */
     useEffect(() => {
@@ -53,7 +57,7 @@ export default function ProfileFeedback({ profile }) {
             setLoading(true);
             setSuccess(null);
 
-            const token = localStorage.getItem('token');
+            const token = getCookie('token');
 
             await axios.post(
                 `${API_BASE_URL}/customer/feedback/`,
@@ -80,6 +84,7 @@ export default function ProfileFeedback({ profile }) {
             setLoading(false);
         }
     };
+
     return (
         <div className="bg-white p-6 rounded-2xl shadow border border-gray-200">
             <h2 className="text-2xl font-bold text-gray-800 mb-1">Góp ý & Phản hồi</h2>
@@ -87,20 +92,27 @@ export default function ProfileFeedback({ profile }) {
             <p className="text-sm text-gray-500 mb-5">Ý kiến của bạn giúp chúng tôi cải thiện dịch vụ tốt hơn</p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-                {/* ===== SELECT REQUEST ===== */}
+                {/*  SELECT REQUEST  */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Mã yêu cầu (không bắt buộc)</label>
 
                     <select
                         value={requestId ?? ''}
-                        disabled={loadingRequests || requests.length === 0}
-                        onChange={(e) => setRequestId(e.target.value ? Number(e.target.value) : null)}
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            setRequestId(value ? value : null);
+                        }}
+                        disabled={loadingRequests}
                         className="
-                            w-full rounded-xl bg-gray-50 text-gray-800
-                            border border-gray-300 p-3
-                            focus:outline-none focus:ring-2 focus:ring-orange-500
-                            disabled:bg-gray-100 disabled:text-gray-400
-                        "
+        w-full rounded-xl
+        bg-gray-50 text-gray-800
+        border border-gray-300 p-3
+        outline-none
+        focus:border-orange-500
+        focus:ring-2 focus:ring-orange-500
+        disabled:bg-gray-100
+        disabled:text-gray-400
+    "
                     >
                         <option value="">
                             {loadingRequests ? 'Đang tải danh sách yêu cầu...' : '— Không chọn mã yêu cầu —'}
@@ -108,13 +120,13 @@ export default function ProfileFeedback({ profile }) {
 
                         {requests.map((req) => (
                             <option key={req.id_request} value={req.id_request}>
-                                {req.code || `Yêu cầu #${req.id_request} ${req.status_code}`}
+                                {req.code ? req.code : `Yêu cầu #${req.id_request} ${req.status_code || ''}`}
                             </option>
                         ))}
                     </select>
                 </div>
 
-                {/* ===== CONTENT ===== */}
+                {/*  CONTENT  */}
                 <textarea
                     rows={5}
                     value={content}

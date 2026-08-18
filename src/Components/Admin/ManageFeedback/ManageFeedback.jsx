@@ -89,6 +89,7 @@ export default function ManageFeedback() {
         }
     };
 
+    console.log(selected)
 
     return (
         <div className="p-6 space-y-5">
@@ -102,6 +103,7 @@ export default function ManageFeedback() {
                     <thead className="bg-gray-50 text-gray-600 text-xs uppercase border-b">
                         <tr>
                             <th className="px-6 py-3 text-left">Mã feedback</th>
+                            <th className="px-6 py-3 text-left">Mã yêu cầu</th>
                             <th className="px-6 py-3 text-left">Khách hàng</th>
                             <th className="px-6 py-3 text-left">Kỹ thuật</th>
                             <th className="px-6 py-3 text-center">Hành động</th>
@@ -111,13 +113,14 @@ export default function ManageFeedback() {
                         {requests.length > 0 ? (
                             requests.map((r) => (
                                 <tr key={r.id_request} className="border-b hover:bg-gray-50">
+                                    <td className="px-6 py-3">{r.id_feedback}</td>
                                     <td className="px-6 py-3">{r.id_request}</td>
                                     <td className="px-6 py-3 font-medium">{r.name_customer}</td>
                                     <td className="px-6 py-3">{r.name_techinician || '—'}</td>
                                     <td className="px-6 py-3 text-center">
                                         <button
                                             onClick={() => openDetail(r.id_feedback)}
-                                            className="px-3 py-1.5 bg-blue-600 text-white rounded-lg text-xs hover:bg-blue-700"
+                                            className="px-3 py-1.5 bg-orange-600 text-white rounded-lg text-xs hover:bg-orange-700"
                                         >
                                             <Eye className="w-4 h-4 inline-block mr-1" />
                                             Xem
@@ -170,7 +173,7 @@ export default function ManageFeedback() {
                 <div className="fixed inset-0 z-50 !mt-0 bg-black/50 backdrop-blur-sm flex items-center justify-center px-4">
                     <div className="bg-white max-w-3xl w-full rounded-2xl shadow-2xl overflow-hidden animate-[fadeIn_0.2s_ease]">
                         {/* Header */}
-                        <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-blue-600 to-blue-500 text-white">
+                        <div className="flex justify-between items-center p-4 border-b bg-gradient-to-r from-orange-600 to-orange-500 text-white">
                             <h3 className="text-lg font-semibold flex items-center gap-2">
                                 <BadgeInfo className="w-5 h-5" />
                                 Chi tiết Feedback
@@ -240,11 +243,11 @@ export default function ManageFeedback() {
                                             value={reply}
                                             onChange={(e) => setReply(e.target.value)}
                                             placeholder="Nhập phản hồi..."
-                                            className="w-full p-4 rounded-xl border border-gray-300 outline-orange-500 text-sm focus:border-blue-500 focus:ring-blue-400 focus:ring-1 transition bg-white"
+                                            className="w-full p-4 rounded-xl border border-gray-300 outline-orange-500 text-sm focus:border-orange-500 focus:ring-orange-400 focus:ring-1 transition bg-white"
                                         />
                                         <button
                                             onClick={handleReply}
-                                            className="w-full p-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                                            className="w-full p-2.5 rounded-xl bg-orange-600 text-white font-medium hover:bg-orange-700 transition flex items-center justify-center gap-2"
                                         >
                                             <Send className="w-4 h-4" />
                                             Gửi phản hồi

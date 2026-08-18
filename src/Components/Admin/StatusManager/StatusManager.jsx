@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, ListChecks, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, ListChecks, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
@@ -145,7 +145,7 @@ export default function StatusManager() {
                                 <th className="p-3">Tên trạng thái</th>
                                 <th className="p-3">Mô tả</th>
                                 <th className="p-3">Ngày tạo</th>
-                                <th className="p-3">Hành động</th>
+                                <th className="p-3 text-center">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -168,19 +168,19 @@ export default function StatusManager() {
                                         <td className="p-3 font-medium">{item.nameStatus}</td>
                                         <td className="p-3">{item.description || '-'}</td>
                                         <td className="p-3">{item.created_at || '-'}</td>
-                                        <td className="p-3 flex gap-2">
+                                        <td className="px-4 py-2 flex justify-center gap-3">
                                             <button
                                                 onClick={() => openEdit(item)}
-                                                className="p-2 rounded bg-blue-50 hover:bg-blue-100 text-blue-600"
+                                                className="p-2 rounded-md hover:bg-orange-50"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit3 size={18} />
                                             </button>
 
                                             <button
                                                 onClick={() => openDeleteConfirm(item.id_status)}
-                                                className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                                                className="p-2 rounded-md hover:bg-red-50 text-red-500"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 size={18} />
                                             </button>
                                         </td>
                                     </tr>

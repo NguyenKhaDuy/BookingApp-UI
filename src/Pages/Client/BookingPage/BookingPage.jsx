@@ -131,7 +131,7 @@ export default function BookingTechnicianForm() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg border mt-10 relative">
+        <div className="max-w-2xl mx-auto mb-10 bg-white p-8 rounded-2xl shadow-lg border mt-10 relative">
             <h2 className="text-3xl font-bold text-gray-800 mb-6 text-center">Đặt thợ sửa chữa</h2>
 
             <div className="space-y-6">

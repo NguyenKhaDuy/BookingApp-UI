@@ -2,26 +2,8 @@ import { useState, useEffect } from 'react';
 import { CheckCircle, XCircle } from 'lucide-react';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
-import { FileText, UserRound, CalendarDays, Banknote } from 'lucide-react';
-import {API_BASE_URL} from '../../../utils/api.js';
-
-const formatDate = (date) => {
-    if (!date) return 'Chưa thanh toán';
-
-    // Nếu backend trả dạng yyyyMMdd (20251118)
-    if (/^\d{8}$/.test(date)) {
-        const y = date.slice(0, 4);
-        const m = date.slice(4, 6);
-        const d = date.slice(6, 8);
-        return `${d}/${m}/${y}`;
-    }
-
-    // ISO date: yyyy-MM-dd
-    const parsed = new Date(date);
-    if (isNaN(parsed)) return 'Chưa thanh toán';
-
-    return parsed.toLocaleDateString('vi-VN');
-};
+import { FileText, UserRound, CalendarDays, Banknote, ChevronLeft, ChevronRight } from 'lucide-react';
+import { API_BASE_URL } from '../../../utils/api.js';
 
 export default function Invoice() {
     const { showToast } = useToast();
@@ -276,25 +258,70 @@ export default function Invoice() {
             </div>
 
             {/* PAGINATION */}
-            <div className="flex justify-center gap-4 mt-6">
-                <button
-                    disabled={pageNo === 1}
-                    onClick={() => setPageNo(pageNo - 1)}
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    Trước
-                </button>
-                <span className="font-medium">
-                    {pageNo} / {totalPage}
-                </span>
-                <button
-                    disabled={pageNo === totalPage}
-                    onClick={() => setPageNo(pageNo + 1)}
-                    className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    Sau
-                </button>
-            </div>
+            {totalPage > 0 && (
+                <div className="flex justify-center items-center gap-2 mb-12 mt-12">
+                    {/* Nút Previous */}
+                    <button
+                        onClick={() => setPageNo((prev) => Math.max(prev - 1, 1))}
+                        disabled={pageNo === 1}
+                        className="
+                flex items-center justify-center
+                w-10 h-10
+                rounded-lg
+                bg-gray-200
+                hover:bg-orange-100
+                hover:text-orange-500
+                transition
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            "
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+
+                    {/* Các trang */}
+                    {Array.from({
+                        length: totalPage,
+                    }).map((_, index) => {
+                        const page = index + 1;
+
+                        return (
+                            <button
+                                key={page}
+                                onClick={() => setPageNo(page)}
+                                className={`
+                        px-4 py-2
+                        rounded-lg
+                        transition
+
+                        ${page === pageNo ? 'bg-orange-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}
+                    `}
+                            >
+                                {page}
+                            </button>
+                        );
+                    })}
+
+                    {/* Nút Next */}
+                    <button
+                        onClick={() => setPageNo((prev) => Math.min(prev + 1, totalPage))}
+                        disabled={pageNo === totalPage}
+                        className="
+                flex items-center justify-center
+                w-10 h-10
+                rounded-lg
+                bg-gray-200
+                hover:bg-orange-100
+                hover:text-orange-500
+                transition
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            "
+                    >
+                        <ChevronRight size={20} />
+                    </button>
+                </div>
+            )}
 
             {/* DETAIL MODAL */}
             {showDetailModal && selectedInvoice && (
@@ -321,7 +348,7 @@ export default function Invoice() {
                             </div>
                             <div>
                                 <p className="text-gray-500">Ngày</p>
-                                <p className="font-medium">{formatDate(selectedInvoice.paid_at) || '—'}</p>
+                                <p className="font-medium">{selectedInvoice.paid_at || '—'}</p>
                             </div>
                             <div>
                                 <p className="text-gray-500">Phương thức</p>

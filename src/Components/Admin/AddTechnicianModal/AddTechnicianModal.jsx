@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Phone, Lock, MapPin, X } from 'lucide-react';
+import { User, Mail, Phone, MapPin, X, BriefcaseBusiness, Clock } from 'lucide-react';
 
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay.jsx';
 import { API_BASE_URL } from '../../../utils/api.js';
@@ -9,7 +9,7 @@ import { useToast } from '../../../Context/ToastContext.jsx';
 export default function AddTechnicianModal({ show, onClose, onSuccess }) {
     const token = getCookie('token');
     const [loadingOverLay, setLoadingOverLay] = useState(false);
- const { showToast } = useToast();
+    const { showToast } = useToast();
     const [form, setForm] = useState({
         full_name: '',
         email: '',
@@ -17,6 +17,8 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
         address: '',
         dob: '',
         gender: 'Nam',
+        working_area: '',
+        experience_year: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -39,6 +41,8 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
             address: '',
             dob: '',
             gender: 'Nam',
+            working_area: '',
+            experience_year: '',
         });
 
         setError('');
@@ -59,6 +63,8 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
             address: form.address,
             dob: form.dob,
             gender: form.gender,
+            working_area: form.working_area,
+            experience_year: form.experience_year ? Number(form.experience_year) : null,
         };
 
         try {
@@ -83,13 +89,13 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
 
             resetForm();
 
-            showToast("Thêm thợ thành công", 'success');
+            showToast('Thêm thợ thành công', 'success');
 
             onSuccess?.();
 
             onClose();
         } catch (err) {
-            showToast("Thêm thợ không thành công", 'error');
+            showToast('Thêm thợ không thành công', 'error');
             setError(err.message);
         } finally {
             setLoading(false);
@@ -141,6 +147,24 @@ export default function AddTechnicianModal({ show, onClose, onSuccess }) {
                             name="address"
                             value={form.address}
                             placeholder="Địa chỉ"
+                            onChange={handleChange}
+                        />
+
+                        <Input
+                            icon={BriefcaseBusiness}
+                            name="working_area"
+                            value={form.working_area}
+                            placeholder="Khu vực làm việc"
+                            onChange={handleChange}
+                        />
+
+                        <Input
+                            icon={Clock}
+                            name="experience_year"
+                            type="number"
+                            min="0"
+                            value={form.experience_year}
+                            placeholder="Số năm kinh nghiệm"
                             onChange={handleChange}
                         />
 
@@ -220,9 +244,12 @@ function Input({ icon: Icon, ...props }) {
         <div className="relative">
             <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 
-            <input {...props} className="w-full pl-10 p-3 border rounded-lg bg-white
+            <input
+                {...props}
+                className="w-full pl-10 p-3 border rounded-lg bg-white
                         focus:border-orange-500 focus:ring-2 focus:ring-orange-300 outline-none transition
-                        required" />
+                        required"
+            />
         </div>
     );
 }

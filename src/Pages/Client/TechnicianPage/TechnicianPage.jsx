@@ -1,7 +1,7 @@
 import React, { Fragment, useEffect, useState } from 'react';
 import axios from 'axios';
 import { useSearchParams } from 'react-router-dom';
-
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
 import TechnicianHero from '../../../Components/Client/TechnicianHero/TechnicianHero';
 import TechnicianFilter from '../../../Components/Client/TechnicianFilter/TechnicianFilter';
@@ -108,10 +108,28 @@ export default function TechnicianPage() {
 
             <TechnicianGrid list={filtered} />
 
-            {/*
-                Pagination*/}
-            {totalPage > 1 && (
-                <div className="flex justify-center gap-2 mb-12">
+            {totalPage > 0 && (
+                <div className="flex justify-center items-center gap-2 mb-12">
+                    {/* Nút Previous */}
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                        disabled={currentPage === 1}
+                        className="
+                flex items-center justify-center
+                w-10 h-10
+                rounded-lg
+                bg-gray-200
+                hover:bg-orange-100
+                hover:text-orange-500
+                transition
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            "
+                    >
+                        <ChevronLeft size={20} />
+                    </button>
+
+                    {/* Các trang */}
                     {Array.from({
                         length: totalPage,
                     }).map((_, index) => {
@@ -122,21 +140,36 @@ export default function TechnicianPage() {
                                 key={page}
                                 onClick={() => setCurrentPage(page)}
                                 className={`
-                                    px-4 py-2
-                                    rounded-lg
-                                    transition
+                        px-4 py-2
+                        rounded-lg
+                        transition
 
-                                    ${
-                                        page === currentPage
-                                            ? 'bg-orange-500 text-white'
-                                            : 'bg-gray-200 hover:bg-gray-300'
-                                    }
-                                `}
+                        ${page === currentPage ? 'bg-orange-500 text-white' : 'bg-gray-200 hover:bg-gray-300'}
+                    `}
                             >
                                 {page}
                             </button>
                         );
                     })}
+
+                    {/* Nút Next */}
+                    <button
+                        onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPage))}
+                        disabled={currentPage === totalPage}
+                        className="
+                flex items-center justify-center
+                w-10 h-10
+                rounded-lg
+                bg-gray-200
+                hover:bg-orange-100
+                hover:text-orange-500
+                transition
+                disabled:opacity-40
+                disabled:cursor-not-allowed
+            "
+                    >
+                        <ChevronRight size={20} />
+                    </button>
                 </div>
             )}
 
