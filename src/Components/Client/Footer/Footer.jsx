@@ -1,6 +1,20 @@
 import { Mail, MapPin, Phone } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import logo from '../../../assets/logo.png';
+import getCookie from '../../../utils/getToken';
+import { useEffect, useState } from 'react';
 export default function Footer() {
+    const navigate = useNavigate();
+    const [isLogin, setIsLogin] = useState(true);
+    useEffect(() => {
+        const token = getCookie('token');
+
+        const user = localStorage.getItem('user');
+
+        if (!token || !user) {
+            setIsLogin(false);
+        }
+    }, []);
     return (
         <footer className="bg-[#0a1a2f] text-gray-300 pt-20 pb-10 px-6 z-50">
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12">
@@ -21,24 +35,24 @@ export default function Footer() {
                     <h3 className="text-lg font-semibold text-white mb-4">Điều hướng</h3>
                     <ul className="space-y-3 text-gray-400">
                         <li>
-                            <a href="#services" className="hover:text-orange-500 transition">
+                            <Link to={'/'} className="hover:text-orange-500 transition">
                                 Dịch vụ
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="#technicians" className="hover:text-orange-500 transition">
+                            <Link to="/technicians" className="hover:text-orange-500 transition">
                                 Kỹ thuật viên
-                            </a>
+                            </Link>
                         </li>
                         <li>
-                            <a href="#pricing" className="hover:text-orange-500 transition">
-                                Bảng giá
-                            </a>
+                            <Link to={isLogin ? '/booking' : '/login'} className="hover:text-orange-500 transition">
+                                Đặt lịch
+                            </Link>
                         </li>
                         <li>
-                            <a href="#contact" className="hover:text-orange-500 transition">
+                            <Link to={'/contact'} className="hover:text-orange-500 transition">
                                 Liên hệ
-                            </a>
+                            </Link>
                         </li>
                     </ul>
                 </div>

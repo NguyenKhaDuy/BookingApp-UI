@@ -1,11 +1,29 @@
-import { useNavigate } from "react-router-dom";
-import avatar from '../../../assets/default-avatar.jpg'
+import { useNavigate } from 'react-router-dom';
+import avatar from '../../../assets/default-avatar.jpg';
+import getCookie from '../../../utils/getToken';
 
 export default function TechnicianProfileHeader({ tech }) {
     const maxStars = 5;
     const isOnline = tech.status_technician === 'ONLINE';
     const navigate = useNavigate();
     const numberRating = tech.ratingDTOS?.length ?? 0;
+
+    const handleBooking = () => {
+        const token = getCookie("token");
+
+        const user = localStorage.getItem('user');
+
+        if (!token || !user) {
+            navigate('/login', {
+                state: {
+                    from: `/booking/${tech.id_user}`,
+                },
+            });
+            return;
+        }
+
+        navigate(`/booking/${tech.id_user}`);
+    };
     return (
         <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col items-center text-center relative">
             {/* Status badge */}
@@ -44,15 +62,11 @@ export default function TechnicianProfileHeader({ tech }) {
             {/* Action Buttons */}
             <div className="flex gap-3 mt-4">
                 <button
-                    onClick={() => navigate(`/booking/${tech.id_user}`)}
+                    onClick={handleBooking}
                     disabled={!isOnline}
                     className={`px-5 py-2 rounded-xl shadow
-            ${
-                isOnline
-                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }
-          `}
+        ${isOnline ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+    `}
                 >
                     Đặt lịch
                 </button>

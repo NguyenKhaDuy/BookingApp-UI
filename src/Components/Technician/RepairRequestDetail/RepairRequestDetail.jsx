@@ -19,7 +19,7 @@ export default function RepairRequestDetail({ data, onClose }) {
                         <b>Trạng thái:</b> {data.status_code}
                     </div>
                     <div>
-                        <b>Ngày hẹn:</b> {formatDateArray(data.scheduled_date)}
+                        <b>Ngày hẹn:</b> {(data.scheduled_date)}
                     </div>
                     <div>
                         <b>Giờ hẹn:</b> {formatTime(data.scheduled_time)}

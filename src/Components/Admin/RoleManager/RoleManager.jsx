@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Edit, Trash2, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, Shield, ChevronLeft, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
@@ -139,7 +139,7 @@ export default function RoleManager() {
                                 <th className="p-3">ID</th>
                                 <th className="p-3">Tên Role</th>
                                 <th className="p-3">Ngày tạo</th>
-                                <th className="p-3">Thao tác</th>
+                                <th className="p-3 text-center">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -161,19 +161,19 @@ export default function RoleManager() {
                                         <td className="p-3">{item.id_role}</td>
                                         <td className="p-3 font-medium">{item.role_name}</td>
                                         <td className="p-3">{item.created_at || '-'}</td>
-                                        <td className="p-3 flex gap-2">
+                                        <td className="p-3 flex justify-center gap-2">
                                             <button
                                                 onClick={() => openEdit(item)}
-                                                className="p-2 rounded bg-blue-50 hover:bg-blue-100 text-blue-600"
+                                                className="p-2 rounded-md hover:bg-orange-50"
                                             >
-                                                <Edit className="w-4 h-4" />
+                                                <Edit3 size={18} />
                                             </button>
 
                                             <button
                                                 onClick={() => openDeleteConfirm(item.id_role)}
-                                                className="p-2 rounded bg-red-50 hover:bg-red-100 text-red-600"
+                                                className="p-2 rounded-md hover:bg-red-50 text-red-500"
                                             >
-                                                <Trash2 className="w-4 h-4" />
+                                                <Trash2 size={18} />
                                             </button>
                                         </td>
                                     </tr>

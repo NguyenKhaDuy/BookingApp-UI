@@ -20,10 +20,10 @@ export function connectWebSocket(token) {
     //AUTO chọn cách connect
     webSocketFactory: () => {
       if (isReactNative()) {
-        console.log("📱 Using React Native WebSocket");
+        console.log("Using React Native WebSocket");
         return new WebSocket(WS_URL_RAW);
       } else {
-        console.log("🌐 Using SockJS (Web)");
+        console.log("Using SockJS (Web)");
         return new SockJS(WS_URL);
       }
     },

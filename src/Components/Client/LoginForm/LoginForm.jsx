@@ -1,6 +1,6 @@
 import { useState, useContext } from 'react';
 import axios from 'axios';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../Context/UserContext';
 import { useToast } from '../../../Context/ToastContext';
@@ -11,9 +11,11 @@ let stompClient = null;
 
 export default function LoginForm() {
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     const { showToast } = useToast();
     const navigate = useNavigate();
-    const { setUser } = useContext(UserContext); // Lấy setUser từ context
+    const { setUser } = useContext(UserContext);
 
     const [form, setForm] = useState({
         email: '',
@@ -29,11 +31,15 @@ export default function LoginForm() {
 
         try {
             setLoading(true);
-            const res = await axios.post(`${API_BASE_URL}/login/`, form, {
-                withCredentials: true,
-            });
 
-            //LƯU USER INFO
+            const res = await axios.post(
+                `${API_BASE_URL}/login/`,
+                form,
+                {
+                    withCredentials: true,
+                }
+            );
+
             localStorage.setItem('user', JSON.stringify(res.data));
             setUser(res.data);
 
@@ -53,6 +59,7 @@ export default function LoginForm() {
                 navigate('/');
                 return;
             }
+
         } catch (error) {
             showToast('Sai email hoặc mật khẩu', 'error');
         } finally {
@@ -60,18 +67,22 @@ export default function LoginForm() {
         }
     };
 
-    //GOOGLE LOGIN
     const handleGoogleLogin = () => {
         window.location.href = `${API_URL_GG}/oauth2/authorization/google`;
     };
 
     return (
         <form className="w-full space-y-5" onSubmit={handleSubmit}>
+
             {/* Email */}
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-gray-700">Email</label>
+                <label className="text-sm font-semibold text-gray-700">
+                    Email
+                </label>
+
                 <div className="relative">
                     <Mail className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+
                     <input
                         type="email"
                         name="email"
@@ -88,25 +99,46 @@ export default function LoginForm() {
 
             {/* Password */}
             <div className="flex flex-col gap-2">
-                <label className="text-sm font-semibold text-gray-700">Mật khẩu</label>
+                <label className="text-sm font-semibold text-gray-700">
+                    Mật khẩu
+                </label>
+
                 <div className="relative">
                     <Lock className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
+
                     <input
-                        type="password"
+                        type={showPassword ? 'text' : 'password'}
                         name="password"
                         value={form.password}
                         onChange={handleChange}
                         placeholder="Nhập mật khẩu"
-                        className="w-full pl-10 pr-4 py-3 border rounded-lg bg-white
+                        className="w-full pl-10 pr-12 py-3 border rounded-lg bg-white
                         focus:border-orange-500 focus:ring-2 focus:ring-orange-300
                         outline-none transition"
                         required
                     />
+
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2
+                        text-gray-400 hover:text-gray-600 transition"
+                        tabIndex={-1}
+                    >
+                        {showPassword ? (
+                            <EyeOff className="w-5 h-5" />
+                        ) : (
+                            <Eye className="w-5 h-5" />
+                        )}
+                    </button>
                 </div>
             </div>
 
             <div className="flex justify-end">
-                <Link to="/forgot-password" className="text-sm text-orange-500 font-semibold hover:underline">
+                <Link
+                    to="/forgot-password"
+                    className="text-sm text-orange-500 font-semibold hover:underline"
+                >
                     Quên mật khẩu?
                 </Link>
             </div>
@@ -127,23 +159,34 @@ export default function LoginForm() {
                 <div className="flex-1 h-px bg-gray-300" />
             </div>
 
-            {/*GOOGLE LOGIN BUTTON */}
+            {/* Google Login */}
             <button
                 type="button"
                 onClick={handleGoogleLogin}
                 className="w-full border flex items-center justify-center gap-3
                 py-3 rounded-xl hover:bg-gray-50 transition"
             >
-                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-5 h-5" />
-                <span className="font-medium">Đăng nhập bằng Google</span>
+                <img
+                    src="https://developers.google.com/identity/images/g-logo.png"
+                    alt="Google"
+                    className="w-5 h-5"
+                />
+
+                <span className="font-medium">
+                    Đăng nhập bằng Google
+                </span>
             </button>
 
             <p className="text-center text-sm text-gray-600">
                 Chưa có tài khoản?{' '}
-                <Link to="/register" className="text-orange-500 font-semibold hover:underline">
+                <Link
+                    to="/register"
+                    className="text-orange-500 font-semibold hover:underline"
+                >
                     Đăng ký ngay
                 </Link>
             </p>
+
             <LoadingOverlay show={loading} />
         </form>
     );

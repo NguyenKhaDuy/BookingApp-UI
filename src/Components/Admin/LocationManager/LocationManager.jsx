@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, X, Search, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Edit3, Trash2, X, Search, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
 import getCookie from '../../../utils/getToken';
 import { useToast } from '../../../Context/ToastContext';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
@@ -269,16 +269,17 @@ export default function LocationManager() {
                                     <td className="px-4 py-2">{x.district}</td>
                                     <td className="px-4 py-2">{x.ward}</td>
                                     <td className="px-4 py-2">{x.conscious}</td>
-                                    <td className="px-4 py-2 flex justify-center gap-3">
+                                    <td className="p-3 flex justify-center gap-2">
                                         <button
                                             onClick={() => openModal(x)}
-                                            className="text-blue-600 hover:text-blue-800"
+                                            className="p-2 rounded-md hover:bg-orange-50"
                                         >
-                                            <Edit size={18} />
+                                            <Edit3 size={18} />
                                         </button>
+
                                         <button
                                             onClick={() => handleDelete(x.id_location)}
-                                            className="text-red-600 hover:text-red-800"
+                                            className="p-2 rounded-md hover:bg-red-50 text-red-500"
                                         >
                                             <Trash2 size={18} />
                                         </button>

@@ -70,10 +70,7 @@ export default function ChatWidget() {
         const msgs = conversation.messageDTOS.map((item) => ({
             sender: item.sender === 'AI' ? 'ai' : 'user',
             content: item.content,
-            time: new Date(item.createdAt).toLocaleTimeString('vi-VN', {
-                hour: '2-digit',
-                minute: '2-digit',
-            }),
+            time: item.createdAt?.substring(11, 16),
         }));
 
         setMessages(msgs);
@@ -353,6 +350,8 @@ export default function ChatWidget() {
         }
     };
 
+    console.log(messages)
+
     return (
         <>
             {open && (
@@ -407,43 +406,62 @@ export default function ChatWidget() {
                         </div>
 
                         <div className="h-[calc(100%-130px)] overflow-y-auto">
-                            {conversations.map((item) => (
-                                <div
-                                    key={item.idConversation}
-                                    className="
-                                        group flex items-center justify-between
-                                        border-b px-4 py-3
-                                        hover:bg-white
-                                    "
-                                >
-                                    <button
-                                        onClick={() => selectConversation(item)}
-                                        className="min-w-0 flex-1 text-left"
+                            {conversations.map((item) => {
+                                const isSelected = selectedConversation?.idConversation === item.idConversation;
+
+                                return (
+                                    <div
+                                        key={item.idConversation}
+                                        className={`
+                group flex items-center justify-between
+                border-b px-4 py-3
+                cursor-pointer
+                transition
+
+                ${isSelected ? 'bg-orange-100 border-l-4 border-l-orange-500' : 'hover:bg-white'}
+            `}
                                     >
-                                        <p className="truncate font-medium">{item.title}</p>
+                                        <button
+                                            onClick={() => selectConversation(item)}
+                                            className="min-w-0 flex-1 text-left"
+                                        >
+                                            <p
+                                                className={`
+                        truncate font-medium
+                        ${isSelected ? 'text-orange-600' : 'text-gray-800'}
+                    `}
+                                            >
+                                                {item.title}
+                                            </p>
 
-                                        <p className="mt-1 text-xs text-gray-500">
-                                            {item.createdAt}
-                                        </p>
-                                    </button>
+                                            <p
+                                                className={`
+                        mt-1 text-xs
+                        ${isSelected ? 'text-orange-500' : 'text-gray-500'}
+                    `}
+                                            >
+                                                {item.createdAt}
+                                            </p>
+                                        </button>
 
-                                    <button
-                                        onClick={() => deleteConversation(item.idConversation)}
-                                        className="
-                                            ml-2 rounded-lg p-2
-                                            text-gray-400
+                                        <button
+                                            onClick={() => deleteConversation(item.idConversation)}
+                                            className={`
+                    ml-2 rounded-lg p-2
+                    text-gray-400
 
-                                            sm:opacity-0
-                                            sm:group-hover:opacity-100
+                    sm:opacity-0
+                    sm:group-hover:opacity-100
 
-                                            hover:bg-red-100
-                                            hover:text-red-500
-                                        "
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
-                                </div>
-                            ))}
+                    hover:bg-red-100
+                    hover:text-red-500
+                `}
+                                        >
+                                            <Trash2 size={16} />
+                                        </button>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </aside>
 

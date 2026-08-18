@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import ServiceSelect from '../ServiceSelect/ServiceSelect';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
-import {API_BASE_URL} from "../../../utils/api.js";
+import { API_BASE_URL } from '../../../utils/api.js';
+
 export default function QuickBooking() {
     const navigate = useNavigate();
-     const { showToast } = useToast();
+    const { showToast } = useToast();
 
     const [services, setServices] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -32,14 +33,28 @@ export default function QuickBooking() {
 
     const getCustomerId = () => {
         const user = localStorage.getItem('user');
+
         if (!user) return null;
-        return JSON.parse(user).id_user;
+
+        try {
+            return JSON.parse(user).id_user;
+        } catch (error) {
+            console.error('User data không hợp lệ:', error);
+            return null;
+        }
     };
 
     const getCustomerName = () => {
         const user = localStorage.getItem('user');
+
         if (!user) return null;
-        return JSON.parse(user).full_name;
+
+        try {
+            return JSON.parse(user).full_name;
+        } catch (error) {
+            console.error('User data không hợp lệ:', error);
+            return null;
+        }
     };
 
     const handleChange = (e) => {
@@ -55,7 +70,14 @@ export default function QuickBooking() {
         const nameCustomer = getCustomerName();
 
         if (!token || !idCustomer) {
-            navigate('/login', { state: { from: '/' } });
+            showToast('Vui lòng đăng nhập để đặt lịch!', 'warning');
+
+            navigate('/login', {
+                state: {
+                    from: '/',
+                },
+            });
+
             return;
         }
 
@@ -70,18 +92,18 @@ export default function QuickBooking() {
             name_customer: nameCustomer,
             location: form.location,
             description: form.description,
+
             scheduled_date: form.scheduled_date.split('-').reverse().join('-'),
+
             scheduled_time: `${form.scheduled_time}:00`,
         };
 
-        //CHUYỂN SANG TRANG REQUEST
         navigate('/request', {
             state: {
                 formData,
             },
         });
     };
-
 
     return (
         <section className="py-24 bg-gray-50" id="quick-booking">
@@ -94,11 +116,15 @@ export default function QuickBooking() {
                         <ServiceSelect
                             services={services}
                             selectedService={form.id_service}
-                            setSelectedService={(value) => setForm({ ...form, id_service: value })}
+                            setSelectedService={(value) =>
+                                setForm({
+                                    ...form,
+                                    id_service: value,
+                                })
+                            }
                         />
 
-                        {/* Ngày */}
-                        {/* Input hiển thị */}
+                        {/* Ngày hiển thị */}
                         <input
                             type="text"
                             readOnly
@@ -118,10 +144,10 @@ export default function QuickBooking() {
                                 }
                             }}
                             className="w-full p-4 rounded-xl 
-               border border-gray-300 
-               focus:border-orange-500 
-               focus:ring-2 focus:ring-orange-300 
-               outline-none transition cursor-pointer"
+                            border border-gray-300 
+                            focus:border-orange-500 
+                            focus:ring-2 focus:ring-orange-300 
+                            outline-none transition cursor-pointer"
                         />
 
                         {/* Input date thật */}
@@ -130,15 +156,13 @@ export default function QuickBooking() {
                             name="scheduled_date"
                             value={form.scheduled_date || ''}
                             onChange={(e) => {
-                                const selectedDate = e.target.value;
-
                                 setForm((prev) => ({
                                     ...prev,
-                                    scheduled_date: selectedDate,
+                                    scheduled_date: e.target.value,
                                 }));
                             }}
                             className="absolute opacity-0 
-               w-0 h-0 pointer-events-none"
+                            w-0 h-0 pointer-events-none"
                         />
 
                         {/* Giờ */}
@@ -170,6 +194,7 @@ export default function QuickBooking() {
                         />
                     </div>
 
+                    {/* Button */}
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
@@ -185,11 +210,12 @@ export default function QuickBooking() {
                 </div>
             </div>
 
-            {/* 🔥 POPUP LOADING */}
+            {/* Loading */}
             {loading && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
                     <div className="bg-white p-8 rounded-2xl shadow-xl flex flex-col items-center gap-4">
                         <div className="w-14 h-14 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+
                         <span className="text-gray-700 font-medium">Đang xử lý, vui lòng chờ...</span>
                     </div>
                 </div>

@@ -92,9 +92,9 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
                                     )}
 
                                     <div>
-                                        <p className="font-semibold">{customer.full_name}</p>
-                                        <p className="text-sm text-gray-600">📞 {customer.phone_number}</p>
-                                        <p className="text-sm text-gray-500">{customer.address}</p>
+                                        <p className="font-semibold">Họ tên: {customer.full_name}</p>
+                                        <p className="text-sm text-gray-600">Số điện thoại: {customer.phone_number}</p>
+                                        <p className="text-sm text-gray-500">Địa chỉ: {customer.address}</p>
                                     </div>
                                 </div>
                             </div>
@@ -115,8 +115,8 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
                                     )}
 
                                     <div>
-                                        <p className="font-semibold">{technician.full_name}</p>
-                                        <p className="text-sm text-gray-600"> {technician.phone_number}</p>
+                                        <p className="font-semibold">Họ tên: {technician.full_name}</p>
+                                        <p className="text-sm text-gray-600">Số điện thoại: {technician.phone_number}</p>
                                         <p className="text-sm text-gray-500">
                                             Kinh nghiệm: {technician.experience_year} năm
                                         </p>
