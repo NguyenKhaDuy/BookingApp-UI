@@ -17,6 +17,7 @@ import EmailManager from '../../../Components/Technician/EmailManager/EmailManag
 import PasswordManager from '../../../Components/Technician/PasswordManager/PasswordManager';
 import ServiceManager from '../../../Components/Technician/ServiceManager/ServiceManager';
 import { API_BASE_URL } from '../../../utils/api';
+import { Bell, Clock, X, Check } from 'lucide-react';
 export default function TechnicianHome({ active }) {
     const navigate = useNavigate();
     const { showToast } = useToast();
@@ -206,25 +207,115 @@ export default function TechnicianHome({ active }) {
         <>
             {/*  POPUP NOTIFICATION  */}
             {open && notification && (
-                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-                    <div className="bg-white w-[90%] max-w-md rounded-xl p-5 shadow-xl animate-fadeIn">
-                        <h2 className="text-lg font-semibold mb-2">🔔 {notification.title}</h2>
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4">
+                    <div
+                        className="
+                bg-white w-full max-w-md
+                rounded-2xl shadow-2xl
+                overflow-hidden
+                animate-fadeIn
+            "
+                    >
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-6 py-5 border-b">
+                            <div className="flex items-center gap-3">
+                                <div className="w-11 h-11 rounded-full bg-orange-100 flex items-center justify-center">
+                                    <Bell className="w-5 h-5 text-orange-500" />
+                                </div>
 
-                        <p className="text-gray-600 mb-3">{notification.body}</p>
+                                <div>
+                                    <h2 className="text-lg font-bold text-gray-900">Yêu cầu đặt lịch</h2>
 
-                        <p className="text-sm text-red-500 mb-4">Tự đóng sau {countdown}s</p>
+                                    <p className="text-xs text-gray-400 mt-0.5">Thông báo mới</p>
+                                </div>
+                            </div>
 
-                        <div className="flex justify-end gap-3">
-                            <button onClick={handleReject} className="px-4 py-2 border rounded-lg hover:bg-gray-100">
-                                Từ chối
-                            </button>
-
+                            {/* Close */}
                             <button
-                                onClick={handleAccept}
-                                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                                onClick={handleReject}
+                                className="
+                        w-9 h-9 rounded-full
+                        flex items-center justify-center
+                        text-gray-400
+                        hover:bg-gray-100
+                        hover:text-gray-600
+                        transition
+                    "
                             >
-                                Chấp nhận
+                                <X className="w-5 h-5" />
                             </button>
+                        </div>
+
+                        {/* Content */}
+                        <div className="px-6 py-6">
+                            <h3 className="text-base font-semibold text-gray-900 mb-2">{notification.title}</h3>
+
+                            <p className="text-gray-600 text-sm leading-relaxed">{notification.body}</p>
+
+                            {/* Countdown */}
+                            <div className="mt-5 flex items-center justify-center">
+                                <div
+                                    className="
+                            inline-flex items-center gap-2
+                            px-4 py-2
+                            rounded-full
+                            bg-red-50
+                            text-red-500
+                            text-sm font-medium
+                        "
+                                >
+                                    <Clock className="w-4 h-4" />
+
+                                    <span>
+                                        Tự đóng sau <strong>{countdown}s</strong>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Footer */}
+                        <div className="px-6 py-5 bg-gray-50 border-t">
+                            <div className="flex gap-3">
+                                {/* Reject */}
+                                <button
+                                    onClick={handleReject}
+                                    className="
+                            flex-1
+                            flex items-center justify-center gap-2
+                            px-4 py-3
+                            rounded-xl
+                            border border-gray-300
+                            bg-white
+                            text-gray-700
+                            font-semibold
+                            hover:bg-gray-100
+                            transition
+                        "
+                                >
+                                    <X className="w-4 h-4" />
+                                    Từ chối
+                                </button>
+
+                                {/* Accept */}
+                                <button
+                                    onClick={handleAccept}
+                                    className="
+                            flex-1
+                            flex items-center justify-center gap-2
+                            px-4 py-3
+                            rounded-xl
+                            bg-green-600
+                            text-white
+                            font-semibold
+                            hover:bg-green-700
+                            shadow-sm
+                            transition
+                        "
+                                >
+                                    <Check className="w-4 h-4" />
+                                    Chấp nhận
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
