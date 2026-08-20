@@ -189,7 +189,7 @@ export default function NotificationTypeManager() {
                                     <td className="p-3 flex justify-center gap-2">
                                         <button
                                             onClick={() => openEdit(item)}
-                                            className="p-2 rounded-md hover:bg-orange-50"
+                                            className="p-2 rounded-md text-orange-600 hover:bg-orange-50"
                                         >
                                             <Edit3 size={18} />
                                         </button>

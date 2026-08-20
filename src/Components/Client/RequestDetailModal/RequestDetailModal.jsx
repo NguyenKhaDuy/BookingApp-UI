@@ -38,6 +38,8 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
     const technician = data?.technicicanDTO; 
     const images = data?.image_request || []; 
 
+    console.log(data)
+
     return (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div className="bg-white w-[95%] md:w-[650px] max-h-[90vh] overflow-y-auto rounded-xl shadow-xl p-5 relative">
@@ -129,7 +131,7 @@ export default function RequestDetailModal({ open, requestId, onClose }) {
                         <div>
                             <p className="font-medium">Thời gian:</p>
                             <p className="text-gray-700">
-                                {formatScheduleDateTime(data.scheduled_date, data.scheduled_time)}
+                                {data.scheduled_date} - {data.scheduled_time}
                             </p>
                         </div>
 

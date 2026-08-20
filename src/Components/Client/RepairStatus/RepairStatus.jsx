@@ -273,7 +273,7 @@ export default function RepairStatusPage() {
                                     <CalendarDays size={16} className="text-gray-400 shrink-0" />
 
                                     <p className="text-sm text-gray-400">
-                                        {formatScheduleDateTime(item.scheduled_date, item.scheduled_time)}
+                                        {item.scheduled_date} - {item.scheduled_time}
                                     </p>
                                 </div>
 

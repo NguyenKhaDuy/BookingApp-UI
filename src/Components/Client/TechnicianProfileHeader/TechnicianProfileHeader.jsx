@@ -69,7 +69,7 @@ export default function TechnicianProfileHeader({ tech }) {
                     onClick={handleBooking}
                     disabled={!isOnline}
                     className={`px-5 py-2 rounded-xl shadow
-        ${isOnline ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+        ${isOnline ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
     `}
                 >
                     Đặt lịch

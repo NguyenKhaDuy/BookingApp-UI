@@ -160,7 +160,7 @@ export default function SkillManager() {
                                         <td className="px-4 py-2 flex justify-center gap-3">
                                             <button
                                                 onClick={() => openEdit(item)}
-                                                className="p-2 rounded-md hover:bg-orange-50"
+                                                className="p-2 rounded-md text-orange-600 hover:bg-orange-50"
                                             >
                                                 <Edit3 className="w-4 h-4" />
                                             </button>

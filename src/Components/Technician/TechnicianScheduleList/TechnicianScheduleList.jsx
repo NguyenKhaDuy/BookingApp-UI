@@ -193,7 +193,7 @@ export default function TechnicianScheduleList() {
                             <div className="flex gap-2 justify-end">
                                 <button
                                     onClick={() => openEditModal(item)}
-                                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
+                                    className="p-2 text-orange-600 hover:bg-orange-50 rounded-lg"
                                 >
                                     <Edit3 size={18} />
                                 </button>

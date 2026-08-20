@@ -7,22 +7,22 @@ export default function WhyChooseUs() {
         {
             title: 'Kỹ thuật viên chuyên nghiệp',
             desc: 'Được đào tạo bài bản – tay nghề cao – giàu kinh nghiệm thực tế.',
-            icon: <Users size={42} className="text-blue-600" />,
+            icon: <Users size={42} className="text-orange-600" />,
         },
         {
             title: 'Uy tín & minh bạch',
             desc: 'Báo giá rõ ràng – không phát sinh – đảm bảo hài lòng 100%.',
-            icon: <ShieldCheck size={42} className="text-blue-600" />,
+            icon: <ShieldCheck size={42} className="text-orange-600" />,
         },
         {
             title: 'Nhanh chóng trong 30 phút',
             desc: 'Tiếp nhận yêu cầu và điều phối kỹ thuật viên nhanh nhất.',
-            icon: <Timer size={42} className="text-blue-600" />,
+            icon: <Timer size={42} className="text-orange-600" />,
         },
         {
             title: 'Bảo hành dài hạn',
             desc: 'Dịch vụ kèm bảo hành rõ ràng – hỗ trợ tận tâm sau sửa chữa.',
-            icon: <BadgeCheck size={42} className="text-blue-600" />,
+            icon: <BadgeCheck size={42} className="text-orange-600" />,
         },
     ];
 

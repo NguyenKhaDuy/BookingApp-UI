@@ -94,7 +94,9 @@ export default function FeaturedTechnicians() {
                                 />
 
                                 {/* Name */}
-                                <h3 className="text-xl font-bold text-gray-900">{tech.full_name}</h3>
+                                <h3 className="text-xl font-bold text-gray-900 truncate w-full" title={tech.full_name}>
+                                    {tech.full_name}
+                                </h3>
 
                                 {/* Stars */}
                                 {/* Stars */}
@@ -119,7 +121,7 @@ export default function FeaturedTechnicians() {
                                 <button
                                     onClick={() => navigate(`/technicians/techniciandetail/${tech.id_user}`)}
                                     className="mt-6 px-4 py-2 rounded-xl
-             bg-blue-600 text-white font-semibold"
+             bg-orange-600 text-white font-semibold"
                                 >
                                     Xem hồ sơ
                                 </button>

@@ -171,7 +171,7 @@ export default function ManageLevel() {
                                     <td className="px-6 py-3 flex items-center justify-center gap-3">
                                         <button
                                             onClick={() => handleEdit(lv)}
-                                            className="p-1.5 hover:bg-blue-50 text-black-600 rounded-full transition"
+                                            className="p-1.5 hover:bg-blue-50 text-orange-600 rounded-full transition"
                                         >
                                             <Edit3 className="w-4 h-4" />
                                         </button>
