@@ -19,8 +19,6 @@ export const ToastProvider = ({ children }) => {
     return (
         <ToastContext.Provider value={{ showToast }}>
             {children}
-
-            {/* TOAST UI */}
             {toast && (
                 <div
                     className={`
