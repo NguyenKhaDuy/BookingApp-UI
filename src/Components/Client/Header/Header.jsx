@@ -53,20 +53,34 @@ export default function HeaderBooking() {
                     }))
                     .sort((a, b) => {
                         const parseDate = (value) => {
-                            // Backend trả array
-                            if (Array.isArray(value)) {
-                                return new Date(
-                                    value[0],
-                                    value[1] - 1,
-                                    value[2],
-                                    value[3] || 0,
-                                    value[4] || 0,
-                                    value[5] || 0,
-                                );
+                            if (!value) return new Date(0);
+
+                            // Backend trả dạng: dd-MM-yyyy HH:mm:ss
+                            if (typeof value === 'string') {
+                                const match = value.match(/^(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{2}):(\d{2}):(\d{2}))?$/);
+
+                                if (match) {
+                                    const [, day, month, year, hour = 0, minute = 0, second = 0] = match;
+
+                                    return new Date(
+                                        Number(year),
+                                        Number(month) - 1,
+                                        Number(day),
+                                        Number(hour),
+                                        Number(minute),
+                                        Number(second),
+                                    );
+                                }
+
+                                // Trường hợp backend trả ISO
+                                const date = new Date(value);
+
+                                if (!isNaN(date.getTime())) {
+                                    return date;
+                                }
                             }
 
-                            // Backend trả string ISO
-                            return new Date(value);
+                            return new Date(0);
                         };
 
                         return parseDate(b.createdAt) - parseDate(a.createdAt);

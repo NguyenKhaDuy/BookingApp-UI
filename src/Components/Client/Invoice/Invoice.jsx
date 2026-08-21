@@ -205,14 +205,14 @@ export default function Invoice() {
 
                                     {/* Thợ */}
                                     <div className="flex items-center gap-2 mt-1">
-                                        <UserRound size={16} className="text-gray-500" />
+                                        <UserRound size={16} className="text-orange-500" />
 
                                         <p className="text-sm text-gray-500">Thợ: {bill.name_tech}</p>
                                     </div>
 
                                     {/* Ngày thanh toán */}
                                     <div className="flex items-center gap-2 mt-1">
-                                        <CalendarDays size={16} className="text-gray-500" />
+                                        <CalendarDays size={16} className="text-orange-500" />
 
                                         <p className="text-sm text-gray-500">
                                             Ngày thanh toán: {bill.paid_at || 'Chưa thanh toán'}

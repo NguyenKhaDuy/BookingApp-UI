@@ -53,6 +53,7 @@ export default function RepairRequest() {
     const STATUS = {
         COMPLETED: 'COMPLETED',
         RECEIVING: 'RECEIVING',
+        INCOMPLETE: 'INCOMPLETE',
         CANCEL: 'CANCEL',
         RECEIVED: 'RECEIVED',
     };
@@ -103,7 +104,6 @@ export default function RepairRequest() {
             <h1 className="text-2xl font-semibold mb-4">Đơn hàng</h1>
 
             <div className="bg-white p-4 rounded-xl shadow">
-
                 <div className="hidden md:block">
                     <table className="w-full">
                         <thead>
@@ -149,7 +149,8 @@ export default function RepairRequest() {
                                             <button
                                                 disabled={
                                                     o.status_code !== STATUS.RECEIVED &&
-                                                    o.status_code !== STATUS.RECEIVING
+                                                    o.status_code !== STATUS.RECEIVING &&
+                                                    o.status_code !== STATUS.INCOMPLETE
                                                 }
                                                 onClick={() => {
                                                     setSelectedOrder(o);
@@ -157,7 +158,8 @@ export default function RepairRequest() {
                                                 }}
                                                 className={`flex items-center gap-2 px-3 h-9 rounded-lg text-sm ${
                                                     o.status_code === STATUS.RECEIVED ||
-                                                    o.status_code === STATUS.RECEIVING
+                                                    o.status_code === STATUS.RECEIVING ||
+                                                    o.status_code === STATUS.INCOMPLETE
                                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                                 }`}
@@ -279,6 +281,12 @@ export default function RepairRequest() {
                                 <>
                                     <option value="7">Đang tiếp nhận</option>
                                     <option value="14">Hủy yêu cầu</option>
+                                </>
+                            )}
+
+                            {selectedOrder.status_code === STATUS.INCOMPLETE && (
+                                <>
+                                    <option value="7">Đang tiếp nhận</option>
                                 </>
                             )}
 

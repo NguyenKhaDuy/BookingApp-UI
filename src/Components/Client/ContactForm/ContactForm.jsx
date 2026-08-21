@@ -8,19 +8,27 @@ export default function ContactForm() {
             <form className="space-y-5">
                 <div>
                     <label className="font-medium text-gray-700">Họ và tên</label>
-                    <input type="text" className="w-full mt-1 p-3 border rounded-xl" placeholder="Nhập họ và tên" />
+                    <input
+                        type="text"
+                        className="w-full mt-1 p-3 border rounded-xl border border-gray-300 outline-orange-500"
+                        placeholder="Nhập họ và tên"
+                    />
                 </div>
 
                 <div>
                     <label className="font-medium text-gray-700">Email</label>
-                    <input type="email" className="w-full mt-1 p-3 border rounded-xl" placeholder="Nhập email" />
+                    <input
+                        type="email"
+                        className="w-full mt-1 p-3 border rounded-xl border border-gray-300 outline-orange-500"
+                        placeholder="Nhập email"
+                    />
                 </div>
 
                 <div>
                     <label className="font-medium text-gray-700">Nội dung</label>
                     <textarea
                         rows="4"
-                        className="w-full mt-1 p-3 border rounded-xl"
+                        className="w-full mt-1 p-3 border rounded-xl border border-gray-300 outline-orange-500"
                         placeholder="Nhập nội dung cần hỗ trợ..."
                     ></textarea>
                 </div>

@@ -13,7 +13,7 @@ export const ToastProvider = ({ children }) => {
 
         setTimeout(() => {
             setToast(null);
-        }, 5000);
+        }, 7000);
     }, []);
 
     return (

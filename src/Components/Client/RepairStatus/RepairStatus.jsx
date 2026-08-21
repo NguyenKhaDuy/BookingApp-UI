@@ -7,7 +7,6 @@ import { addWebSocketListener } from '../../../utils/stompClient';
 import { useToast } from '../../../Context/ToastContext';
 import getCookie from '../../../utils/getToken';
 import LoadingOverlay from '../../../Layouts/LoadingOverLay/LoadingOverlay';
-import { formatScheduleDateTime } from '../../../utils/formatDate.js';
 import { API_BASE_URL } from '../../../utils/api.js';
 import { Wrench, FileText, MapPin, CalendarDays, UserRound } from 'lucide-react';
 
@@ -148,6 +147,11 @@ export default function RepairStatusPage() {
             icon: <CheckCircle size={22} className="text-blue-500" />,
         },
         {
+            key: 'INCOMPLETE',
+            label: 'Chưa hoàn thành',
+            icon: <Clock size={22} className="text-yellow-500" />,
+        },
+        {
             key: 'COMPLETED',
             label: 'Hoàn thành',
             icon: <CheckCircle size={22} className="text-orange-500" />,
@@ -256,21 +260,21 @@ export default function RepairStatusPage() {
 
                                 {/* Mô tả */}
                                 <div className="flex items-start gap-2">
-                                    <FileText size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                                    <FileText size={16} className="text-orange-500 mt-0.5 shrink-0" />
 
                                     <p className="text-sm text-gray-500">{item.description}</p>
                                 </div>
 
                                 {/* Địa điểm */}
                                 <div className="flex items-center gap-2">
-                                    <MapPin size={16} className="text-gray-400 shrink-0" />
+                                    <MapPin size={16} className="text-orange-500 shrink-0" />
 
                                     <p className="text-sm text-gray-400">{item.location}</p>
                                 </div>
 
                                 {/* Ngày giờ */}
                                 <div className="flex items-center gap-2">
-                                    <CalendarDays size={16} className="text-gray-400 shrink-0" />
+                                    <CalendarDays size={16} className="text-orange-500 shrink-0" />
 
                                     <p className="text-sm text-gray-400">
                                         {item.scheduled_date} - {item.scheduled_time}
