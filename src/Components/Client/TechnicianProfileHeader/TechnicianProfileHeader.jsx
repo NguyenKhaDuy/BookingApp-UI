@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import avatar from '../../../assets/default-avatar.jpg';
 import getCookie from '../../../utils/getToken';
-import { Star } from 'lucide-react';
+import { Star, X } from 'lucide-react';
 
 export default function TechnicianProfileHeader({ tech }) {
     const maxStars = 5;
@@ -9,9 +10,13 @@ export default function TechnicianProfileHeader({ tech }) {
     const navigate = useNavigate();
     const numberRating = tech.ratingDTOS?.length ?? 0;
 
-    const handleBooking = () => {
-        const token = getCookie("token");
+    // State mở / đóng ảnh lớn
+    const [showAvatar, setShowAvatar] = useState(false);
 
+    const avatarSrc = tech.avatarBase64 ? `data:image/jpeg;base64,${tech.avatarBase64}` : avatar;
+
+    const handleBooking = () => {
+        const token = getCookie('token');
         const user = localStorage.getItem('user');
 
         if (!token || !user) {
@@ -25,60 +30,91 @@ export default function TechnicianProfileHeader({ tech }) {
 
         navigate(`/booking/${tech.id_user}`);
     };
+
     return (
-        <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col items-center text-center relative">
-            {/* Status badge */}
-            <span
-                className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold
-          ${isOnline ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}
-        `}
-            >
-                {isOnline ? 'Đang hoạt động' : 'Ngoại tuyến'}
-            </span>
-
-            {/* Avatar */}
-            <img
-                src={tech.avatarBase64 ? `data:image/jpeg;base64,${tech.avatarBase64}` : avatar}
-                alt={tech.full_name || 'Technician'}
-                className="w-28 h-28 rounded-full object-cover shadow-md"
-            />
-
-            <h1 className="text-2xl font-bold mt-4">{tech.full_name || '—'}</h1>
-
-            {/* Rating */}
-            <div className="flex items-center gap-1 mt-2">
-                {[...Array(maxStars)].map((_, index) => (
-                    <Star
-                        key={index}
-                        className={`w-5 h-5 ${
-                            index < Math.round(tech?.total_star ?? 0)
-                                ? 'text-yellow-500 fill-yellow-500'
-                                : 'text-gray-300'
-                        }`}
-                    />
-                ))}
-
-                <span className="ml-1 font-semibold">{(tech?.total_star ?? 0).toFixed(1)}</span>
-
-                <span className="text-gray-400 text-sm">({numberRating} đánh giá)</span>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3 mt-4">
-                <button
-                    onClick={handleBooking}
-                    disabled={!isOnline}
-                    className={`px-5 py-2 rounded-xl shadow
-        ${isOnline ? 'bg-orange-600 text-white hover:bg-orange-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
-    `}
+        <>
+            <div className="bg-white rounded-3xl p-6 shadow-md flex flex-col items-center text-center relative">
+                {/* Status */}
+                <span
+                    className={`absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-semibold
+                    ${isOnline ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'}`}
                 >
-                    Đặt lịch
-                </button>
+                    {isOnline ? 'Đang hoạt động' : 'Ngoại tuyến'}
+                </span>
 
-                <button className="px-5 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300">
-                    Nhắn tin
-                </button>
+                {/* Avatar */}
+                <img
+                    src={avatarSrc}
+                    alt={tech.full_name || 'Technician'}
+                    onClick={() => setShowAvatar(true)}
+                    className="w-28 h-28 rounded-full object-cover shadow-md cursor-pointer hover:scale-105 transition duration-300"
+                />
+
+                <h1 className="text-2xl font-bold mt-4">{tech.full_name || '—'}</h1>
+
+                {/* Rating */}
+                <div className="flex items-center gap-1 mt-2">
+                    {[...Array(maxStars)].map((_, index) => (
+                        <Star
+                            key={index}
+                            className={`w-5 h-5 ${
+                                index < Math.round(tech?.total_star ?? 0)
+                                    ? 'text-yellow-500 fill-yellow-500'
+                                    : 'text-gray-300'
+                            }`}
+                        />
+                    ))}
+
+                    <span className="ml-1 font-semibold">{(tech?.total_star ?? 0).toFixed(1)}</span>
+
+                    <span className="text-gray-400 text-sm">({numberRating} đánh giá)</span>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 mt-4">
+                    <button
+                        onClick={handleBooking}
+                        disabled={!isOnline}
+                        className={`px-5 py-2 rounded-xl shadow
+                        ${
+                            isOnline
+                                ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                        }`}
+                    >
+                        Đặt lịch
+                    </button>
+
+                    <button className="px-5 py-2 bg-gray-200 text-gray-700 rounded-xl shadow hover:bg-gray-300">
+                        Nhắn tin
+                    </button>
+                </div>
             </div>
-        </div>
+
+            {/* Modal ảnh lớn */}
+            {showAvatar && (
+                <div
+                    className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+                    style={{margin: 0}}
+                    onClick={() => setShowAvatar(false)}
+                >
+                    <div className="relative max-w-2xl w-full flex justify-center" onClick={(e) => e.stopPropagation()}>
+                        {/* Nút đóng */}
+                        <button
+                            onClick={() => setShowAvatar(false)}
+                            className="absolute -top-12 right-0 text-white hover:text-gray-300 transition"
+                        >
+                            <X size={32} />
+                        </button>
+
+                        <img
+                            src={avatarSrc}
+                            alt={tech.full_name}
+                            className="max-h-[85vh] max-w-full rounded-2xl object-contain shadow-2xl"
+                        />
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

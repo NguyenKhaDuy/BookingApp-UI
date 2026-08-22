@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useContext } from 'react';
 import { UserContext } from '../../../Context/UserContext';
 import { API_BASE_URL } from '../../../utils/api';
+import Cropper from 'react-easy-crop';
 
 export default function AccountPage() {
     const [loading, setLoading] = useState(false);
@@ -22,6 +23,13 @@ export default function AccountPage() {
     const [bankList, setBankList] = useState([]);
     const [loadingBank, setLoadingBank] = useState(false);
     const [payAmount, setPayAmount] = useState('');
+
+    // Crop avatar
+    const [cropImage, setCropImage] = useState(null);
+    const [crop, setCrop] = useState({ x: 0, y: 0 });
+    const [zoom, setZoom] = useState(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+    const [showCropModal, setShowCropModal] = useState(false);
 
     const token = getCookie('token');
 
@@ -87,44 +95,185 @@ export default function AccountPage() {
         fetchBanks();
     }, [showBankModal, showToast]);
 
-    const handleAvatarChange = async (e) => {
-        const file = e.target.files[0];
+    // const handleAvatarChange = async (e) => {
+    //     const file = e.target.files[0];
+    //     if (!file) return;
+
+    //     const reader = new FileReader();
+    //     reader.onloadend = async () => {
+    //         const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+    //         setProfile((prev) => ({ ...prev, avatarBase64: base64String }));
+
+    //         try {
+    //             setLoading(true);
+
+    //             const formData = new FormData();
+    //             formData.append('id_user', id_user);
+    //             formData.append('avatar', file);
+
+    //             await axios.put(`${API_BASE_URL}/technician/profile/avatar/`, formData, {
+    //                 headers: {
+    //                     Authorization: `Bearer ${token}`,
+    //                 },
+    //             });
+
+    //             showToast('Cập nhật avatar thành công!', 'success');
+    //             await fetchProfile();
+    //             setUser((prev) => ({ ...prev, avatarBase64: base64String }));
+    //             localStorage.setItem(
+    //                 'user',
+    //                 JSON.stringify({ ...JSON.parse(localStorage.getItem('user')), avatarBase64: base64String }),
+    //             );
+    //         } catch (err) {
+    //             showToast('Lỗi cập nhật avatar: ' + (err.response?.data?.message || err.message), 'error');
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+
+    //     reader.readAsDataURL(file);
+    // };
+
+    const handleAvatarChange = (e) => {
+        const file = e.target.files?.[0];
         if (!file) return;
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+        // Chỉ cho phép chọn ảnh
+        if (!file.type.startsWith('image/')) {
+            showToast('Vui lòng chọn file ảnh!', 'error');
+            return;
+        }
 
-            setProfile((prev) => ({ ...prev, avatarBase64: base64String }));
+        const imageUrl = URL.createObjectURL(file);
 
-            try {
-                setLoading(true);
+        setCropImage(imageUrl);
+        setCrop({ x: 0, y: 0 });
+        setZoom(1);
+        setShowCropModal(true);
 
-                const formData = new FormData();
-                formData.append('id_user', id_user);
-                formData.append('avatar', file);
+        // Reset input để có thể chọn lại cùng một file
+        e.target.value = '';
+    };
 
-                await axios.put(`${API_BASE_URL}/technician/profile/avatar/`, formData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
+    const handleCropComplete = (croppedArea, croppedAreaPixels) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    };
 
-                showToast('Cập nhật avatar thành công!', 'success');
-                await fetchProfile();
-                setUser((prev) => ({ ...prev, avatarBase64: base64String }));
-                localStorage.setItem(
-                    'user',
-                    JSON.stringify({ ...JSON.parse(localStorage.getItem('user')), avatarBase64: base64String }),
-                );
-            } catch (err) {
-                showToast('Lỗi cập nhật avatar: ' + (err.response?.data?.message || err.message), 'error');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const getCroppedImg = async (imageSrc, pixelCrop) => {
+        const image = new Image();
 
-        reader.readAsDataURL(file);
+        image.src = imageSrc;
+
+        await new Promise((resolve, reject) => {
+            image.onload = resolve;
+            image.onerror = reject;
+        });
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = pixelCrop.width;
+        canvas.height = pixelCrop.height;
+
+        ctx.drawImage(
+            image,
+            pixelCrop.x,
+            pixelCrop.y,
+            pixelCrop.width,
+            pixelCrop.height,
+            0,
+            0,
+            pixelCrop.width,
+            pixelCrop.height,
+        );
+
+        return new Promise((resolve, reject) => {
+            canvas.toBlob(
+                (blob) => {
+                    if (!blob) {
+                        reject(new Error('Không thể tạo ảnh'));
+                        return;
+                    }
+
+                    resolve(blob);
+                },
+                'image/jpeg',
+                0.9,
+            );
+        });
+    };
+
+    const handleConfirmCrop = async () => {
+        if (!cropImage || !croppedAreaPixels) return;
+
+        try {
+            setShowCropModal(false);
+            setLoading(true);
+
+            const croppedBlob = await getCroppedImg(cropImage, croppedAreaPixels);
+
+            const croppedFile = new File([croppedBlob], 'avatar.jpg', {
+                type: 'image/jpeg',
+            });
+
+            // Preview ảnh sau khi crop
+            const reader = new FileReader();
+
+            reader.onloadend = async () => {
+                const base64String = reader.result.replace('data:', '').replace(/^.+,/, '');
+
+                setProfile((prev) => ({
+                    ...prev,
+                    avatarBase64: base64String,
+                }));
+
+                try {
+                    const formData = new FormData();
+
+                    formData.append('id_user', id_user);
+                    formData.append('avatar', croppedFile);
+
+                    await axios.put(`${API_BASE_URL}/technician/profile/avatar/`, formData, {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+
+                    showToast('Cập nhật avatar thành công!', 'success');
+
+                    await fetchProfile();
+
+                    setUser((prev) => ({
+                        ...prev,
+                        avatarBase64: base64String,
+                    }));
+
+                    localStorage.setItem(
+                        'user',
+                        JSON.stringify({
+                            ...JSON.parse(localStorage.getItem('user')),
+                            avatarBase64: base64String,
+                        }),
+                    );
+                } catch (err) {
+                    showToast('Lỗi cập nhật avatar: ' + (err.response?.data?.message || err.message), 'error');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            reader.readAsDataURL(croppedBlob);
+        } catch (error) {
+            console.error('Crop avatar error:', error);
+
+            setLoading(false);
+
+            showToast('Không thể xử lý ảnh!', 'error');
+        } finally {
+            URL.revokeObjectURL(cropImage);
+            setCropImage(null);
+        }
     };
 
     const handleChange = (field, value) => {
@@ -439,6 +588,66 @@ export default function AccountPage() {
             )}
 
             <LoadingOverlay show={loading} />
+
+            {showCropModal && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-xl p-6 w-full max-w-lg">
+                        <h2 className="text-xl font-bold text-gray-800 mb-4 text-center">Cắt ảnh đại diện</h2>
+
+                        {/* Khung crop */}
+                        <div className="relative w-full h-[400px] bg-black rounded-xl overflow-hidden">
+                            <Cropper
+                                image={cropImage}
+                                crop={crop}
+                                zoom={zoom}
+                                aspect={1}
+                                cropShape="rect"
+                                showGrid={true}
+                                onCropChange={setCrop}
+                                onZoomChange={setZoom}
+                                onCropComplete={handleCropComplete}
+                                restrictPosition={false}
+                            />
+                        </div>
+
+                        {/* Zoom */}
+                        <div className="mt-5">
+                            <input
+                                type="range"
+                                min={1}
+                                max={3}
+                                step={0.1}
+                                value={zoom}
+                                onChange={(e) => setZoom(Number(e.target.value))}
+                                className="w-full accent-orange-500 cursor-pointer"
+                            />
+                        </div>
+
+                        {/* Buttons */}
+                        <div className="flex justify-end gap-3 mt-5">
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    URL.revokeObjectURL(cropImage);
+                                    setCropImage(null);
+                                    setShowCropModal(false);
+                                }}
+                                className="px-5 py-2 rounded-lg bg-gray-300 hover:bg-gray-400"
+                            >
+                                Hủy
+                            </button>
+
+                            <button
+                                type="button"
+                                onClick={handleConfirmCrop}
+                                className="px-5 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600"
+                            >
+                                Xác nhận
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
