@@ -271,7 +271,7 @@ export default function RepairRequest() {
                         <h2 className="font-semibold text-lg mb-3 text-center">Cập nhật trạng thái yêu cầu</h2>
 
                         <select
-                            className="w-full border p-2 rounded mb-4"
+                            className="w-full border-gray-300 outline-orange-500 border p-2 rounded mb-4"
                             onChange={(e) => setNewStatus(Number(e.target.value))}
                             defaultValue=""
                         >

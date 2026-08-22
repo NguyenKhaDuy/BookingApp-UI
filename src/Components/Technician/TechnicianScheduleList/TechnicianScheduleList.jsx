@@ -277,7 +277,7 @@ export default function TechnicianScheduleList() {
                                                 dateInput?.click();
                                             }
                                         }}
-                                        className="w-full border rounded-lg px-3 py-2 cursor-pointer"
+                                        className="w-full border-gray-300 outline-orange-500 mb-4 border rounded-lg px-3 py-2 cursor-pointer"
                                     />
 
                                     {/* Input date thật để chọn ngày */}
@@ -290,7 +290,7 @@ export default function TechnicianScheduleList() {
                                                 date: e.target.value,
                                             })
                                         }
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer"
+                                        className="absolute  right-3 top-1/2 -translate-y-1/2 opacity-0 w-8 h-8 cursor-pointer"
                                     />
                                 </div>
                             </div>
@@ -300,7 +300,7 @@ export default function TechnicianScheduleList() {
                                     <label className="text-sm">Giờ bắt đầu</label>
                                     <input
                                         type="time"
-                                        className="w-full border rounded-lg px-3 py-2"
+                                        className="w-full border-gray-300 outline-orange-500 mb-4 border rounded-lg px-3 py-2"
                                         value={form.start}
                                         onChange={(e) => setForm({ ...form, start: e.target.value })}
                                     />
@@ -310,7 +310,7 @@ export default function TechnicianScheduleList() {
                                     <label className="text-sm">Giờ kết thúc</label>
                                     <input
                                         type="time"
-                                        className="w-full border rounded-lg px-3 py-2"
+                                        className="w-full border-gray-300 outline-orange-500 mb-4 border rounded-lg px-3 py-2"
                                         value={form.end}
                                         onChange={(e) => setForm({ ...form, end: e.target.value })}
                                     />

@@ -7,7 +7,7 @@ export default function ContactInfo() {
 
             <div className="flex items-center gap-4 mb-5">
                 <Phone className="text-orange-500" />
-                <p className="text-gray-700 font-medium">+84 0971349801</p>
+                <p className="text-gray-700 font-medium">0971349801</p>
             </div>
 
             <div className="flex items-center gap-4 mb-5">
